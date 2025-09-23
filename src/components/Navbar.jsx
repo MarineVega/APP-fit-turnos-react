@@ -1,3 +1,4 @@
+import React from 'react'
 import Logo_Fit_Home from "../assets/img/Logo_Fit_Home.png"
 import menu from "../assets/img/menu.png"
 import buscar from "../assets/img/buscar.png"

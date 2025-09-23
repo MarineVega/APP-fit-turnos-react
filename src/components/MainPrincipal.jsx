@@ -1,3 +1,4 @@
+import React from 'react'
 import Logo_Fit from "../assets/img/Logo_Fit.png"
 import icono_pilates from "../assets/img/icono_pilates.png"
 import icono_padel from "../assets/img/icono_padel.png"

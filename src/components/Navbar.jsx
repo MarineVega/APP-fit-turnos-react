@@ -1,4 +1,12 @@
+/*
+import Logo_Fit_Home from "../../public/assets/img/Logo_Fit_Home.png"
+import menu from "../../public/assets/img/menu.png"
+import buscar from "../../public/assets/img/buscar.png"
+import notif from "../../public/assets/img/notif.png"
+*/
 import React from 'react'
+import { Link } from "react-router-dom"
+
 import Logo_Fit_Home from "../assets/img/Logo_Fit_Home.png"
 import menu from "../assets/img/menu.png"
 import buscar from "../assets/img/buscar.png"
@@ -6,19 +14,37 @@ import notif from "../assets/img/notif.png"
 
 function Navbar (){
     return (
-        <>
+        <header className="header">            
             <div className="navbar">
                 {/* Zona izquierda */}
                 <div className="nav-left">
                 
-                    {/* <!-- Logo --> */}
-                    <a href="#" className="logo">
+                    {/* <!-- Logo --> */}      
+                    <Link to="/" className="logo">
                         <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
-                    </a>
+                    </Link>
+
+                    {/* <a href="#" className="logo">
+                        <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
+                    </a> */}
+
+                     {/* <a href="/" className="logo"> */}
+                        {/* usando rutas absolutas */}
+                        {/* <img src="/assets/img/Logo_Fit_Home.png" alt="Logo" />      */}
+                    {/* </a> */}
+                    
+
+
                     {/* <!-- icono hamburguesa SOLO en mobile --> */}
+                     <Link to="/" className="icon">
+                        <img src={menu} alt="Menú" loading="lazy" />
+                    </Link>
+                    
+                    {/* 
                     <a href="#" className="icon" id="btnMenu">
                         <img src={menu} alt="Menú" loading="lazy" />
-                    </a>
+                    </a> */}
+
 
                     {/* <!-- menu visible solo en escritorio --> */}
                     <div className="nav-links desktop-only">
@@ -51,7 +77,7 @@ function Navbar (){
                 </div>
 
             </div>
-        </>
+        </header>
     )
 }
 

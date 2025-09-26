@@ -1,25 +1,26 @@
 import React from 'react'
+import Navbar from './Navbar'
 
 function Header (){
     return (
-        <>
-            <div className="header">
-                {/* <!-- Menú desplegable mobile --> */}
-                <div className="menu-desplegable" id="menuDesplegable">
+       
+        <div className="header">
+            <Navbar></Navbar>
 
-                    <a href="#" id="nombreUsuarioMobile" style={{display: "none"}}></a>
+            {/* <!-- Menú desplegable mobile --> */}
+            <div className="menu-desplegable" id="menuDesplegable">
 
-                    <a href="./pages/cuenta.html" id="menuHamburguesaIniciarSesion">Iniciar Sesión</a>
-                    <a href="./pages/cuenta.html?form=crear" id="menuHamburguesaCrearCuenta">Crear Cuenta</a>
+                <a href="#" id="nombreUsuarioMobile" style={{display: "none"}}></a>
+
+                <a href="./pages/cuenta.html" id="menuHamburguesaIniciarSesion">Iniciar Sesión</a>
+                <a href="./pages/cuenta.html?form=crear" id="menuHamburguesaCrearCuenta">Crear Cuenta</a>
+            
+                <a href="./pages/administrar.html" id="menuHamburguesaAdmin">Administrar</a>        
+                <a href="./pages/turnos.html" id="menuHamburguesaTurnos">Turnos</a>
                 
-                    <a href="./pages/administrar.html" id="menuHamburguesaAdmin">Administrar</a>        
-                    <a href="./pages/turnos.html" id="menuHamburguesaTurnos">Turnos</a>
-                    
-                    <a href="./index.html" id="menuHamburguesaCerrarSesion">Cerrar Sesión</a> 
-                </div> 
-            </div>
-
-        </>
+                <a href="./index.html" id="menuHamburguesaCerrarSesion">Cerrar Sesión</a> 
+            </div> 
+        </div>       
     )
 }
 

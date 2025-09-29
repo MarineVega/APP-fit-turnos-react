@@ -1,72 +1,64 @@
+// src/components/RegisterForm.jsx
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { registerUser } from "../services/api";
 
 export default function RegisterForm({ onSwitch }) {
-  const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmar, setConfirmar] = useState("");
-  const [esAdmin, setEsAdmin] = useState(false);
+  const [password2, setPassword2] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
+    if (!email || !password || !password2)
+      return setError("Completá todos los campos.");
+    if (password !== password2) return setError("Las contraseñas no coinciden.");
 
-    if (!nombre || !email || !password || !confirmar) {
-      setError("Completá todos los campos.");
-      return;
-    }
-    if (/\s/.test(nombre)) {
-      setError("El nombre de usuario no puede contener espacios.");
-      return;
-    }
-    if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
-      return;
-    }
-    if (password !== confirmar) {
-      setError("Las contraseñas no coinciden.");
-      return;
-    }
-
+    setLoading(true);
     try {
-      await registerUser({ nombre, email, password, esAdmin });
-      Swal.fire("¡Operación Exitosa!", "Tu cuenta ha sido creada", "success");
-      onSwitch("login");
+      // Simulación registro
+      Swal.fire({
+        title: "¡Usuario registrado!",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then(() => onSwitch("login"));
     } catch (err) {
-      setError(err.message || "Error al registrar usuario");
+      setError("Error al registrar el usuario");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form className="formCuenta" onSubmit={handleSubmit}>
-      <div>
-        <label>Nombre de Usuario</label>
-        <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-      </div>
-      <div>
-        <label>Email</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      </div>
-      <div>
-        <label>Contraseña</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      </div>
-      <div>
-        <label>Confirmar Contraseña</label>
-        <input type="password" value={confirmar} onChange={(e) => setConfirmar(e.target.value)} />
-      </div>
-      <div>
-        <label>
-          <input type="checkbox" checked={esAdmin} onChange={(e) => setEsAdmin(e.target.checked)} />
-          Crear como administrador
-        </label>
-      </div>
-      <p className="advertencia">{error}</p>
-      <button type="submit">REGISTRARSE</button>
-      <p><a href="#" onClick={() => onSwitch("login")}>Ya tenés cuenta? Iniciar sesión</a></p>
+    <form onSubmit={handleRegister} className="formCuenta">
+      <label>Email</label>
+      <input value={email} onChange={(e) => setEmail(e.target.value)} />
+
+      <label>Contraseña</label>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <label>Repetir Contraseña</label>
+      <input
+        type="password"
+        value={password2}
+        onChange={(e) => setPassword2(e.target.value)}
+      />
+
+      {error && <p className="advertencia">{error}</p>}
+
+      <button type="submit" disabled={loading}>
+        {loading ? "Cargando..." : "Registrar"}
+      </button>
+
+      <p onClick={() => onSwitch("login")}>Volver al login</p>
     </form>
   );
 }

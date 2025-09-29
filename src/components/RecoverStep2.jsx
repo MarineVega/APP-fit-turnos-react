@@ -1,42 +1,24 @@
+// src/components/RecoverStep2.jsx
 import { useState } from "react";
-import Swal from "sweetalert2";
 
 export default function RecoverStep2({ onSwitch }) {
-  const [codigo, setCodigo] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleNext = (e) => {
     e.preventDefault();
-    setError("");
-
-    const codigoGuardado = localStorage.getItem("codigoRecuperacion");
-    if (!codigo) {
-      setError("Ingresá el código de seguridad.");
-      return;
-    }
-    if (codigo !== codigoGuardado) {
-      Swal.fire("Código incorrecto", "Revisá tu correo", "error");
-      return;
-    }
-
+    if (!code) return setError("Ingresá el código recibido");
+    // Simulación verificación
     onSwitch("recover3");
   };
 
-  const reenviarCodigo = () => {
-    const nuevoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
-    localStorage.setItem("codigoRecuperacion", nuevoCodigo);
-    Swal.fire("Código reenviado", "Revisá tu correo nuevamente", "info");
-  };
-
   return (
-    <form className="formCuenta" onSubmit={handleSubmit}>
-      <div>
-        <label>Código de Seguridad</label>
-        <input type="text" value={codigo} onChange={(e) => setCodigo(e.target.value)} />
-      </div>
-      <p className="advertencia">{error}</p>
-      <button type="submit">CONFIRMAR</button>
-      <p><a href="#" onClick={reenviarCodigo}>Reenviar código</a></p>
+    <form onSubmit={handleNext} className="formCuenta">
+      <label>Código</label>
+      <input value={code} onChange={(e) => setCode(e.target.value)} />
+      {error && <p className="advertencia">{error}</p>}
+      <button type="submit">Siguiente</button>
+      <p onClick={() => onSwitch("login")}>Volver al login</p>
     </form>
   );
 }

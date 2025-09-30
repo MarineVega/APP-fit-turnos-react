@@ -2,19 +2,19 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import LoginForm from "../components/LoginForm";
-import RegisterForm from "../components/RegisterForm";
-import RecoverForm from "../components/RecoverForm";
-import RecoverStep2 from "../components/RecoverStep2";
-import RecoverStep3 from "../components/RecoverStep3";
+import RegistrarForm from "../components/RegistrarForm";
+import RecuperarForm from "../components/RecuperarForm";
+import RecuperarStep2 from "../components/RecuperarStep2";
+import RecuperarStep3 from "../components/RecuperarStep3";
 
 export default function Cuenta() {
   const [form, setForm] = useState("login");
   const [searchParams] = useSearchParams();
 
-  // Lee ?form=crear para arrancar en el registro
+  // Arranca en registro si viene ?form=crear
   useEffect(() => {
     if (searchParams.get("form") === "crear") {
-      setForm("register");
+      setForm("registrar");
     }
   }, [searchParams]);
 
@@ -23,12 +23,14 @@ export default function Cuenta() {
   };
 
   return (
-    <div className="cuentaContainer">
-      {form === "login" && <LoginForm onSwitch={handleSwitch} />}
-      {form === "register" && <RegisterForm onSwitch={handleSwitch} />}
-      {form === "recover1" && <RecoverForm onSwitch={handleSwitch} />}
-      {form === "recover2" && <RecoverStep2 onSwitch={handleSwitch} />}
-      {form === "recover3" && <RecoverStep3 onSwitch={handleSwitch} />}
-    </div>
+    <main className="mainCuenta">
+      <section className="seccionCuenta">
+        {form === "login" && <LoginForm onSwitch={handleSwitch} />}
+        {form === "registrar" && <RegistrarForm onSwitch={handleSwitch} />}
+        {form === "recuperar1" && <RecuperarForm onSwitch={handleSwitch} />}
+        {form === "recuperar2" && <RecuperarStep2 onSwitch={handleSwitch} />}
+        {form === "recuperar3" && <RecuperarStep3 onSwitch={handleSwitch} />}
+      </section>
+    </main>
   );
 }

@@ -1,7 +1,4 @@
-// src/components/RecoverStep2.jsx
-import { useState } from "react";
-
-export default function RecoverStep2({ onSwitch }) {
+export default function RecuperarStep2({ onSwitch }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
 
@@ -9,7 +6,7 @@ export default function RecoverStep2({ onSwitch }) {
     e.preventDefault();
     if (!code) return setError("Ingresá el código recibido");
     // Simulación verificación
-    onSwitch("recover3");
+    onSwitch("recuperar3"); // ⚠ corregido
   };
 
   return (

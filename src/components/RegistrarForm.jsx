@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 
-export default function RegisterForm({ onSwitch }) {
+export default function RegistrarForm({ onSwitch }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
@@ -35,6 +35,7 @@ export default function RegisterForm({ onSwitch }) {
 
   return (
     <form onSubmit={handleRegister} className="formCuenta">
+      <div>
       <label>Email</label>
       <input value={email} onChange={(e) => setEmail(e.target.value)} />
 
@@ -59,6 +60,7 @@ export default function RegisterForm({ onSwitch }) {
       </button>
 
       <p onClick={() => onSwitch("login")}>Volver al login</p>
+      </div>
     </form>
   );
 }

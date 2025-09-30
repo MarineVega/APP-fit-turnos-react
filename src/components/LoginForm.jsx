@@ -38,6 +38,7 @@ export default function LoginForm({ onSwitch }) {
 
   return (
     <form onSubmit={handleSubmit} className="formCuenta">
+      <div>
       <label>Email</label>
       <input value={email} onChange={(e) => setEmail(e.target.value)} />
 
@@ -54,8 +55,9 @@ export default function LoginForm({ onSwitch }) {
         {loading ? "Cargando..." : "Ingresar"}
       </button>
 
-      <p onClick={() => onSwitch("register")}>Crear cuenta</p>
-      <p onClick={() => onSwitch("recover1")}>Olvidé mi contraseña</p>
+      <p onClick={() => onSwitch("registrar")}>Crear cuenta</p>
+      <p onClick={() => onSwitch("recuperar1")}>Olvidé mi contraseña</p>
+      </div>
     </form>
   );
 }

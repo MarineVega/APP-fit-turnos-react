@@ -1,8 +1,7 @@
-// src/components/RecoverForm.jsx
 import { useState } from "react";
 import Swal from "sweetalert2";
 
-export default function RecoverForm({ onSwitch }) {
+export default function RecuperarForm({ onSwitch }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,10 +18,12 @@ export default function RecoverForm({ onSwitch }) {
         title: "Código enviado",
         text: "Revisá tu correo",
         icon: "success",
-      }).then(() => onSwitch("recover2"));
+      }).then(() => {
+        setLoading(false);
+        onSwitch("recuperar2");
+      });
     } catch (err) {
       setError("Error al enviar el correo");
-    } finally {
       setLoading(false);
     }
   };
@@ -30,7 +31,11 @@ export default function RecoverForm({ onSwitch }) {
   return (
     <form onSubmit={handleRecover} className="formCuenta">
       <label>Email</label>
-      <input value={email} onChange={(e) => setEmail(e.target.value)} />
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
       {error && <p className="advertencia">{error}</p>}
       <button type="submit" disabled={loading}>
         {loading ? "Cargando..." : "Enviar código"}

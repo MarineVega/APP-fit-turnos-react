@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 
-export default function RecoverStep3({ onSwitch }) {
+export default function RecuperarStep3({ onSwitch }) {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [error, setError] = useState("");

@@ -12,7 +12,7 @@ import menu from "../assets/img/menu.png"
 import buscar from "../assets/img/buscar.png"
 import notif from "../assets/img/notif.png"
 
-function Navbar (){
+export default function Navbar (){
     return (
         <header className="header">            
             <div className="navbar">
@@ -80,5 +80,3 @@ function Navbar (){
         </header>
     )
 }
-
-export default Navbar

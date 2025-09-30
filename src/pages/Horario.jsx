@@ -1,9 +1,7 @@
-function Horario() {
+export default function Horario() {
   return (
     <>      
       
     </>
   )
 }
-
-export default Horario

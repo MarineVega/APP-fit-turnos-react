@@ -1,4 +1,4 @@
-function Profesor() {
+export default function Profesor() {
   return (
     <>      
       
@@ -6,4 +6,3 @@ function Profesor() {
   )
 }
 
-export default Profesor

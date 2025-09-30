@@ -1,9 +1,7 @@
-function Administrar() {
+export default function Administrar() {
   return (
     <>      
       
     </>
   )
 }
-
-export default Administrar

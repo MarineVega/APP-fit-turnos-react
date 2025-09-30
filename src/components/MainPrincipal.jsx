@@ -11,7 +11,7 @@ import icono_instructor from "../../public/assets/img/icono_instructor.png"
 import icono_rehabilitacion from "../../public/assets/img/icono_rehabilitacion.png"
 import icono_natacion from "../../public/assets/img/icono_natacion.png"
 */
-import React from 'react'
+import React from 'react';
 import { useNavigate, Link } from "react-router-dom";       // importa React Router
 
 import Logo_Fit from "../assets/img/Logo_Fit.png"
@@ -25,7 +25,7 @@ import icono_instructor from "../assets/img/icono_instructor.png"
 import icono_rehabilitacion from "../assets/img/icono_rehabilitacion.png"
 import icono_natacion from "../assets/img/icono_natacion.png"
 
-function MainPrincipal() {
+export default function MainPrincipal() {
     const navigate = useNavigate();     // hook de navegación
 
     return (
@@ -89,6 +89,37 @@ function MainPrincipal() {
             >
             REGISTRARSE
             </a> */}
+            
+            <button
+                className="btnAceptar"
+                type="button"
+                onClick={() => navigate("/Actividad?modo=consultar")}
+            >Actividades
+            </button>
+            
+            <button
+                className="btnAceptar"
+                type="button"
+                onClick={() => navigate("/Actividad?modo=agregar")}
+            >Agregar Actividad
+            </button>
+
+             <button
+                className="btnAceptar"
+                type="button"
+                onClick={() => navigate("/Actividad?modo=modificar")}
+            >Modificar Actividad
+            </button>
+
+             <button
+                className="btnAceptar"
+                type="button"
+                onClick={() => navigate("/Actividad?modo=eliminar")}
+            >Eliminar Actividad
+            </button>
+
+            {/* o
+            <Link to="/actividad">Actividades</Link> */}
 
             <img className="logoMedusa" src={Logo_Medusa} alt="Logo Medusa Soft"/>
     
@@ -98,7 +129,7 @@ function MainPrincipal() {
                 <source src="../assets/video/izquierda.mp4" type="video/mp4" />       
             </video> */}
 
-            {/* <video
+            <video
                 className="video-lateral izquierda"
                 autoPlay
                 muted
@@ -106,13 +137,13 @@ function MainPrincipal() {
                 playsInline
             >
                 <source src="/assets/video/izquierda.mp4" type="video/mp4" />
-            </video> */}
+            </video>
 
             {/* <!-- Video derecho --> */}
             {/* <video className="video-lateral derecha" autoplay muted loop playsinline>
                 <source src="../assets/video/derecha.mp4" type="video/mp4" />    
             </video>  */}
-{/* 
+
             <video
                 className="video-lateral derecha"
                 autoPlay
@@ -121,7 +152,7 @@ function MainPrincipal() {
                 playsInline
             >
                 <source src="/assets/video/derecha.mp4" type="video/mp4" />
-            </video> */}
+            </video>
             
         </main>
 
@@ -129,5 +160,3 @@ function MainPrincipal() {
     )
  
 }
-
-export default MainPrincipal

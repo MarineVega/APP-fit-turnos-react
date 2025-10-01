@@ -1,8 +1,7 @@
-// ImagenesLaterales.jsx
 import imgIzquierda from "../assets/img/cuenta2.png";
 import imgDerecha from "../assets/img/cuenta1.png";
 
-export default function ImagenesLaterales({ altIzq, altDer }) {
+export default function ImagenLateral({ altIzq, altDer }) {
   return (
     <div className="contenedor-lateral desktop-only">
       <img

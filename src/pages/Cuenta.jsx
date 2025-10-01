@@ -12,26 +12,15 @@ export default function Cuenta() {
   const [form, setForm] = useState("login");
   const [searchParams] = useSearchParams();
 
-  // Arranca en registro si viene ?form=crear
   useEffect(() => {
-    if (searchParams.get("form") === "crear") {
-      setForm("registrar");
-    }
+    if (searchParams.get("form") === "crear") setForm("registrar");
   }, [searchParams]);
 
-  const handleSwitch = (next) => {
-    setForm(next);
-  };
+  const handleSwitch = (next) => setForm(next);
 
   return (
     <main className="mainCuenta">
-      {/* Imágenes laterales parametrizables */}
-      <ImagenLateral
-        
-        altIzq="Imagen lateral izquierda"
-        altDer="Imagen lateral derecha"
-      />
-
+      <ImagenLateral altIzq="Cuenta izquierda" altDer="Cuenta derecha" />
       <section className="seccionCuenta">
         {form === "login" && <LoginForm onSwitch={handleSwitch} />}
         {form === "registrar" && <RegistrarForm onSwitch={handleSwitch} />}

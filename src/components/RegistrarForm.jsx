@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
+import "../styles/style.css";
+import exito from "../assets/img/exito.png";
+
 
 export default function RegistrarForm({ onSwitch }) {
   const navigate = useNavigate();
@@ -20,7 +23,7 @@ export default function RegistrarForm({ onSwitch }) {
     background: "#bababa",
     confirmButtonColor: "#6edc8c",
     customClass: {
-      confirmButton: "btnAceptar",
+      confirmButton: "btnCuentaLogin",
       cancelButton: "btnCancelar",
     },
   });
@@ -69,21 +72,16 @@ export default function RegistrarForm({ onSwitch }) {
 
     setLoading(true);
     try {
-      swalEstilo
-        .fire({
-          title: "¡Operación Exitosa!",
-          text: "Bienvenid@, ya está todo listo, alcanza tus objetivos con nosotros.",
-          imageUrl: "../assets/img/exito.png",
-          imageHeight: 100,
-          imageAlt: "Éxito",
-          icon: "success",
-          confirmButtonText: "Inicio",
-        })
-        .then((result) => {
-          if (result.isConfirmed) {
-            onSwitch("login");
-          }
-        });
+      await swalEstilo.fire({
+        title: "¡Operación Exitosa!",
+        text: "Bienvenid@, ya está todo listo, alcanza tus objetivos con nosotros.",
+        imageUrl: exito,
+        imageHeight: 100,
+        imageAlt: "Éxito",
+        icon: "success",
+        confirmButtonText: "Inicio",
+      });
+      onSwitch("login");
     } catch (err) {
       setError("Error al registrar el usuario");
       console.error(err);
@@ -102,6 +100,7 @@ export default function RegistrarForm({ onSwitch }) {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         name="username"
+        className="inputCuenta"
       />
 
       <FormCampos
@@ -110,6 +109,7 @@ export default function RegistrarForm({ onSwitch }) {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         name="email"
+        className="inputCuenta"
       />
 
       <FormCampos
@@ -118,6 +118,7 @@ export default function RegistrarForm({ onSwitch }) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         name="password"
+        className="inputCuenta"
       />
 
       <FormCampos
@@ -126,6 +127,7 @@ export default function RegistrarForm({ onSwitch }) {
         value={password2}
         onChange={(e) => setPassword2(e.target.value)}
         name="password2"
+        className="inputCuenta"
       />
 
       <div className="check-admin">
@@ -137,35 +139,30 @@ export default function RegistrarForm({ onSwitch }) {
         />
         <label htmlFor="isAdmin">Crear como administrador</label>
       </div>
+    {/* Aquí el error */}
+      {error && (
+        <div className="contenedorError">
+          <p className="adventencia">{error}</p>
+        </div>
+      )}
 
-      {error && <p className="advertencia">{error}</p>}
 
       <FormBotones
         boton1={{
           id: "btnRegistrar",
           label: loading ? "Cargando..." : "REGISTRARSE",
-          className: "btnAceptar",
+          className: "btnCuentaLogin",
           onClick: handleRegister,
         }}
-        boton2={{
-          id: "btnCancelar",
-          label: "Cancelar",
-          className: "btnCancelar",
-          onClick: () => navigate("/"),
-        }}
+       
       />
 
-      {/* 🔗 Link subrayado y azul */}
-      <a
-        href="#"
+      <p
         className="link"
-        onClick={(e) => {
-          e.preventDefault();
-          onSwitch("login");
-        }}
+        onClick={() => onSwitch("login")}
       >
         Ya tenés cuenta? Iniciar sesión
-      </a>
+      </p>
     </form>
   );
 }

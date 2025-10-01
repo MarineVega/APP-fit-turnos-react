@@ -64,6 +64,12 @@ export default function LoginForm({ onSwitch }) {
           className: "btnAceptar",
           onClick: handleSubmit,
         }}
+         boton2={{
+          id: "btnCancelar",
+          label: "Cancelar",
+          className: "btnCancelar",
+          onClick: () => navigate("/"),
+        }}
       />
 
       {/* 🔗 Links */}

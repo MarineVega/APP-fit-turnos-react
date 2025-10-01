@@ -30,6 +30,12 @@ export default function RecuperarStep2({ onSwitch }) {
           className: "btnAceptar",
           onClick: handleNext,
         }}
+         boton2={{
+          id: "btnCancelar",
+          label: "Cancelar",
+          className: "btnCancelar",
+          onClick: () => navigate("/"),
+        }}
       />
 
       {/* 🔗 Link */}

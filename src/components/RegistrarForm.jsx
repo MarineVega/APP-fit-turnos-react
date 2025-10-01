@@ -135,9 +135,10 @@ export default function RegistrarForm({ onSwitch }) {
           type="checkbox"
           id="isAdmin"
           checked={isAdmin}
+          className="checkboxAdmin"   // <- agregamos la clase
           onChange={(e) => setIsAdmin(e.target.checked)}
         />
-        <label htmlFor="isAdmin">Crear como administrador</label>
+       <label htmlFor="isAdmin">Crear como administrador</label>       
       </div>
     {/* Aquí el error */}
       {error && (
@@ -146,23 +147,28 @@ export default function RegistrarForm({ onSwitch }) {
         </div>
       )}
 
-
-      <FormBotones
+      <div className="contenedorBotones">
+      <FormBotones 
+       
         boton1={{
           id: "btnRegistrar",
           label: loading ? "Cargando..." : "REGISTRARSE",
           className: "btnCuentaLogin",
           onClick: handleRegister,
         }}
-       
+        boton2={{
+          id: "btnCancelar",
+          label: "Cancelar",
+          className: "btnCancelar",
+          onClick: () => navigate("/"),
+        }}
       />
-
-      <p
-        className="link"
-        onClick={() => onSwitch("login")}
-      >
-        Ya tenés cuenta? Iniciar sesión
+     <div className="contenedorError">
+      <p className="link" onClick={() => onSwitch("login")}>
+              Ya tenés cuenta? Iniciar sesión
       </p>
+      </div>
+      </div>
     </form>
   );
 }

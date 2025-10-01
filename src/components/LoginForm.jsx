@@ -1,8 +1,9 @@
-// src/components/LoginForm.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useAuth } from "../context/AuthContext.jsx";
+import FormCampos from "./FormCampos.jsx";
+import FormBotones from "./FormBotones.jsx";
 
 export default function LoginForm({ onSwitch }) {
   const navigate = useNavigate();
@@ -38,26 +39,40 @@ export default function LoginForm({ onSwitch }) {
 
   return (
     <form onSubmit={handleSubmit} className="formCuenta">
-      <div>
-      <label>Email</label>
-      <input value={email} onChange={(e) => setEmail(e.target.value)} />
+      <FormCampos
+        label="Email"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        name="email"
+      />
 
-      <label>Contraseña</label>
-      <input
+      <FormCampos
+        label="Contraseña"
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        name="password"
       />
 
       {error && <p className="advertencia">{error}</p>}
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Cargando..." : "Ingresar"}
-      </button>
+      <FormBotones
+        boton1={{
+          id: "btnIngresar",
+          label: loading ? "Cargando..." : "Ingresar",
+          className: "btnAceptar",
+          onClick: handleSubmit,
+        }}
+      />
 
-      <p onClick={() => onSwitch("registrar")}>Crear cuenta</p>
-      <p onClick={() => onSwitch("recuperar1")}>Olvidé mi contraseña</p>
-      </div>
+      {/* 🔗 Links */}
+      <p className="link" onClick={() => onSwitch("registrar")}>
+        Crear cuenta
+      </p>
+      <p className="link" onClick={() => onSwitch("recuperar1")}>
+        Olvidé mi contraseña
+      </p>
     </form>
   );
 }

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
+import FormCampos from "./FormCampos.jsx";
+import FormBotones from "./FormBotones.jsx";
 
 export default function RecuperarForm({ onSwitch }) {
   const [email, setEmail] = useState("");
@@ -13,7 +15,6 @@ export default function RecuperarForm({ onSwitch }) {
 
     setLoading(true);
     try {
-      // Simulación envío de código
       Swal.fire({
         title: "Código enviado",
         text: "Revisá tu correo",
@@ -30,17 +31,29 @@ export default function RecuperarForm({ onSwitch }) {
 
   return (
     <form onSubmit={handleRecover} className="formCuenta">
-      <label>Email</label>
-      <input
+      <FormCampos
+        label="Email"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        name="email"
       />
+
       {error && <p className="advertencia">{error}</p>}
-      <button type="submit" disabled={loading}>
-        {loading ? "Cargando..." : "Enviar código"}
-      </button>
-      <p onClick={() => onSwitch("login")}>Volver al login</p>
+
+      <FormBotones
+        boton1={{
+          id: "btnEnviarCodigo",
+          label: loading ? "Cargando..." : "Enviar código",
+          className: "btnAceptar",
+          onClick: handleRecover,
+        }}
+      />
+
+      {/* 🔗 Link */}
+      <p className="link" onClick={() => onSwitch("login")}>
+        Volver al login
+      </p>
     </form>
   );
 }

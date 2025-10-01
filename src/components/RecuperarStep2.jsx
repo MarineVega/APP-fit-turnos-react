@@ -1,3 +1,7 @@
+import { useState } from "react";
+import FormCampos from "./FormCampos.jsx";
+import FormBotones from "./FormBotones.jsx";
+
 export default function RecuperarStep2({ onSwitch }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -5,17 +9,33 @@ export default function RecuperarStep2({ onSwitch }) {
   const handleNext = (e) => {
     e.preventDefault();
     if (!code) return setError("Ingresá el código recibido");
-    // Simulación verificación
-    onSwitch("recuperar3"); // ⚠ corregido
+    onSwitch("recuperar3");
   };
 
   return (
     <form onSubmit={handleNext} className="formCuenta">
-      <label>Código</label>
-      <input value={code} onChange={(e) => setCode(e.target.value)} />
+      <FormCampos
+        label="Código"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        name="codigo"
+      />
+
       {error && <p className="advertencia">{error}</p>}
-      <button type="submit">Siguiente</button>
-      <p onClick={() => onSwitch("login")}>Volver al login</p>
+
+      <FormBotones
+        boton1={{
+          id: "btnSiguiente",
+          label: "Siguiente",
+          className: "btnAceptar",
+          onClick: handleNext,
+        }}
+      />
+
+      {/* 🔗 Link */}
+      <p className="link" onClick={() => onSwitch("login")}>
+        Volver al login
+      </p>
     </form>
   );
 }

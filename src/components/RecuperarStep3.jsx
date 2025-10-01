@@ -1,6 +1,7 @@
-// src/components/RecoverStep3.jsx
 import { useState } from "react";
 import Swal from "sweetalert2";
+import FormCampos from "./FormCampos.jsx";
+import FormBotones from "./FormBotones.jsx";
 
 export default function RecuperarStep3({ onSwitch }) {
   const [password, setPassword] = useState("");
@@ -23,21 +24,37 @@ export default function RecuperarStep3({ onSwitch }) {
 
   return (
     <form onSubmit={handleReset} className="formCuenta">
-      <label>Nueva Contraseña</label>
-      <input
+      <FormCampos
+        label="Nueva Contraseña"
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        name="password"
       />
-      <label>Repetir Contraseña</label>
-      <input
+
+      <FormCampos
+        label="Repetir Contraseña"
         type="password"
         value={password2}
         onChange={(e) => setPassword2(e.target.value)}
+        name="password2"
       />
+
       {error && <p className="advertencia">{error}</p>}
-      <button type="submit">Actualizar</button>
-      <p onClick={() => onSwitch("login")}>Volver al login</p>
+
+      <FormBotones
+        boton1={{
+          id: "btnActualizar",
+          label: "Actualizar",
+          className: "btnAceptar",
+          onClick: handleReset,
+        }}
+      />
+
+      {/* 🔗 Link */}
+      <p className="link" onClick={() => onSwitch("login")}>
+        Volver al login
+      </p>
     </form>
   );
 }

@@ -43,7 +43,13 @@ export default function RecuperarForm({ onSwitch }) {
         className="inputCuenta"
       />
 
-      {error && <p className="advertencia">{error}</p>}
+       {/* Aquí el error */}
+      {error && (
+        <div className="contenedorError">
+          <p className="adventencia">{error}</p>
+        </div>
+      )}
+      
      <div className="contenedorBotones">
       <FormBotones
         boton1={{

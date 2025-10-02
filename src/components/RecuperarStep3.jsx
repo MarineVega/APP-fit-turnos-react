@@ -44,8 +44,13 @@ export default function RecuperarStep3({ onSwitch }) {
         name="password2"
         className="inputCuenta"
       />
-
-      {error && <p className="advertencia">{error}</p>}
+ {/* Aquí el error */}
+      {error && (
+        <div className="contenedorError">
+          <p className="adventencia">{error}</p>
+        </div>
+      )}
+      
       <div className="contenedorBotones">
       <FormBotones
         boton1={{

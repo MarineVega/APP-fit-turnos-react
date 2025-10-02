@@ -2,6 +2,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
+import TituloConFlecha from "./TituloConFlecha.jsx";
 
 export default function RecuperarStep3({ onSwitch }) {
   const [password, setPassword] = useState("");
@@ -24,12 +25,15 @@ export default function RecuperarStep3({ onSwitch }) {
 
   return (
     <form onSubmit={handleReset} className="formCuenta">
+      <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
+
       <FormCampos
         label="Nueva Contraseña"
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         name="password"
+        className="inputCuenta"
       />
 
       <FormCampos
@@ -38,10 +42,11 @@ export default function RecuperarStep3({ onSwitch }) {
         value={password2}
         onChange={(e) => setPassword2(e.target.value)}
         name="password2"
+        className="inputCuenta"
       />
 
       {error && <p className="advertencia">{error}</p>}
-
+      <div className="contenedorBotones">
       <FormBotones
         boton1={{
           id: "btnActualizar",
@@ -61,6 +66,7 @@ export default function RecuperarStep3({ onSwitch }) {
       <p className="link" onClick={() => onSwitch("login")}>
         Volver al login
       </p>
+      </div>
     </form>
   );
 }

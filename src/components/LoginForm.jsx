@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { useAuth } from "../context/AuthContext.jsx";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
+import TituloConFlecha from "./TituloConFlecha.jsx";
 
 export default function LoginForm({ onSwitch }) {
   const navigate = useNavigate();
@@ -39,12 +40,14 @@ export default function LoginForm({ onSwitch }) {
 
   return (
     <form onSubmit={handleSubmit} className="formCuenta">
+      <TituloConFlecha>Iniciar Sesión</TituloConFlecha>
       <FormCampos
         label="Email"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         name="email"
+        className="inputCuenta"
       />
 
       <FormCampos
@@ -53,10 +56,12 @@ export default function LoginForm({ onSwitch }) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         name="password"
+        className="inputCuenta"
       />
 
       {error && <p className="advertencia">{error}</p>}
 
+      <div className="contenedorBotones">
       <FormBotones
         boton1={{
           id: "btnIngresar",
@@ -79,6 +84,7 @@ export default function LoginForm({ onSwitch }) {
       <p className="link" onClick={() => onSwitch("recuperar1")}>
         Olvidé mi contraseña
       </p>
-    </form>
+    </div>
+   </form>
   );
 }

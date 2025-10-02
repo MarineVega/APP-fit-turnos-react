@@ -2,6 +2,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
+import TituloConFlecha from "./TituloConFlecha.jsx";
 
 export default function RecuperarForm({ onSwitch }) {
   const [email, setEmail] = useState("");
@@ -31,16 +32,19 @@ export default function RecuperarForm({ onSwitch }) {
 
   return (
     <form onSubmit={handleRecover} className="formCuenta">
+      <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
+
       <FormCampos
         label="Email"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         name="email"
+        className="inputCuenta"
       />
 
       {error && <p className="advertencia">{error}</p>}
-
+     <div className="contenedorBotones">
       <FormBotones
         boton1={{
           id: "btnEnviarCodigo",
@@ -48,12 +52,19 @@ export default function RecuperarForm({ onSwitch }) {
           className: "btnAceptar",
           onClick: handleRecover,
         }}
+         boton2={{
+          id: "btnCancelar",
+          label: "Cancelar",
+          className: "btnCancelar",
+          onClick: () => navigate("/"),
+        }}
       />
 
       {/* 🔗 Link */}
       <p className="link" onClick={() => onSwitch("login")}>
         Volver al login
       </p>
+      </div>
     </form>
   );
 }

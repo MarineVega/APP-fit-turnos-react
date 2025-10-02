@@ -1,6 +1,7 @@
 import { useState } from "react";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
+import TituloConFlecha from "./TituloConFlecha.jsx";
 
 export default function RecuperarStep2({ onSwitch }) {
   const [code, setCode] = useState("");
@@ -14,15 +15,18 @@ export default function RecuperarStep2({ onSwitch }) {
 
   return (
     <form onSubmit={handleNext} className="formCuenta">
+      <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
+
       <FormCampos
         label="Código"
         value={code}
         onChange={(e) => setCode(e.target.value)}
         name="codigo"
+        className="inputCuenta"
       />
 
       {error && <p className="advertencia">{error}</p>}
-
+      <div className="contenedorBotones">
       <FormBotones
         boton1={{
           id: "btnSiguiente",
@@ -42,6 +46,7 @@ export default function RecuperarStep2({ onSwitch }) {
       <p className="link" onClick={() => onSwitch("login")}>
         Volver al login
       </p>
+      </div>
     </form>
   );
 }

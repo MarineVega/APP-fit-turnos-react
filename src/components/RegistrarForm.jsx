@@ -5,6 +5,7 @@ import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import "../styles/style.css";
 import exito from "../assets/img/exito.png";
+import TituloConFlecha from "./TituloConFlecha.jsx";
 
 
 export default function RegistrarForm({ onSwitch }) {
@@ -92,7 +93,7 @@ export default function RegistrarForm({ onSwitch }) {
 
   return (
     <form onSubmit={handleRegister} className="formCuenta">
-      <h2>Crear Cuenta</h2>
+      <TituloConFlecha>Crear Cuenta</TituloConFlecha>
 
       <FormCampos
         label="Nombre de Usuario"

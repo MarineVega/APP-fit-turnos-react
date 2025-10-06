@@ -79,12 +79,13 @@ export default function RecuperarStep2({ onSwitch }) {
             onClick: () => onSwitch("login"),
           }}
         />
-      </div>
+      
 
       {/* Reenviar */}
       <p className="link" onClick={handleResend}>
         Reenviar código
       </p>
+      </div>
     </form>
   );
 }

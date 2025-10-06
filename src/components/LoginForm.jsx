@@ -31,7 +31,7 @@ export default function LoginForm({ onSwitch }) {
       const usuario = usuarios.find(u => u.email === email && u.password === password);
 
       if (usuario) {
-        localStorage.setItem("user", JSON.stringify({ name: usuario.name, email: usuario.email }));
+        localStorage.setItem("user", JSON.stringify({ nombre: usuario.nombre, email: usuario.email }));
         Swal.fire({
           title: "¡Bienvenido!",
           icon: "success",

@@ -4,27 +4,27 @@
     "nombre": "Yoga",
     "descripcion": "Clases de yoga para todos los niveles",
     "cupoMaximo": 20,
-    "imagen": "../assets/img/icono_yoga.png"
+    "imagen": "icono_yoga.png"
   },
   {
     "id": 2,
     "nombre": "Crossfit",
     "descripcion": "Entrenamiento funcional de alta intensidad",
     "cupoMaximo": 25,
-    "imagen": "../assets/img/icono_pesas.png"
+    "imagen": "icono_pesas.png"
   },
   {
     "id": 3,
     "nombre": "Pilates",
     "descripcion": "Fortalecimiento y flexibilidad",
     "cupoMaximo": 15,
-    "imagen": "../assets/img/icono_pilates.png"
+    "imagen": "icono_pilates.png"
   },
   {
     "id": 4,
     "nombre": "Personal",
     "descripcion": "Entrenamiento personal acorde a cada necesidad",
     "cupoMaximo": 30,
-    "imagen": "../assets/img/icono_personal.png"
+    "imagen": "icono_instructor.png"
   }
 ]

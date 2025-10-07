@@ -107,7 +107,7 @@ export default function MainPrincipal() {
              <button
                 className="btnAceptar"
                 type="button"
-                onClick={() => navigate("/Actividad?modo=modificar")}
+                onClick={() => navigate("/Actividad?modo=editar")}
             >Modificar Actividad
             </button>
 

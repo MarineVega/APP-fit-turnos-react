@@ -6,6 +6,7 @@ const FormCampos = ({               // desestructuro las props
     placeholder,
     value,
     onChange,
+    onFocus,
     className="",
     error,
     name,
@@ -39,6 +40,7 @@ const FormCampos = ({               // desestructuro las props
                 name={name}
                 className={className}
                 onChange={handleFileChange}
+                onFocus={onFocus}
             />
             {preview && filePreview && (
                 <img src={filePreview} alt="Vista previa" width="100" />
@@ -50,6 +52,7 @@ const FormCampos = ({               // desestructuro las props
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}
+                    onFocus={onFocus}
                     name={name}
                 />
             ) : (
@@ -58,7 +61,8 @@ const FormCampos = ({               // desestructuro las props
                     className={className}
                     placeholder={placeholder}
                     value={value}
-                    onChange={onChange}
+                    onChange={onChange}                    
+                    onFocus={onFocus}
                     name={name}
                 />
             )}

@@ -44,58 +44,36 @@ export default function ActividadList({ actividades = [], modo }) {
                     {modo !== "consultar" && <th>Acciones</th>}
                     </tr>
                 </thead>
-                <tbody>
-{/*                     
-                    {actividades.length > 0 ? (
-                        actividades.map((act, index) => (                     
-                            <ActividadRow
-                            key={index}
-                            actividad={act}
-                            index={index}
-                            modo={modo}
-                            setActividades={setActividades}
-                            />
-                    ))
-                    ) : (
-                    <tr>
-                        <td colSpan={modo !== "consultar" ? 5 : 4}>
-                        No hay actividades registradas.
-                        </td>
-                    </tr>
-                    )} */}
 
+                <tbody>
                     {actividades.length > 0 ? (
                         actividades.map((actividad) => (
                             <tr key={actividad.id}>
                             <td>{actividad.nombre}</td>
                             <td>{actividad.descripcion}</td>
-                            <td>{actividad.cupoMaximo}</td>
-                            <td>
-{/*                                 
-                                {actividad.imagen ? (
-                                <img
-                                    src={URL.createObjectURL(actividad.imagen)}
+                            <td id="cupo">{actividad.cupoMaximo}</td>
+                            <td id="imagen">
+                                {actividad.imagen ? 
+                                (   <img
+                                    src={
+                                        actividad.imagen instanceof File
+                                        ? URL.createObjectURL(actividad.imagen)         
+                                        //: `/src/assets/img/${actividad.imagen}`
+                                        : new URL(`../assets/img/${actividad.imagen}`, import.meta.url).href
+                                        /* ¿Qué hace la línea anterior?
+                                        Si la imagen viene del formulario (File): usa URL.createObjectURL como antes.
+                                        Si es un nombre de archivo (como "yoga.png"): 
+                                        new URL('../assets/img/yoga.png', import.meta.url).href genera la URL final procesada por Vite.
+                                        Esto permite usar imágenes que están dentro de src/assets/img sin moverlas a public/.
+                                        */
+                                    }
                                     alt={actividad.nombre}
-                                    width="80"
-                                />
-                                ) : (
-                                "Sin imagen"
-                                )} */}
-
-                                {/* Si act.imagen es un File (cuando recién la cargás desde el formulario) → usa createObjectURL.
-                                Si es un string (cuando la leés del JSON o la base de datos) → úsalo directamente como src.
-                                Si no hay nada → muestra "Sin imagen". */}
-                                <td>
-                                    {actividad.imagen instanceof File
-                                        ? <img src={URL.createObjectURL(actividad.imagen)} alt={actividad.nombre} width="50" />
-                                        : actividad.imagen
-                                        ? <img src={actividad.imagen} alt={actividad.nombre} width="50" />
-                                        : "Sin imagen"}
-                                </td>
-
-
-
+                                    width="50"                                    
+                                    />
+                                ) : ("Sin imagen")
+                                }
                             </td>
+
                             {modo !== "consultar" && <td>Acciones</td>}
                             </tr>
                         ))

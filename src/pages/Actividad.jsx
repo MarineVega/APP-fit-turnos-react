@@ -24,7 +24,12 @@ export default function Actividad() {
 
   // Función para agregar actividad
   const guardarActividad = (nuevaActividad) => {
+    console.log("nuevaActividad")
+    console.log(nuevaActividad)
+    
     setActividades((prev) => [...prev, { id: prev.length + 1, ...nuevaActividad }]);
+
+    console.log(actividades)
 
     /* Cuando pase a MySQL
     puedo hacerlo con axios

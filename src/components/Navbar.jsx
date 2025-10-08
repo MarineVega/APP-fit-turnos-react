@@ -1,84 +1,172 @@
-/*
-import Logo_Fit_Home from "../../public/assets/img/Logo_Fit_Home.png"
-import menu from "../../public/assets/img/menu.png"
-import buscar from "../../public/assets/img/buscar.png"
-import notif from "../../public/assets/img/notif.png"
-*/
-import React from 'react'
-import { Link } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
-import Logo_Fit_Home from "../assets/img/Logo_Fit_Home.png"
-import menu from "../assets/img/menu.png"
-import buscar from "../assets/img/buscar.png"
-import notif from "../assets/img/notif.png"
+import Logo_Fit_Home from "../assets/img/Logo_Fit_Home.png";
+import menuIcon from "../assets/img/menu.png";
+import buscar from "../assets/img/buscar.png";
+import notif from "../assets/img/notif.png";
 
-function Navbar (){
-    return (
-        <header className="header">            
-            <div className="navbar">
-                {/* Zona izquierda */}
-                <div className="nav-left">
-                
-                    {/* <!-- Logo --> */}      
-                    <Link to="/" className="logo">
-                        <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
-                    </Link>
+function Navbar() {
+  const navigate = useNavigate();
+  const [usuarioActivo, setUsuarioActivo] = useState(null);
+  const [menuAbierto, setMenuAbierto] = useState(false);
 
-                    {/* <a href="#" className="logo">
-                        <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
-                    </a> */}
+  useEffect(() => {
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    setUsuarioActivo(usuario);
+  }, []);
 
-                     {/* <a href="/" className="logo"> */}
-                        {/* usando rutas absolutas */}
-                        {/* <img src="/assets/img/Logo_Fit_Home.png" alt="Logo" />      */}
-                    {/* </a> */}
-                    
+  const toggleMenu = () => {
+    setMenuAbierto(!menuAbierto);
+  };
 
+  const cerrarSesion = () => {
+    Swal.fire({
+      title: "¿Cerrar sesión?",
+      text: "¿Querés salir de tu cuenta?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, salir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        confirmButton: "btnAceptar",
+        cancelButton: "btnCancelar",
+      },
+      buttonsStyling: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("usuarioActivo");
+        setUsuarioActivo(null);
+        setMenuAbierto(false);
+        navigate("/");
+      }
+    });
+  };
 
-                    {/* <!-- icono hamburguesa SOLO en mobile --> */}
-                     <Link to="/" className="icon">
-                        <img src={menu} alt="Menú" loading="lazy" />
-                    </Link>
-                    
-                    {/* 
-                    <a href="#" className="icon" id="btnMenu">
-                        <img src={menu} alt="Menú" loading="lazy" />
-                    </a> */}
+  return (
+    <header className="header">
+      <div className="navbar">
+        {/* === Zona izquierda === */}
+        <div className="nav-left">
+          {/* Logo */}
+          <Link to="/" className="logo">
+            <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
+          </Link>
 
+          {/* Icono hamburguesa SOLO visible en mobile */}
+          <button id="btnMenu" className="icon btnMenu" onClick={toggleMenu}>
+            <img src={menuIcon} alt="Menú" loading="lazy" />
+          </button>
 
-                    {/* <!-- menu visible solo en escritorio --> */}
-                    <div className="nav-links desktop-only">
-                        <a href="./pages/turnos.html" id="menuTurnos">Turnos</a>
-                        <a href="./pages/administrar.html" id="menuAdmin">Administrar</a>
-                    </div>
+          {/* Menú de escritorio */}
+          <div className="nav-links desktop-only">
+            {usuarioActivo && (
+              <>
+                <Link to="/turnos" id="menuTurnos">
+                  Turnos
+                </Link>
+                {usuarioActivo.esAdmin && (
+                  <Link to="/administrar" id="menuAdmin">
+                    Administrar
+                  </Link>
+                )}
+              </>
+            )}
+          </div>
+        </div>
 
-                </div>
+        {/* === Zona derecha === */}
+        <div className="nav-right">
+          <div className="nav-links desktop-only">
+            {usuarioActivo ? (
+              <>
+                <span id="nombreUsuario">
+                  {usuarioActivo.nombre}
+                  {usuarioActivo.esAdmin && " (Admin)"}
+                </span>
+                <a href="#" onClick={cerrarSesion} id="menuCerrarSesion">
+                  Cerrar Sesión
+                </a>
+              </>
+            ) : (
+              <>
+                <Link to="/cuenta" id="menuIniciarSesion">
+                  Iniciar Sesión
+                </Link>
+                <Link to="/cuenta?form=crear" id="menuCrearCuenta">
+                  Crear Cuenta
+                </Link>
+              </>
+            )}
+          </div>
 
-                {/* <!-- Zona derecha --> */}
-                <div className="nav-right">
-                    {/* <!-- Menú visible solo en escritorio --> */}
-                    <div className="nav-links desktop-only">
+          {/* Iconos búsqueda y notificaciones */}
+          <a href="#" className="icon">
+            <img src={buscar} alt="Buscar" loading="lazy" />
+          </a>
+          <a href="#" className="icon">
+            <img src={notif} alt="Notificaciones" loading="lazy" />
+          </a>
+        </div>
+      </div>
 
-                        <a href="#" id="nombreUsuario" style={{display: "none"}}></a> 
-
-                        <a href="./pages/cuenta.html" id="menuIniciarSesion">Iniciar Sesión</a>
-                        <a href="./pages/cuenta.html?form=crear" id="menuCrearCuenta">Crear Cuenta</a>
-                        
-                        <a href="./index.html" id="menuCerrarSesion">Cerrar Sesión</a> 
-                    </div>
-
-                    {/* <!-- iconos --> */}
-                    <a href="#" className="icon">
-                        <img src={buscar} alt="Buscar" loading="lazy" />
-                    </a>
-                    <a href="#" className="icon">
-                        <img src={notif} alt="Notificaciones" loading="lazy" />
-                    </a>
-                </div>
-
-            </div>
-        </header>
-    )
+      {/* === Menú desplegable mobile === */}
+      <div
+        id="menuDesplegable"
+        className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}
+      >
+        {usuarioActivo ? (
+          <>
+            <span id="nombreUsuarioMobile">
+              {usuarioActivo.nombre}
+              {usuarioActivo.esAdmin && " (Admin)"}
+            </span>
+            {usuarioActivo.esAdmin && (
+              <Link
+                to="/administrar"
+                id="menuHamburguesaAdmin"
+                onClick={() => setMenuAbierto(false)}
+              >
+                Administrar
+              </Link>
+            )}
+            <Link
+              to="/turnos"
+              id="menuHamburguesaTurnos"
+              onClick={() => setMenuAbierto(false)}
+            >
+              Turnos
+            </Link>
+            <a
+              href="#"
+              onClick={cerrarSesion}
+              id="menuHamburguesaCerrarSesion"
+            >
+              Cerrar Sesión
+            </a>
+          </>
+        ) : (
+          <>
+            <Link
+              to="/cuenta"
+              id="menuHamburguesaIniciarSesion"
+              onClick={() => setMenuAbierto(false)}
+            >
+              Iniciar Sesión
+            </Link>
+            <Link
+              to="/cuenta?form=crear"
+              id="menuHamburguesaCrearCuenta"
+              onClick={() => setMenuAbierto(false)}
+            >
+              Crear Cuenta
+            </Link>
+          </>
+        )}
+      </div>
+    </header>
+  );
 }
 
-export default Navbar
+export default Navbar;

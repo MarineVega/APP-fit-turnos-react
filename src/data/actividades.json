@@ -33,5 +33,12 @@
     "descripcion": "Entrenamiento personal Hit",
     "cupoMaximo": 10,
     "imagen": "icono_instructor.png"
+  },
+  {
+    "actividad_id": 6 ,
+    "nombre": "Yoga 70",
+    "descripcion": "Yoga mayores de 70",
+    "cupoMaximo": 6,
+    "imagen": "icono_yoga.png"
   }
 ]

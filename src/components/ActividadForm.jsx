@@ -21,7 +21,12 @@ const swalEstilo = Swal.mixin({
 export default function ActividadForm({ guardar, actividades = [], datoInicial = null }) {
     const [params] = useSearchParams();
     const modo = params.get("modo") || "agregar";
-    const id = parseInt(params.get("id"));
+    //const id = parseInt(params.get("id"));
+
+    // Cuando no haya parámetro id en la URL, uso el que viene del objeto datoInicial (que el padre le pasa correctamente)
+    //const id = parseInt(params.get("id")) || datoInicial?.id || null;
+
+    const id = datoInicial?.actividad_id || null;
 
     // Estados del formulario
     const [nombre, setNombre] = useState(datoInicial?.nombre || "");
@@ -38,7 +43,13 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
 
     // Si estoy en modo editar, cargo los datos de la actividad
     useEffect(() =>{
-        if (modo === "editar" && id && actividades.length > 0) {
+        //if (modo === "editar" && id && actividades.length > 0) {
+        if (modo === "editar" && datoInicial) {
+            setNombre(datoInicial.nombre);
+            setDescripcion(datoInicial.descripcion);
+            setCupoMaximo(datoInicial.cupoMaximo);
+            setImagen(datoInicial.imagen ||null);
+           /*
             const act = actividades.find((a) => a.id === id);
             if (act) {
                 setNombre(act.nombre),
@@ -46,8 +57,15 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
                 setCupoMaximo(act.cupoMaximo);
                 setImagen(act.imagen || null);
             }
+            */
         }
-    }, [modo, id, actividades]);
+    }, [modo, datoInicial]);      //[modo, id, actividades]);
+
+
+    console.log("🟢 Modo:", modo);
+    console.log("🟢 Dato inicial recibido:", datoInicial);
+    console.log("🟢 ID actual (otro):", datoInicial.actividad_id);
+    console.log("🟢 ID actual:", id);
 
     // Validación y guardado
     const validarGuardar = (e) => {
@@ -71,13 +89,19 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
             esValido = false;
         }
         
+        console.log("👉 Listado de Actividades:", actividades);
+        console.log("👉 Actividad a modificar:", id);
+
         // Valido que no se ingrese un nombre de actividad existente (usando las actividades del estado)
         const nombreIngresado = nombre.trim().toLowerCase();            // normalizo el texto ingresado (quito espacios y lo paso a minúscula)        
         const nombreDuplicado = actividades.some((act) =>               // recorro todas las actividades y busco si hay otra con el mismo nombre
             act.nombre.trim().toLowerCase() === nombreIngresado &&
-            act.id !== id               // permito mismo nombre solo si estoy editando esa misma actividad
+            Number(act.actividad_id) !== Number(id)   // permito mismo nombre solo si estoy editando esa misma actividad
+                                            // 👈 realizo una omparación numérica
         );
         
+        console.log("🟢 ID actual:", id);
+        console.log("🟢 Comparando contra actividades:", actividades.map(a => a.id));
 
         /*      código para mostrar que tiene actividades e ir comparando
         // 🔹 Validar nombre duplicado (usando las actividades del estado)

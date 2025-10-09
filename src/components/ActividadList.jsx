@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ActividadRow from "./ActividadRow";
+//import ActividadRow from "./ActividadRow";
 
 import Swal from "sweetalert2";
 
@@ -96,7 +96,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
 
     // ✅ Manejo de eliminación con validación    
     const eliminarActividad = (actividad) => {
-        console.log('actividad.id ', actividad.actividad_id)
+        console.log('actividad.actividad_id ', actividad.actividad_id)
 
         if (tieneReservasActivas(actividad.actividad_id)) {
             swalEstilo.fire({
@@ -178,7 +178,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                                         : obtenerRutaImagen(actividad.imagen);
 
                                 return (
-                                    <tr key={actividad.id}>
+                                    <tr key={actividad.actividad_id}>
                                         <td>{actividad.nombre}</td>
                                         <td>{actividad.descripcion}</td>
                                         <td id="cupo">{actividad.cupoMaximo}</td>

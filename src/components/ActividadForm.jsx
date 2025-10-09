@@ -64,7 +64,6 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
 
     console.log("🟢 Modo:", modo);
     console.log("🟢 Dato inicial recibido:", datoInicial);
-    console.log("🟢 ID actual (otro):", datoInicial.actividad_id);
     console.log("🟢 ID actual:", id);
 
     // Validación y guardado
@@ -157,7 +156,8 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
             if (modo === "editar") {
                 window.location.href = "/actividad?modo=editar";
             } else {
-                window.location.href = "/actividad?modo=consultar";
+                //window.location.href = "/actividad?modo=consultar";
+                window.location.href = "/actividad?modo=postAlta";      // para distinguirlo del consultar normal
             }        
         });
     };

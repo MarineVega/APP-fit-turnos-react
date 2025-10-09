@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 //import ActividadRow from "./ActividadRow";
+import FormBotones from "./FormBotones";
 
 import Swal from "sweetalert2";
 
@@ -244,6 +245,15 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                     </tbody>
                 </table>
             </section>
+
+            {modo === "postAlta" && (
+                <FormBotones
+                    boton1={{ id: "agregar", label: "AGREGAR", className: "btnAceptar", onClick: () => (window.location.href = "/actividad?modo=agregar") }}
+                    boton2={{ id: "cancelar", label: "VOLVER", className: "btnCancelar", onClick: () => (window.location.href = "/") }}                        
+                    contenedorClass="contenedorBotones"
+                />
+            )}
+            
         </main>
     );
 }

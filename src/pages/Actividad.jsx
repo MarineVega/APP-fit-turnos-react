@@ -106,6 +106,14 @@ export default function Actividad() {
           <ActividadList actividades={actividades} modo="consultar" />
         </>
       )}
+
+      {modo === "postAlta" && (
+        <>
+          <h2>Listado de Actividades</h2>
+          <ActividadList actividades={actividades} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
+        </>
+    )}
+
     </main>
   );
 }

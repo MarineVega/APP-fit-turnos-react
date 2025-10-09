@@ -58,8 +58,8 @@ export default function Actividad() {
 
       {modo === "agregar" && (
         <>
-          <TituloConFlecha>Agregar Actividad</TituloConFlecha>
-          {/* <h2>Agregar Actividad</h2> */}
+          <TituloConFlecha titulo="Agregar Actividad" destino="/" />
+          {/* <TituloConFlecha titulo="Agregar Actividad" destino="/actividad?modo=consultar" /> */}
           
           {/* OJO!!!! hacerlo dinámico para poder usarlo con otras imágenes */}
           <ImagenLateral altIzq="Cuenta izquierda" altDer="Cuenta derecha" />           
@@ -72,7 +72,7 @@ export default function Actividad() {
       {/* Primero muestro la tabla, y al hacer clic en editar se abre el form */}
       {modo === "editar" && !datoInicial && (
         <>
-          <h2>Modificar Actividad</h2>
+          <TituloConFlecha titulo="Modificar Actividad" destino="/" />
           <ActividadList
             actividades={actividades}
             modo="editar"
@@ -83,7 +83,7 @@ export default function Actividad() {
 
       {modo === "editar" && datoInicial && (
         <>
-          <h2>Modificar Actividad</h2>
+          <TituloConFlecha titulo="Modificar Actividad" destino="/" />
           <ImagenLateral />
           <ActividadForm
             guardar={guardarActividad}
@@ -95,21 +95,21 @@ export default function Actividad() {
 
       {modo === "eliminar" && (
         <>
-          <h2>Eliminar Actividad</h2>
+          <TituloConFlecha titulo="Eliminar Actividad" destino="/" />
           <ActividadList actividades={actividades} modo="eliminar" />
         </>
       )}
 
       {modo === "consultar" && (
         <>
-          <h2>Listado de Actividades</h2>
+          <TituloConFlecha titulo="Listado de Actividades" destino="/" />
           <ActividadList actividades={actividades} modo="consultar" />
         </>
       )}
 
       {modo === "postAlta" && (
         <>
-          <h2>Listado de Actividades</h2>
+          <TituloConFlecha titulo="Listado de Actividades" destino="/" />
           <ActividadList actividades={actividades} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
         </>
     )}

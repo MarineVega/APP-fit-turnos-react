@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import exitoImg from "../assets/img/exito.png"
+import exitoImg from "../assets/img/exito.png";
 import FormCampos from "./FormCampos";
 import FormBotones from "./FormBotones";
+import { useSearchParams } from "react-router-dom";
 
 // configuro estilos para sweetalert
 const swalEstilo = Swal.mixin({
@@ -16,7 +17,12 @@ const swalEstilo = Swal.mixin({
     }
 });
 
-export default function ActividadForm({ guardar, datoInicial }) {
+//export default function ActividadForm({ guardar, datoInicial }) {
+export default function ActividadForm({ guardar, actividades = [], datoInicial = null }) {
+    const [params] = useSearchParams();
+    const modo = params.get("modo") || "agregar";
+    const id = parseInt(params.get("id"));
+
     // Estados del formulario
     const [nombre, setNombre] = useState(datoInicial?.nombre || "");
     const [descripcion, setDescripcion] = useState(datoInicial?.descripcion || "");
@@ -30,6 +36,20 @@ export default function ActividadForm({ guardar, datoInicial }) {
         cupoMaximo: "",
     });
 
+    // Si estoy en modo editar, cargo los datos de la actividad
+    useEffect(() =>{
+        if (modo === "editar" && id && actividades.length > 0) {
+            const act = actividades.find((a) => a.id === id);
+            if (act) {
+                setNombre(act.nombre),
+                setDescripcion(act.descripcion);
+                setCupoMaximo(act.cupoMaximo);
+                setImagen(act.imagen || null);
+            }
+        }
+    }, [modo, id, actividades]);
+
+    // Validación y guardado
     const validarGuardar = (e) => {
         e.preventDefault();
 
@@ -58,9 +78,14 @@ export default function ActividadForm({ guardar, datoInicial }) {
 
         guardar({ nombre, descripcion, cupoMaximo, imagen });
 
+        const mensaje = 
+            modo === "editar"
+                ? 'La actividad ha sido actualizada.'
+                : 'La actividad ha sido creada.';
+
         swalEstilo.fire({
             title: '¡Operación Exitosa!',
-            text: 'La actividad ha sido creada.',
+            text: mensaje ,
             imageUrl: exitoImg ,
             imageAlt: 'Éxito',
             icon: 'success',
@@ -71,36 +96,25 @@ export default function ActividadForm({ guardar, datoInicial }) {
             buttonsStyling: false
         }).then(() => {
             limpiarFormulario();
-            window.location.href = "/actividad?modo=consultar";
-        
-        /*
-        then((result) => {
-            if (result.isConfirmed) {
-                if (modo === "editar") {
-                    window.location.href = './actividad.html?modo=editar';
-                } else {
-                    window.location.href = './actividad.html?modo=consultar';
-                }
-            }
-                */
+            // Redirección según modo
+            if (modo === "editar") {
+                window.location.href = "/actividad?modo=editar";
+            } else {
+                window.location.href = "/actividad?modo=consultar";
+            }        
         });
-
-      //  limpiarFormulario();      
     };
 
-    // const cancelar = () => {    
-    //     if (modo === "agregar") {
-    //         window.location.href = "../pages/administrar.html";
-    //     } else if (modo === "editar") {
-    //         window.location.href = "./actividad.html?modo=editar";
-    //     } else {
-    //         window.location.href = "./actividad.html?modo=consultar";
-    //     }
-    // });
 
     function cancelar () {
         limpiarFormulario();
-        window.location.href = "/actividad?modo=consultar";
+        if (modo === "agregar") {
+            window.location.href = "/";
+         } else if (modo === "editar") {
+            window.location.href = "/actividad?modo=editar";
+        } else {
+            window.location.href = "/actividad?modo=consultar";
+        }        
     }
 
     // Limpio campos
@@ -187,11 +201,10 @@ export default function ActividadForm({ guardar, datoInicial }) {
             </form>
 
             <FormBotones                    
-                boton1={{ id: "agregar", label: "AGREGAR", className: "btnAceptar", onClick: validarGuardar }}
+                boton1={{ id: "agregar", label: modo === "editar" ? "GUARDAR" : "AGREGAR", className: "btnAceptar", onClick: validarGuardar }}
                 boton2={{ id: "cancelar", label: "CANCELAR", className: "btnCancelar", onClick: cancelar }}
                 contenedorClass="contenedorBotones"
             />                
         </section>
     );
 }
-

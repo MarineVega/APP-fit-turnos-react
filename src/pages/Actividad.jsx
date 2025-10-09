@@ -1,13 +1,12 @@
-import React, { useState } from "react";    // React no se importa con llaves, solo el hook useState
+import React, { useState } from "react";         // React no se importa con llaves, solo el hook useState
 import { useSearchParams } from "react-router-dom";
 import "../styles/style.css";
 
-import ActividadForm from "../components/ActividadForm"
-import ActividadList from "../components/ActividadList"
-import ImagenLateral from "../components/ImagenLateral"
+import ActividadForm from "../components/ActividadForm";
+import ActividadList from "../components/ActividadList";
+import ImagenLateral from "../components/ImagenLateral";
 
-import actividadesData from "../data/actividades.json";   // 👈 importa el JSON local (provisorio hasta que levante los datos de la BD)
-
+import actividadesData from "../data/actividades.json";     // 👈 importo el JSON local (provisorio hasta que levante los datos
 
 export default function Actividad() {
   //actividad → se mostrará "consultar"
@@ -16,57 +15,45 @@ export default function Actividad() {
   //actividad?modo=eliminar → mostrará la lista en modo eliminar
   //http://localhost:5173/actividad?modo=agregar
 
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const modo = params.get("modo") || "consultar";
-
-  // Estado de actividades, inicia con las del JSON
+  const id = parseInt(params.get("id"));            // 👈 identificador de la actividad a editar (si existe)
   const [actividades, setActividades] = useState(actividadesData);
+  const [datoInicial, setDatoInicial] = useState(null);     // actividad seleccionada para editar
 
-  // Función para agregar actividad
-  const guardarActividad = (nuevaActividad) => {
-    console.log("nuevaActividad")
-    console.log(nuevaActividad)
-    
-    setActividades((prev) => [...prev, { id: prev.length + 1, ...nuevaActividad }]);
+  // Detectar si hay una actividad seleccionada para editar  
+  React.useEffect(() => {
+    if (modo === "editar" && id) {
+      const act = actividades.find((a) => a.id === id);
+      setDatoInicial(act || null);
+    } else {
+      setDatoInicial(null);
+    }
+  }, [modo, id, actividades]);
 
-    console.log(actividades)
+  // Guardar actividad nueva o editada
+  const guardarActividad = (actividad) => {
+    if (modo === "editar" && datoInicial) {
+      const actualizadas = actividades.map((a) =>
+        a.id === datoInicial.id ? { ...a, ...actividad } : a
+      );
+      setActividades(actualizadas);
+    } else {
+      setActividades((prev) => [
+        ...prev,
+        { id: prev.length + 1, ...actividad },
+      ]);
+    }
+  };
 
-    /* Cuando pase a MySQL
-    puedo hacerlo con axios
-    axios.post("http://localhost:3000/api/actividades", nueva)
-      .then(res => setActividades(prev => [...prev, res.data]))
-      .catch(err => console.error(err));
-    
-    o con fetch
-      */
-
-    /*
-    const guardarActividad = async (nueva) => {
-      try {
-        const response = await fetch("http://localhost:3000/api/actividades", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(nueva)
-        });
-
-        if (!response.ok) {
-          throw new Error("Error al guardar actividad");
-        }
-
-        const data = await response.json(); // 👈 lo que devuelva tu backend
-        setActividades((prev) => [...prev, data]);
-      } catch (error) {
-        console.error("Error en fetch:", error);
-      }
-    };
-  */
+  // Cuando clickeo en el botón editar de la tabla
+  const handleEditar = (actividad) => {
+    setDatoInicial(actividad);
+    setParams({ modo: "editar", id: actividad.id }); 
   };
 
   return (
     <main className="mainActividad">
-       
       {modo === "agregar" && (
         <>
           <h2>Agregar Actividad</h2>
@@ -75,10 +62,27 @@ export default function Actividad() {
         </>
       )}
 
-      {modo === "editar" && (
+      {/* Primero muestro la tabla, y al hacer clic en editar se abre el form */}
+      {modo === "editar" && !datoInicial && (
         <>
           <h2>Modificar Actividad</h2>
-          <ActividadList actividades={actividades} modo="editar" />
+          <ActividadList
+            actividades={actividades}
+            modo="editar"
+            onEditar={handleEditar}
+          />
+        </>
+      )}
+
+      {modo === "editar" && datoInicial && (
+        <>
+          <h2>Modificar Actividad</h2>
+          <ImagenLateral />
+          <ActividadForm
+            guardar={guardarActividad}
+            datoInicial={datoInicial}
+            actividades={actividades}
+          />
         </>
       )}
 
@@ -95,7 +99,6 @@ export default function Actividad() {
           <ActividadList actividades={actividades} modo="consultar" />
         </>
       )}
-      
     </main>
   );
 }

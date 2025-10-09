@@ -70,6 +70,39 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
             nuevosErrores.cupoMaximo = "El cupo debe estar entre 1 y 100.";
             esValido = false;
         }
+        
+        // Valido que no se ingrese un nombre de actividad existente (usando las actividades del estado)
+        const nombreIngresado = nombre.trim().toLowerCase();            // normalizo el texto ingresado (quito espacios y lo paso a minúscula)        
+        const nombreDuplicado = actividades.some((act) =>               // recorro todas las actividades y busco si hay otra con el mismo nombre
+            act.nombre.trim().toLowerCase() === nombreIngresado &&
+            act.id !== id               // permito mismo nombre solo si estoy editando esa misma actividad
+        );
+        
+
+        /*      código para mostrar que tiene actividades e ir comparando
+        // 🔹 Validar nombre duplicado (usando las actividades del estado)
+        const nombreIngresado = nombre.trim().toLowerCase();
+
+        console.log("👉 Nombre ingresado:", nombreIngresado);
+        console.log("👉 Lista de actividades actuales:", actividades);
+
+        const nombreDuplicado = actividades.some((act) => {
+            const nombreAct = act.nombre.trim().toLowerCase();
+            const esDuplicado = nombreAct === nombreIngresado && act.id !== id//;
+
+            console.log(`Comparando con "${act.nombre}" (id: ${act.id}) → duplicado: ${esDuplicado}`);
+
+            return esDuplicado;
+        });
+        */
+
+        
+
+        if (nombreDuplicado) {
+            nuevosErrores.nombre = "Ya existe una actividad con ese nombre.";
+            esValido = false;
+        }
+
 
         setErrores(nuevosErrores);
 

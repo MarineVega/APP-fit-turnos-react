@@ -793,6 +793,8 @@ a.btnAceptar:hover {
   bottom: 0;
   left: 0;  
 }
+
+
 /* 
 .footer-content {
   display: flex;
@@ -1311,6 +1313,9 @@ main {
 }
 */
 
+
+
+
 @media (min-width: 1024px) {
   /* Mostrar solo en pantallas de escritorio (por ejemplo, a partir de 1024) */
   .desktop-only {
@@ -1347,6 +1352,5 @@ main {
   /* Desplazamiento lateral */
   .imagen-lateral-actividad.izquierda, .imagen-lateral-profesor.izquierda { left: 2%; }
   .imagen-lateral-actividad.derecha, .imagen-lateral-profesor.derecha { right: 2%; }
-
-
 }
+

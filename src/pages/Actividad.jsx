@@ -5,6 +5,7 @@ import "../styles/style.css";
 import ActividadForm from "../components/ActividadForm";
 import ActividadList from "../components/ActividadList";
 import ImagenLateral from "../components/ImagenLateral";
+import TituloConFlecha from "../components/TituloConFlecha";
 
 import actividadesData from "../data/actividades.json";     // 👈 importo el JSON local (provisorio hasta que levante los datos
 
@@ -54,11 +55,17 @@ export default function Actividad() {
 
   return (
     <main className="mainActividad">
+
       {modo === "agregar" && (
         <>
-          <h2>Agregar Actividad</h2>
-          <ImagenLateral />
-          <ActividadForm guardar={guardarActividad} />
+          <TituloConFlecha>Agregar Actividad</TituloConFlecha>
+          {/* <h2>Agregar Actividad</h2> */}
+          
+          {/* OJO!!!! hacerlo dinámico para poder usarlo con otras imágenes */}
+          <ImagenLateral altIzq="Cuenta izquierda" altDer="Cuenta derecha" />           
+
+          {/* 👇 Le paso también las actividades existentes, para la validación de nombre existente */}
+          <ActividadForm guardar={guardarActividad} actividades={actividades} />          
         </>
       )}
 

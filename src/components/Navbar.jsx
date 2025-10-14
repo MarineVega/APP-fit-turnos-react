@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import "../components/Navbar.css";
+
 import Logo_Fit_Home from "../assets/img/Logo_Fit_Home.png";
 import menuIcon from "../assets/img/menu.png";
 import buscar from "../assets/img/buscar.png";

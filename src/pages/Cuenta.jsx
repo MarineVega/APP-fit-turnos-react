@@ -8,6 +8,9 @@ import RecuperarStep2 from "../components/RecuperarStep2";
 import RecuperarStep3 from "../components/RecuperarStep3";
 import ImagenLateral from "../components/ImagenLateral";
 
+import imgCuentaIzq from "../assets/img/cuenta2.png";
+import imgCuentaDer from "../assets/img/cuenta1.png";
+
 export default function Cuenta() {
   const [form, setForm] = useState("login");
   const [searchParams] = useSearchParams();
@@ -20,7 +23,12 @@ export default function Cuenta() {
 
   return (
     <main className="mainCuenta">
-      <ImagenLateral altIzq="Cuenta izquierda" altDer="Cuenta derecha" />
+      <ImagenLateral
+        imgIzquierda={imgCuentaIzq}
+        imgDerecha={imgCuentaDer}
+        altIzq="Cuenta izquierda"
+        altDer="Cuenta derecha"
+      />
       <section className="seccionCuenta">
         {form === "login" && <LoginForm onSwitch={handleSwitch} />}
         {form === "registrar" && <RegistrarForm onSwitch={handleSwitch} />}

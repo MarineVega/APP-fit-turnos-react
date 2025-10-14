@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
+import "../components/Navbar.css";
 import Logo_Fit_Home from "../assets/img/Logo_Fit_Home.png";
 import menuIcon from "../assets/img/menu.png";
 import buscar from "../assets/img/buscar.png";
@@ -13,15 +13,26 @@ function Navbar() {
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   useEffect(() => {
-    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-    setUsuarioActivo(usuario);
+    const actualizarUsuario = () => {
+      const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+      setUsuarioActivo(usuario);
+    };
+
+    actualizarUsuario();
+
+    window.addEventListener("storage", actualizarUsuario);
+    window.addEventListener("usuarioActualizado", actualizarUsuario);
+
+    return () => {
+      window.removeEventListener("storage", actualizarUsuario);
+      window.removeEventListener("usuarioActualizado", actualizarUsuario);
+    };
   }, []);
 
-  const toggleMenu = () => {
-    setMenuAbierto(!menuAbierto);
-  };
+  const toggleMenu = () => setMenuAbierto((prev) => !prev);
 
-  const cerrarSesion = () => {
+  const cerrarSesion = (e) => {
+    e?.preventDefault();
     Swal.fire({
       title: "¿Cerrar sesión?",
       text: "¿Querés salir de tu cuenta?",
@@ -39,132 +50,129 @@ function Navbar() {
         localStorage.removeItem("usuarioActivo");
         setUsuarioActivo(null);
         setMenuAbierto(false);
+        window.dispatchEvent(new Event("usuarioActualizado"));
         navigate("/");
       }
     });
   };
 
-  return (
-    <header className="header">
-      <div className="navbar">
-        {/* === Zona izquierda === */}
-        <div className="nav-left">
-          {/* Logo */}
-          <Link to="/" className="logo">
-            <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
-          </Link>
-
-          {/* Icono hamburguesa SOLO visible en mobile */}
-          <button id="btnMenu" className="icon btnMenu" onClick={toggleMenu}>
-            <img src={menuIcon} alt="Menú" loading="lazy" />
-          </button>
-
-          {/* Menú de escritorio */}
-          <div className="nav-links desktop-only">
-            {usuarioActivo && (
-              <>
-                <Link to="/turnos" id="menuTurnos">
-                  Turnos
-                </Link>
-                {usuarioActivo.esAdmin && (
-                  <Link to="/administrar" id="menuAdmin">
-                    Administrar
-                  </Link>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* === Zona derecha === */}
-        <div className="nav-right">
-          <div className="nav-links desktop-only">
-            {usuarioActivo ? (
-              <>
-                <span id="nombreUsuario">
-                  {usuarioActivo.nombre}
-                  {usuarioActivo.esAdmin && " (Admin)"}
-                </span>
-                <a href="#" onClick={cerrarSesion} id="menuCerrarSesion">
-                  Cerrar Sesión
-                </a>
-              </>
-            ) : (
-              <>
-                <Link to="/cuenta" id="menuIniciarSesion">
-                  Iniciar Sesión
-                </Link>
-                <Link to="/cuenta?form=crear" id="menuCrearCuenta">
-                  Crear Cuenta
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Iconos búsqueda y notificaciones */}
-          <a href="#" className="icon">
-            <img src={buscar} alt="Buscar" loading="lazy" />
-          </a>
-          <a href="#" className="icon">
-            <img src={notif} alt="Notificaciones" loading="lazy" />
-          </a>
-        </div>
-      </div>
-
-      {/* === Menú desplegable mobile === */}
-      <div
-        id="menuDesplegable"
-        className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}
-      >
-        {usuarioActivo ? (
+  // Menu de escritorio
+  const DesktopMenu = () => (
+    <>
+      {/* Lado izquierdo */}
+      <div className="nav-left desktop-only">
+        {usuarioActivo && (
           <>
-            <span id="nombreUsuarioMobile">
-              {usuarioActivo.nombre}
-              {usuarioActivo.esAdmin && " (Admin)"}
-            </span>
+            <Link to="/turnos" id="menuTurnos">
+              Turnos
+            </Link>
             {usuarioActivo.esAdmin && (
-              <Link
-                to="/administrar"
-                id="menuHamburguesaAdmin"
-                onClick={() => setMenuAbierto(false)}
-              >
+              <Link to="/administrar" id="menuAdmin">
                 Administrar
               </Link>
             )}
-            <Link
-              to="/turnos"
-              id="menuHamburguesaTurnos"
-              onClick={() => setMenuAbierto(false)}
+          </>
+        )}
+      </div>
+
+      {/* Lado derecho */}
+      <div className="nav-right desktop-only">
+        {usuarioActivo ? (
+          <>
+            <span
+              id="nombreUsuario"
+              style={{ color: "white", fontSize: "18px", fontWeight: "bold" }}
             >
-              Turnos
-            </Link>
-            <a
-              href="#"
+              {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
+            </span>
+            <button
+              className="btn-link"
               onClick={cerrarSesion}
-              id="menuHamburguesaCerrarSesion"
+              id="menuCerrarSesion"
             >
               Cerrar Sesión
-            </a>
+            </button>
           </>
         ) : (
           <>
-            <Link
-              to="/cuenta"
-              id="menuHamburguesaIniciarSesion"
-              onClick={() => setMenuAbierto(false)}
-            >
+            <Link to="/cuenta" id="menuIniciarSesion">
               Iniciar Sesión
             </Link>
-            <Link
-              to="/cuenta?form=crear"
-              id="menuHamburguesaCrearCuenta"
-              onClick={() => setMenuAbierto(false)}
-            >
+            <Link to="/cuenta?form=crear" id="menuCrearCuenta">
               Crear Cuenta
             </Link>
           </>
         )}
+        <a href="#" className="icon" aria-label="Buscar">
+           <img src={buscar} alt="Buscar" loading="lazy" />
+        </a>
+        <a href="#" className="icon" aria-label="Notificaciones">
+          <img src={notif} alt="Notificaciones" loading="lazy" />
+        </a>
+
       </div>
+    </>
+  );
+
+  // Menu mobile
+  const MobileMenu = () => (
+    <div className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}>
+      {usuarioActivo ? (
+        <>
+          <span id="nombreUsuarioMobile">
+            {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
+          </span>
+          <Link to="/turnos" onClick={() => setMenuAbierto(false)}>
+            Turnos
+          </Link>
+          {usuarioActivo.esAdmin && (
+            <Link to="/administrar" onClick={() => setMenuAbierto(false)}>
+              Administrar
+            </Link>
+          )}
+          <button className="btn-link" onClick={cerrarSesion}>
+            Cerrar Sesión
+          </button>
+        </>
+      ) : (
+        <>
+          <Link to="/cuenta" onClick={() => setMenuAbierto(false)}>
+            Iniciar Sesión
+          </Link>
+          <Link to="/cuenta?form=crear" onClick={() => setMenuAbierto(false)}>
+            Crear Cuenta
+          </Link>
+        </>
+      )}
+    </div>
+  );
+
+  return (
+    <header className="header">
+      <div className="navbar">
+        {/* Logo izquierda */}
+        <div className="nav-left">
+          <Link to="/" className="logo">
+            <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
+          </Link>
+        </div>
+
+        {/* Menu de escritorio */}
+        <DesktopMenu />
+
+        {/* Botón menú mobile */}
+        <button
+          id="btnMenu"
+          className="icon btnMenu desktop-hidden"
+          onClick={toggleMenu}
+          aria-label="Abrir menú"
+        >
+          <img src={menuIcon} alt="Menú" loading="lazy" />
+        </button>
+      </div>
+
+      {/* Menu mobile */}
+      <MobileMenu />
     </header>
   );
 }

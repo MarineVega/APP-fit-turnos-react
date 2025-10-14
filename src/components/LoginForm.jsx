@@ -12,38 +12,57 @@ export default function LoginForm({ onSwitch }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Verificar si ya hay usuario logueado
+  // Si ya hay usuario logueado, redirige
   useEffect(() => {
-    const usuarioActivo = JSON.parse(localStorage.getItem("user"));
-    if (usuarioActivo) navigate("/"); // Redirige si ya está logueado
-  }, []);
+    const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (usuarioActivo) navigate("/turnos");
+  }, [navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
-    if (!email || !password) return setError("Completá todos los campos.");
+
+    if (!email || !password) {
+      setError("Completá todos los campos.");
+      return;
+    }
 
     setLoading(true);
 
     setTimeout(() => {
-      // Buscar usuario en localStorage
       const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-      const usuario = usuarios.find(u => u.email === email && u.password === password);
+      const usuario = usuarios.find(
+        (u) => u.email === email && u.password === password
+      );
 
       if (usuario) {
-        localStorage.setItem("user", JSON.stringify({ nombre: usuario.nombre, email: usuario.email }));
+        localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
+
+        // Notificar a otros componentes
+        window.dispatchEvent(new Event("usuarioActualizado"));
+
         Swal.fire({
           title: "¡Bienvenido!",
           icon: "success",
           timer: 1500,
           showConfirmButton: false,
-        }).then(() => navigate("/"));
+        }).then(() => navigate("/turnos"));
       } else {
         setError("Usuario o contraseña incorrecta");
       }
 
       setLoading(false);
-    }, 300); // Simula espera de servidor
+    }, 300);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    if (error) setError("");
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    if (error) setError("");
   };
 
   return (
@@ -54,7 +73,7 @@ export default function LoginForm({ onSwitch }) {
         label="Email"
         type="email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={handleEmailChange}
         name="email"
         className="inputCuenta"
       />
@@ -63,7 +82,7 @@ export default function LoginForm({ onSwitch }) {
         label="Contraseña"
         type="password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={handlePasswordChange}
         name="password"
         className="inputCuenta"
       />
@@ -80,7 +99,7 @@ export default function LoginForm({ onSwitch }) {
             id: "btnIngresar",
             label: loading ? "Cargando..." : "Ingresar",
             className: "btnAceptar",
-            onClick: handleSubmit,
+            type: "submit",
           }}
           boton2={{
             id: "btnCancelar",

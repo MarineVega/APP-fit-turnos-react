@@ -1378,4 +1378,32 @@ main {
   .imagen-lateral-actividad.derecha, .imagen-lateral-profesor.derecha { right: 2%; }
 
 
+
+
+  .nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+.nav-right a,
+.nav-right button,
+.nav-right span {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon img {
+  height: 20px;
+  margin-left: 5px;
+}
+
 }

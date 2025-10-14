@@ -56,10 +56,9 @@ function Navbar() {
     });
   };
 
-  // Menu de escritorio
+  // ===== Menú de escritorio =====
   const DesktopMenu = () => (
     <>
-      {/* Lado izquierdo */}
       <div className="nav-left desktop-only">
         {usuarioActivo && (
           <>
@@ -75,7 +74,6 @@ function Navbar() {
         )}
       </div>
 
-      {/* Lado derecho */}
       <div className="nav-right desktop-only">
         {usuarioActivo ? (
           <>
@@ -104,17 +102,16 @@ function Navbar() {
           </>
         )}
         <a href="#" className="icon" aria-label="Buscar">
-           <img src={buscar} alt="Buscar" loading="lazy" />
+          <img src={buscar} alt="Buscar" loading="lazy" />
         </a>
         <a href="#" className="icon" aria-label="Notificaciones">
           <img src={notif} alt="Notificaciones" loading="lazy" />
         </a>
-
       </div>
     </>
   );
 
-  // Menu mobile
+  // ===== Menú mobile =====
   const MobileMenu = () => (
     <div className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}>
       {usuarioActivo ? (
@@ -147,31 +144,31 @@ function Navbar() {
     </div>
   );
 
+  // ===== Render =====
   return (
     <header className="header">
       <div className="navbar">
-        {/* Logo izquierda */}
+        {/* Logo + hamburguesa */}
         <div className="nav-left">
           <Link to="/" className="logo">
             <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
           </Link>
+
+          <button
+            id="btnMenu"
+            className="icon btnMenu desktop-hidden"
+            onClick={toggleMenu}
+            aria-label="Abrir menú"
+          >
+            <img src={menuIcon} alt="Menú" loading="lazy" />
+          </button>
         </div>
 
-        {/* Menu de escritorio */}
+        {/* Menú de escritorio */}
         <DesktopMenu />
-
-        {/* Botón menú mobile */}
-        <button
-          id="btnMenu"
-          className="icon btnMenu desktop-hidden"
-          onClick={toggleMenu}
-          aria-label="Abrir menú"
-        >
-          <img src={menuIcon} alt="Menú" loading="lazy" />
-        </button>
       </div>
 
-      {/* Menu mobile */}
+      {/* Menú mobile */}
       <MobileMenu />
     </header>
   );

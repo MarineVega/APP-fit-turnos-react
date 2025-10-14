@@ -249,7 +249,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
             {modo === "postAlta" && (
                 <FormBotones
                     boton1={{ id: "agregar", label: "AGREGAR", className: "btnAceptar", onClick: () => (window.location.href = "/actividad?modo=agregar") }}
-                    boton2={{ id: "cancelar", label: "VOLVER", className: "btnCancelar", onClick: () => (window.location.href = "/") }}                        
+                    boton2={{ id: "cancelar", label: "VOLVER", className: "btnCancelar", onClick: () => (window.location.href = "/administrar") }}                        
                     contenedorClass="contenedorBotones"
                 />
             )}

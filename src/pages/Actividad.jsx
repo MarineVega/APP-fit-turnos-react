@@ -2,6 +2,9 @@ import React, { useState } from "react";         // React no se importa con llav
 import { useSearchParams } from "react-router-dom";
 import "../styles/style.css";
 
+import imgIzquierda from "../assets/img/actividad1.png";
+import imgDerecha from "../assets/img/actividad2.png";
+
 import ActividadForm from "../components/ActividadForm";
 import ActividadList from "../components/ActividadList";
 import ImagenLateral from "../components/ImagenLateral";
@@ -58,11 +61,16 @@ export default function Actividad() {
 
       {modo === "agregar" && (
         <>
-          <TituloConFlecha titulo="Agregar Actividad" destino="/" />
+          <TituloConFlecha> Agregar Actividad </TituloConFlecha>
+          {/*  <TituloConFlecha titulo="Agregar Actividad" destino="/administrar" />*/}
           {/* <TituloConFlecha titulo="Agregar Actividad" destino="/actividad?modo=consultar" /> */}
           
-          {/* OJO!!!! hacerlo dinámico para poder usarlo con otras imágenes */}
-          <ImagenLateral altIzq="Cuenta izquierda" altDer="Cuenta derecha" />           
+          <ImagenLateral
+            imgIzquierda={imgIzquierda}
+            imgDerecha={imgDerecha}
+            altIzq="Actividad izquierda"
+            altDer="Actividad derecha"
+          />
 
           {/* 👇 Le paso también las actividades existentes, para la validación de nombre existente */}
           <ActividadForm guardar={guardarActividad} actividades={actividades} />          
@@ -72,7 +80,8 @@ export default function Actividad() {
       {/* Primero muestro la tabla, y al hacer clic en editar se abre el form */}
       {modo === "editar" && !datoInicial && (
         <>
-          <TituloConFlecha titulo="Modificar Actividad" destino="/" />
+          {/* <TituloConFlecha titulo="Modificar Actividad" destino="/administrar" /> */}
+          <TituloConFlecha> Modificar Actividad </TituloConFlecha>
           <ActividadList
             actividades={actividades}
             modo="editar"
@@ -83,7 +92,7 @@ export default function Actividad() {
 
       {modo === "editar" && datoInicial && (
         <>
-          <TituloConFlecha titulo="Modificar Actividad" destino="/" />
+          <TituloConFlecha> Modificar Actividad </TituloConFlecha>
           <ImagenLateral />
           <ActividadForm
             guardar={guardarActividad}
@@ -94,22 +103,22 @@ export default function Actividad() {
       )}
 
       {modo === "eliminar" && (
-        <>
-          <TituloConFlecha titulo="Eliminar Actividad" destino="/" />
+        <>          
+          <TituloConFlecha> Eliminar Actividad </TituloConFlecha>
           <ActividadList actividades={actividades} modo="eliminar" />
         </>
       )}
 
       {modo === "consultar" && (
         <>
-          <TituloConFlecha titulo="Listado de Actividades" destino="/" />
+          <TituloConFlecha> Listado de Actividades </TituloConFlecha>
           <ActividadList actividades={actividades} modo="consultar" />
         </>
       )}
 
       {modo === "postAlta" && (
         <>
-          <TituloConFlecha titulo="Listado de Actividades" destino="/" />
+          <TituloConFlecha> Listado de Actividades </TituloConFlecha>
           <ActividadList actividades={actividades} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
         </>
     )}

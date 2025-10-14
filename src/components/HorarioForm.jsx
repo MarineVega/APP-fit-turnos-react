@@ -1,8 +1,13 @@
+//  OJOOOO!!!!!!!!!!!!!!!!! REEMPLAZAR POR HORARIO
+
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import exitoImg from "../assets/img/exito.png";
 import FormCampos from "./FormCampos";
 import FormBotones from "./FormBotones";
+import ComboProfesores from "./ComboProfesores";
+import ComboActividades from "./ComboActividades";
+
 import { useSearchParams } from "react-router-dom";
 
 // configuro estilos para sweetalert
@@ -17,49 +22,42 @@ const swalEstilo = Swal.mixin({
     }
 });
 
-//export default function ActividadForm({ guardar, datoInicial }) {
-export default function ActividadForm({ guardar, actividades = [], datoInicial = null }) {
+export default function HorarioForm({ guardar, horarios = [], datoInicial = null }) {
     const [params] = useSearchParams();
-    const modo = params.get("modo") || "agregar";
-    //const id = parseInt(params.get("id"));
+    const modo = params.get("modo") || "agregar";    
+
+    
 
     // Cuando no haya parámetro id en la URL, uso el que viene del objeto datoInicial (que el padre le pasa correctamente)
     //const id = parseInt(params.get("id")) || datoInicial?.id || null;
 
-    const id = datoInicial?.actividad_id || null;
+    const id = datoInicial?.horario_id || null;
 
     // Estados del formulario
-    const [nombre, setNombre] = useState(datoInicial?.nombre || "");
-    const [descripcion, setDescripcion] = useState(datoInicial?.descripcion || "");
-    const [cupoMaximo, setCupoMaximo] = useState(datoInicial?.cupoMaximo || "");
-    const [imagen, setImagen] = useState(datoInicial?.imagen || null);
+    const [profesor, setProfesor] = useState(datoInicial?.profesor || null);
+    const [actividad, setActividad] = useState(datoInicial?.actividad || "");
+    const [cupoMaximo, setCupoMaximo] = useState(datoInicial?.cupoMaximo || null);
+    const [dias, setDias] = useState(datoInicial?.dias || "");
+    const [horario, setHorario] = useState(datoInicial?.horario || "");
 
     // Estados de errores
     const [errores, setErrores] = useState({
-        nombre: "",
-        descripcion: "",
-        cupoMaximo: "",
+        profesor: "",
+        actividad: "",
+        dias: "",
+        horario: "",
     });
 
-    // Si estoy en modo editar, cargo los datos de la actividad
-    useEffect(() =>{
-        //if (modo === "editar" && id && actividades.length > 0) {
+    // Si estoy en modo editar, cargo los datos del horario
+    useEffect(() =>{        
         if (modo === "editar" && datoInicial) {
-            setNombre(datoInicial.nombre);
-            setDescripcion(datoInicial.descripcion);
-            setCupoMaximo(datoInicial.cupoMaximo);
-            setImagen(datoInicial.imagen ||null);
-           /*
-            const act = actividades.find((a) => a.id === id);
-            if (act) {
-                setNombre(act.nombre),
-                setDescripcion(act.descripcion);
-                setCupoMaximo(act.cupoMaximo);
-                setImagen(act.imagen || null);
-            }
-            */
+            setProfesor(datoInicial.profesor || null);
+            setActividad(datoInicial.actividad);
+            setCupoMaximo(datoInicial.cupoMaximo || null);
+            setDias(datoInicial.dias);
+            setHorario(datoInicial.horario);            
         }
-    }, [modo, datoInicial]);      //[modo, id, actividades]);
+    }, [modo, datoInicial]);
 
 
     console.log("🟢 Modo:", modo);
@@ -70,27 +68,43 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
     const validarGuardar = (e) => {
         e.preventDefault();
 
-        let nuevosErrores = { nombre: "", descripcion: "", cupoMaximo: "" };
+        let nuevosErrores = { actividad: "", dias: "", horario: "" };
         let esValido = true;
 
-        if (!nombre.trim()) {
-            nuevosErrores.nombre = "Por favor ingrese el nombre.";
+        if (!actividad.trim()) {
+            nuevosErrores.actividad = "Por favor seleccione una actividad.";
             esValido = false;
         }
 
-        if (!descripcion.trim()) {
-            nuevosErrores.descripcion = "Por favor ingrese una descripción.";
-            esValido = false;
+        // el cupo máximo es opcional, pero si se completa, validar el rango
+        /*
+        if (cupoMaximo.value !== "") {
+            const valor = parseInt(cupoMaximo.value);
+            if (isNaN(valor) || valor < 1 || valor > 100) {
+                mostrarMensajeError("cupoMaximoError", "El cupo debe estar entre 1 y 100.");
+                esValido = false;
+            }
         }
-
-        if (!cupoMaximo || cupoMaximo < 1 || cupoMaximo > 100) {
+          */  
+        if (cupoMaximo & (cupoMaximo < 1 || cupoMaximo > 100)) {
             nuevosErrores.cupoMaximo = "El cupo debe estar entre 1 y 100.";
             esValido = false;
         }
         
-        console.log("👉 Listado de Actividades:", actividades);
-        console.log("👉 Actividad a modificar:", id);
+         if (!dias.trim()) {
+            nuevosErrores.dias = "Debe seleccionar al menos un día.";
+            esValido = false;
+        }
 
+         if (!horario.trim()) {
+            nuevosErrores.horario = "Por favor seleccione un horario.";
+            esValido = false;
+        }
+
+        console.log("👉 Listado de Horarios:", horarios);
+        console.log("👉 Horario a modificar:", id);
+
+/*
         // Valido que no se ingrese un nombre de actividad existente (usando las actividades del estado)
         const nombreIngresado = nombre.trim().toLowerCase();            // normalizo el texto ingresado (quito espacios y lo paso a minúscula)        
         const nombreDuplicado = actividades.some((act) =>               // recorro todas las actividades y busco si hay otra con el mismo nombre
@@ -98,9 +112,10 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
             Number(act.actividad_id) !== Number(id)   // permito mismo nombre solo si estoy editando esa misma actividad
                                             // 👈 realizo una omparación numérica
         );
-        
+*/
+
         console.log("🟢 ID actual:", id);
-        console.log("🟢 Comparando contra actividades:", actividades.map(a => a.id));
+        console.log("🟢 Comparando contra horarios:", horarios.map(a => a.id));
 
         /*      código para mostrar que tiene actividades e ir comparando
         // 🔹 Validar nombre duplicado (usando las actividades del estado)
@@ -120,24 +135,24 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
         */
 
         
-
+/*
         if (nombreDuplicado) {
             nuevosErrores.nombre = "Ya existe una actividad con ese nombre.";
             esValido = false;
         }
-
+*/
 
         setErrores(nuevosErrores);
 
         // Si hay errores SALGO
         if (!esValido) return;
 
-        guardar({ nombre, descripcion, cupoMaximo, imagen });
+        guardar({ profesor, actividad, cupoMaximo, dias, horario });
 
         const mensaje = 
             modo === "editar"
-                ? 'La actividad ha sido actualizada.'
-                : 'La actividad ha sido creada.';
+                ? 'El horario ha sido actualizado.'
+                : 'El horario ha sido creado.';
 
         swalEstilo.fire({
             title: '¡Operación Exitosa!',
@@ -154,10 +169,9 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
             limpiarFormulario();
             // Redirección según modo
             if (modo === "editar") {
-                window.location.href = "/actividad?modo=editar";
+                window.location.href = "/horario?modo=editar";
             } else {
-                //window.location.href = "/actividad?modo=consultar";
-                window.location.href = "/actividad?modo=postAlta";      // para distinguirlo del consultar normal
+                window.location.href = "/horario?modo=postAlta";      // para distinguirlo del consultar normal
             }        
         });
     };
@@ -168,30 +182,64 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
         if (modo === "agregar") {
             window.location.href = "/administrar";
          } else if (modo === "editar") {
-            window.location.href = "/actividad?modo=editar";
+            window.location.href = "/horario?modo=editar";
         } else {
-            window.location.href = "/actividad?modo=consultar";
+            window.location.href = "/horario?modo=consultar";
         }        
     }
 
     // Limpio campos
     function limpiarFormulario() {
-        setNombre("");
-        setDescripcion("");
-        setCupoMaximo("");
-        setImagen(null);
-        setErrores({ nombre: "", descripcion: "", cupoMaximo: "" });
-    }
+        setProfesor("");
+        setActividad("");
+        setCupoMaximo(null);
+        setDias("");
+        setHorario("");
+
+        setErrores({ actividad: "", dias: "", horario: "" });    
+    };
+
+    
 
     // Limpia el mensaje de error al hacer foco o modificar el campo
     const limpiarError = (campo) => {
         setErrores((prev) => ({ ...prev, [campo]: "" }));           // se actualiza así -> setErrores(prev => ({ ...prev, nombre: "" }));
     };
 
+    // Combo Profesores
+    const [profesorID, setProfesorID] = useState("");
+    const handleProfesor = (e) => {
+        e.preventDefault();
+        console.log("Profesor seleccionado:", profesorID);
+    };
+
+    // Combo Actividades
+    const [actividadID, setActividadID] = useState("");
+    const handleActividad = (e) => {
+        e.preventDefault();
+        console.log("Actividad seleccionada:", actividadID);
+    };
 
     return (
-        <section className="seccionActividad">        
-            <form onSubmit={validarGuardar} className="formActividad">
+        <section className="seccionHorario">        
+            <form onSubmit={validarGuardar} className="formHorario">
+                
+                <ComboProfesores 
+                    value={profesorID} 
+                    onChange={setProfesorID}
+                    className="inputHorario"
+                    label="Profesor"
+                />
+
+                <ComboActividades 
+                    value={actividadID} 
+                    onChange={setActividadID} 
+                    incluirTodos={false}
+                    className="inputHorario"
+                    label="Actividad *"               
+                />
+                
+{/* 
                 <FormCampos
                     label="Nombre *"
                     name="nombre"
@@ -218,10 +266,10 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
                     onFocus={() => limpiarError("descripcion")}
                     className="inputActividad"
                     error={errores.descripcion}
-                />
+                /> */}
 
                 <FormCampos
-                    label="Cupo Máximo *"
+                    label="Cupo Máximo"
                     type="number"
                     name="cupoMaximo"
                     placeholder="10"
@@ -235,26 +283,6 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
                     error={errores.cupoMaximo}
                 />
                 
-                <FormCampos
-                    label="Imagen"
-                    type="file"
-                    name="imagen"
-                    isFile={true}           // 👈 indicamos que es un input file
-                    preview={true}          // 👈 mostramos vista previa
-                    value={imagen}
-                   // onChange={(e) => setImagen(e.target.files[0])}
-                    onChange={(e) => {
-                        const archivo = e.target.files[0];
-                        if (archivo) {
-                            // guardamos solo el nombre del archivo, no el objeto File; ej: "yoga.png"
-                            setImagen(archivo.name);        //sería lo que voy a mostrar luego desde /assets/img/yoga.png
-                        }
-                    }}
-                    className="inputActividad"
-                    warning={"Coloque la imagen en la carpeta <b>src/assets/img</b> antes de seleccionarla."}
-                />
-                
-                <label className="advertencia">* Campos obligatorios</label>                
             </form>
 
             <FormBotones                    

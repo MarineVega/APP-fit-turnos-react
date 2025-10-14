@@ -1,0 +1,26 @@
+[
+  {
+    "profesor_id": 1,
+    "persona_id": 3,
+    "apellido": "Pérez",
+    "nombre": "María",
+    "titulo": "Lic. en Educación Física",
+    "activo": true
+  },
+  {
+    "profesor_id": 2,
+    "persona_id": 4,
+    "apellido": "Gómez",
+    "nombre": "Carlos",
+    "titulo": "Instructor de Yoga",
+    "activo": false
+  },
+  {
+    "profesor_id": 3,
+    "persona_id": 6,
+    "apellido": "Fernández",
+    "nombre": "Laura",
+    "titulo": "Profesora de Pilates",
+    "activo": true
+  }
+]

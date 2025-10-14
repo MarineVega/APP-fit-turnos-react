@@ -93,31 +93,11 @@ export default function MainPrincipal() {
             <button
                 className="btnAceptar"
                 type="button"
-                onClick={() => navigate("/Actividad?modo=consultar")}
-            >Actividades
+                onClick={() => navigate("/Administrar")}
+            >Administrar
             </button>
             
-            <button
-                className="btnAceptar"
-                type="button"
-                onClick={() => navigate("/Actividad?modo=agregar")}
-            >Agregar Actividad
-            </button>
-
-             <button
-                className="btnAceptar"
-                type="button"
-                onClick={() => navigate("/Actividad?modo=editar")}
-            >Modificar Actividad
-            </button>
-
-             <button
-                className="btnAceptar"
-                type="button"
-                onClick={() => navigate("/Actividad?modo=eliminar")}
-            >Eliminar Actividad
-            </button>
-
+            
             {/* o
             <Link to="/actividad">Actividades</Link> */}
 

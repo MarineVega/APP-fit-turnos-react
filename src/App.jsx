@@ -14,6 +14,7 @@ import Administrar from "./pages/Administrar";
 import Turnos from "./pages/Turnos";
 import Cuenta from "./pages/Cuenta";
 import Actividad from './pages/Actividad';
+import Horario from './pages/Horario';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/administrar" element={<Administrar />} />
         <Route path="/turnos" element={<Turnos />} />        
         <Route path="/actividad" element={<Actividad />} />
+        <Route path="/horario" element={<Horario />} />
       </Routes>
           
       <Footer />

@@ -14,7 +14,7 @@ export default function RegistrarForm({ onSwitch }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [esAdmin, setEsAdmin] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -65,7 +65,7 @@ export default function RegistrarForm({ onSwitch }) {
       nombre: username,
       email,
       password,
-      esAdmin: isAdmin,
+      esAdmin: esAdmin,
     };
 
     usuariosGuardados.push(nuevoUsuario);
@@ -134,12 +134,12 @@ export default function RegistrarForm({ onSwitch }) {
       <div className="check-admin">
         <input
           type="checkbox"
-          id="isAdmin"
-          checked={isAdmin}
+          id="esAdmin"
+          checked={esAdmin}
           className="checkboxAdmin"   // <- agregamos la clase
-          onChange={(e) => setIsAdmin(e.target.checked)}
+          onChange={(e) => setEsAdmin(e.target.checked)}
         />
-       <label htmlFor="isAdmin">Crear como administrador</label>       
+       <label htmlFor="esAdmin">Crear como administrador</label>       
       </div>
     {/* Aquí el error */}
       {error && (

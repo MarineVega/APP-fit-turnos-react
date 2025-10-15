@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import "./Navbar.css";
 
 import Logo_Fit_Home from "../assets/img/Logo_Fit_Home.png";
 import menuIcon from "../assets/img/menu.png";
@@ -60,13 +61,19 @@ function Navbar() {
   const DesktopMenu = () => (
     <>
       <div className="nav-left desktop-only">
+        {/* Logo */}
+        <Link to="/" className="logo">
+          <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
+        </Link>
+
+        {/* Turnos y Administrar si está logueado */}
         {usuarioActivo && (
           <>
-            <Link to="/turnos" id="menuTurnos">
+            <Link className="menu-link" to="/turnos">
               Turnos
             </Link>
             {usuarioActivo.esAdmin && (
-              <Link to="/administrar" id="menuAdmin">
+              <Link className="menu-link" to="/administrar">
                 Administrar
               </Link>
             )}
@@ -75,32 +82,26 @@ function Navbar() {
       </div>
 
       <div className="nav-right desktop-only">
-        {usuarioActivo ? (
+        {/* Nombre y Cerrar sesión si está logueado */}
+        {usuarioActivo && (
           <>
             <span
-              id="nombreUsuario"
-              style={{ color: "white", fontSize: "18px", fontWeight: "bold" }}
+              className="menu-link"
+              style={{ fontSize: "1.1rem", fontWeight: 600, color: "white" }}
             >
               {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
             </span>
-            <button
-              className="btn-link"
+            <span
+              className="menu-link logout"
+              style={{ cursor: "pointer" }}
               onClick={cerrarSesion}
-              id="menuCerrarSesion"
             >
-              Cerrar Sesión
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/cuenta" id="menuIniciarSesion">
-              Iniciar Sesión
-            </Link>
-            <Link to="/cuenta?form=crear" id="menuCrearCuenta">
-              Crear Cuenta
-            </Link>
+              Cerrar sesión
+            </span>
           </>
         )}
+
+        {/* Iconos siempre visibles */}
         <a href="#" className="icon" aria-label="Buscar">
           <img src={buscar} alt="Buscar" loading="lazy" />
         </a>
@@ -116,7 +117,7 @@ function Navbar() {
     <div className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}>
       {usuarioActivo ? (
         <>
-          <span id="nombreUsuarioMobile">
+          <span className="menu-link">
             {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
           </span>
           <Link to="/turnos" onClick={() => setMenuAbierto(false)}>
@@ -127,9 +128,9 @@ function Navbar() {
               Administrar
             </Link>
           )}
-          <button className="btn-link" onClick={cerrarSesion}>
-            Cerrar Sesión
-          </button>
+          <span className="menu-link logout" onClick={cerrarSesion}>
+            Cerrar sesión
+          </span>
         </>
       ) : (
         <>
@@ -144,31 +145,24 @@ function Navbar() {
     </div>
   );
 
-  // ===== Render =====
   return (
     <header className="header">
       <div className="navbar">
-        {/* Logo + hamburguesa */}
-        <div className="nav-left">
-          <Link to="/" className="logo">
-            <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
-          </Link>
-
-          <button
-            id="btnMenu"
-            className="icon btnMenu desktop-hidden"
-            onClick={toggleMenu}
-            aria-label="Abrir menú"
-          >
-            <img src={menuIcon} alt="Menú" loading="lazy" />
-          </button>
-        </div>
+        {/* Botón de menú móvil */}
+        <button
+          id="btnMenu"
+          className="icon btnMenu desktop-hidden"
+          onClick={toggleMenu}
+          aria-label="Abrir menú"
+        >
+          <img src={menuIcon} alt="Menú" loading="lazy" />
+        </button>
 
         {/* Menú de escritorio */}
         <DesktopMenu />
       </div>
 
-      {/* Menú mobile */}
+      {/* Menú móvil */}
       <MobileMenu />
     </header>
   );

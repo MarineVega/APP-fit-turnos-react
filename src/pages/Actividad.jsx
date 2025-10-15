@@ -93,7 +93,12 @@ export default function Actividad() {
       {modo === "editar" && datoInicial && (
         <>
           <TituloConFlecha> Modificar Actividad </TituloConFlecha>
-          <ImagenLateral />
+           <ImagenLateral
+            imgIzquierda={imgIzquierda}
+            imgDerecha={imgDerecha}
+            altIzq="Actividad izquierda"
+            altDer="Actividad derecha"
+          />
           <ActividadForm
             guardar={guardarActividad}
             datoInicial={datoInicial}

@@ -4,9 +4,11 @@ import actividadesData from "../data/actividades.json";       // 👈 Datos mock
 export default function ComboActividades({  
     value, 
     onChange = () => {},
+    onFocus,
     incluirTodos = true, 
     className="",
     label,
+    error,
 }) {
   const [actividades, setActividades] = useState([]);
 
@@ -23,7 +25,7 @@ export default function ComboActividades({
 
   return (
     <div className="campoFormulario">
-      <label for="actividad"> {label} </label>
+      <label htmlFor="actividad"> {label} </label>
       <select
         id="actividad"
         name="actividad"
@@ -32,7 +34,8 @@ export default function ComboActividades({
             const val = e.target.value;
             // convertimos "" a null para que el padre reciba null si selecciona "(Todos)"
             onChange(val === "" ? null : val);
-        }}          
+        }}   
+        onFocus={onFocus}       
         className={className}
       >
         {/* 👇 Opción por defecto */}
@@ -48,6 +51,10 @@ export default function ComboActividades({
           </option>
         ))}
       </select>
+
+      {/* 👇 Mostramos el mensaje de error, si existe */}
+      {error && <div className="mensaje-error">{error}</div>}
+
     </div>
   );
 }

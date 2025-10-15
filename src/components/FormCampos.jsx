@@ -7,7 +7,7 @@ const FormCampos = ({               // desestructuro las props
     value,
     onChange,
     onFocus,
-    className="",
+    className = "",
     error,
     name,
     isTextArea = false,
@@ -50,7 +50,7 @@ const FormCampos = ({               // desestructuro las props
                 <textarea
                     className={className}
                     placeholder={placeholder}
-                    value={value}
+                    value={value ?? ""}
                     onChange={onChange}
                     onFocus={onFocus}
                     name={name}
@@ -60,7 +60,7 @@ const FormCampos = ({               // desestructuro las props
                     type={type}
                     className={className}
                     placeholder={placeholder}
-                    value={value}
+                    value={value ?? ""}
                     onChange={onChange}                    
                     onFocus={onFocus}
                     name={name}

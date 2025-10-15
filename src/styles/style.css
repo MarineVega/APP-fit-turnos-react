@@ -428,14 +428,14 @@ a.btnAceptar:hover {
         }
 
         .etiquetaDias {
-          font-weight: bold;
+          /*font-weight: bold;*/
           display: block;
         }
       }
     }
     
     .etiquetaHoras {
-      font-weight: bold;      
+      /*font-weight: bold; */
       display: block;
     }
         

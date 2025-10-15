@@ -4,9 +4,11 @@ import profesoresData from "../data/profesores.json";       // 👈 Datos mock
 export default function ComboProfesores({ 
     value, 
     onChange = () => {},
+    onFocus,
     incluirTodos = true,
     className="",
     label,
+    error,
     }) {
   const [profesores, setProfesores] = useState([]);
 
@@ -24,16 +26,17 @@ export default function ComboProfesores({
   return (
     <div className="campoFormulario">
       {/* <label htmlFor="profesor">Profesor *</label> */}
-      <label for="profesor"> {label} </label>
+      <label htmlFor="profesor"> {label} </label>
       <select
         id="profesor"
         name="profesor"
         value={value ?? ""} // si value es null/undefined mostramos ""
         onChange={(e) => {
           const val = e.target.value;
-          // convertimos "" a null para que el padre reciba null si selecciona "(Todos)"
+          // convierto "" a null para que el padre reciba null si selecciona "(Todos)"
           onChange(val === "" ? null : val);
         }}
+        onFocus={onFocus}       
         className={className}
       >
         {/* 👇 Opción por defecto */}
@@ -49,6 +52,10 @@ export default function ComboProfesores({
           </option>
         ))}
       </select>
+      
+      {/* 👇 Mostramos el mensaje de error, si existe */}
+      {error && <div className="mensaje-error">{error}</div>}
+
     </div>
   );
 }

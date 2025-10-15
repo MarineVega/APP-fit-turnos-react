@@ -1,5 +1,3 @@
-//  OJOOOO!!!!!!!!!!!!!!!!! REEMPLAZAR POR HORARIO
-
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import exitoImg from "../assets/img/exito.png";
@@ -7,6 +5,8 @@ import FormCampos from "./FormCampos";
 import FormBotones from "./FormBotones";
 import ComboProfesores from "./ComboProfesores";
 import ComboActividades from "./ComboActividades";
+import ComboHoras from "./ComboHoras";
+import DiasSemana from "./DiasSemana";
 
 import { useSearchParams } from "react-router-dom";
 
@@ -37,25 +37,37 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
     const [profesor, setProfesor] = useState(datoInicial?.profesor || null);
     const [actividad, setActividad] = useState(datoInicial?.actividad || "");
     const [cupoMaximo, setCupoMaximo] = useState(datoInicial?.cupoMaximo || null);
-    const [dias, setDias] = useState(datoInicial?.dias || "");
-    const [horario, setHorario] = useState(datoInicial?.horario || "");
+    //const [dias, setDias] = useState(datoInicial?.dias || "");
+    const [hora, setHora] = useState(datoInicial?.hora || "");
 
     // Estados de errores
     const [errores, setErrores] = useState({
         profesor: "",
         actividad: "",
         dias: "",
-        horario: "",
+        hora: "",
     });
 
     // Si estoy en modo editar, cargo los datos del horario
-    useEffect(() =>{        
+    useEffect(() => {        
         if (modo === "editar" && datoInicial) {
             setProfesor(datoInicial.profesor || null);
             setActividad(datoInicial.actividad);
             setCupoMaximo(datoInicial.cupoMaximo || null);
             setDias(datoInicial.dias);
-            setHorario(datoInicial.horario);            
+            setHora(datoInicial.hora);    
+            
+            // 👇 Si en la BD viene como string JSON, lo convierto a array:    
+            // entonces, cuando se abre el formulario en modo editar, los checkboxes se marcan automáticamente ✅.        
+            if (typeof datoInicial.dias === "string") {
+            try {
+                setDiasSeleccionados(JSON.parse(datoInicial.dias));
+            } catch {
+                setDiasSeleccionados([]);
+            }
+            } else {
+                setDiasSeleccionados(datoInicial.dias || []);
+            }
         }
     }, [modo, datoInicial]);
 
@@ -68,40 +80,32 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
     const validarGuardar = (e) => {
         e.preventDefault();
 
-        let nuevosErrores = { actividad: "", dias: "", horario: "" };
+        let nuevosErrores = { actividad: "", dias: "", hora: "" };
         let esValido = true;
 
-        if (!actividad.trim()) {
+        if (!actividadID) {
             nuevosErrores.actividad = "Por favor seleccione una actividad.";
             esValido = false;
         }
 
-        // el cupo máximo es opcional, pero si se completa, validar el rango
-        /*
-        if (cupoMaximo.value !== "") {
-            const valor = parseInt(cupoMaximo.value);
-            if (isNaN(valor) || valor < 1 || valor > 100) {
-                mostrarMensajeError("cupoMaximoError", "El cupo debe estar entre 1 y 100.");
-                esValido = false;
-            }
-        }
-          */  
-        if (cupoMaximo & (cupoMaximo < 1 || cupoMaximo > 100)) {
+        // el cupo máximo es opcional, pero si se completa, validar el rango        
+        if (cupoMaximo && (cupoMaximo < 1 || cupoMaximo > 100)) {
             nuevosErrores.cupoMaximo = "El cupo debe estar entre 1 y 100.";
             esValido = false;
         }
         
-         if (!dias.trim()) {
+        if (diasSeleccionados.length === 0) {
             nuevosErrores.dias = "Debe seleccionar al menos un día.";
             esValido = false;
         }
 
-         if (!horario.trim()) {
-            nuevosErrores.horario = "Por favor seleccione un horario.";
+        if (!horaID) {
+            nuevosErrores.hora = "Por favor seleccione una hora.";
             esValido = false;
         }
 
-        console.log("👉 Listado de Horarios:", horarios);
+        console.log("diasSeleccionados", diasSeleccionados);
+        console.log("👉 Listado de Horas:", hora);
         console.log("👉 Horario a modificar:", id);
 
 /*
@@ -147,7 +151,15 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
         // Si hay errores SALGO
         if (!esValido) return;
 
-        guardar({ profesor, actividad, cupoMaximo, dias, horario });
+        // Si pasa todas las validaciones
+        guardar({ 
+            profesor: profesorID || null, 
+            actividad: actividadID, 
+            cupoMaximo, 
+            //dias: diasSeleccionados,                          //  dias: ["lunes", "miércoles", "viernes"],
+            dias: JSON.stringify(diasSeleccionados),            // "dias": "[\"lunes\",\"miércoles\",\"viernes\"]", --> para recibirlo en SQL como texto "["lunes","miércoles","viernes"]".
+            hora: horaID 
+        });
 
         const mensaje = 
             modo === "editar"
@@ -194,9 +206,9 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
         setActividad("");
         setCupoMaximo(null);
         setDias("");
-        setHorario("");
+        setHora("");
 
-        setErrores({ actividad: "", dias: "", horario: "" });    
+        setErrores({ actividad: "", dias: "", hora: "" });    
     };
 
     
@@ -209,6 +221,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
     // Combo Profesores
     const [profesorID, setProfesorID] = useState("");
     const handleProfesor = (e) => {
+        //e.preventDefault() --> evita que el formulario se recargue (comportamiento por defecto del navegador).
         e.preventDefault();
         console.log("Profesor seleccionado:", profesorID);
     };
@@ -220,53 +233,44 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
         console.log("Actividad seleccionada:", actividadID);
     };
 
+    const [diasSeleccionados, setDiasSeleccionados] = useState([]);
+
+    // Combo Horas
+    const [horaID, setHoraID] = useState("");
+    const handleHora = (e) => {
+        e.preventDefault();
+        console.log("Hora seleccionada:", horaID);
+    };
+
     return (
         <section className="seccionHorario">        
             <form onSubmit={validarGuardar} className="formHorario">
                 
                 <ComboProfesores 
                     value={profesorID} 
-                    onChange={setProfesorID}
+                    //onChange={setProfesorID}
+                    onChange={(e) => {
+                        setProfesorID(e);
+                        limpiarError("profesor");
+                    }}
+                    onFocus={() => limpiarError("profesor")}
                     className="inputHorario"
                     label="Profesor"
                 />
 
                 <ComboActividades 
                     value={actividadID} 
-                    onChange={setActividadID} 
+                    onChange={(e) => {
+                        setActividadID(e);
+                        limpiarError("actividad");
+                    }}
+                    onFocus={() => limpiarError("actividad")}
+                   // onChange={setActividadID} 
                     incluirTodos={false}
                     className="inputHorario"
-                    label="Actividad *"               
+                    label="Actividad *"
+                    error={errores.actividad}               
                 />
-                
-{/* 
-                <FormCampos
-                    label="Nombre *"
-                    name="nombre"
-                    placeholder="Nombre"
-                    value={nombre}
-                    onChange={(e) => {
-                        setNombre(e.target.value);
-                        limpiarError("nombre");
-                    }}
-                    onFocus={() => limpiarError("nombre")}
-                    className="inputActividad"
-                    error={errores.nombre}
-                />
-
-                <FormCampos
-                    label="Descripción *"
-                    name="descripcion"
-                    placeholder="Descripción"
-                    value={descripcion}
-                    onChange={(e) => {
-                        setDescripcion(e.target.value);
-                        limpiarError("descripcion");
-                    }}
-                    onFocus={() => limpiarError("descripcion")}
-                    className="inputActividad"
-                    error={errores.descripcion}
-                /> */}
 
                 <FormCampos
                     label="Cupo Máximo"
@@ -283,6 +287,31 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                     error={errores.cupoMaximo}
                 />
                 
+                <DiasSemana
+                    diasSeleccionados={diasSeleccionados}
+                    //onChange={setDiasSeleccionados}
+                    onChange={(e) => {
+                        setDiasSeleccionados(e);
+                        limpiarError("dias");
+                    }}
+                    onFocus={() => limpiarError("dias")}
+                    error={errores.dias}
+                />
+
+                <ComboHoras 
+                    value={horaID}
+                    onChange={(e) => {
+                        setHoraID(e);
+                        limpiarError("hora");
+                    }}
+                    onFocus={() => limpiarError("hora")}
+                    incluirTodos={false}
+                    className="inputHorario"
+                    label="Horario *"               
+                    error={errores.hora}
+                />
+
+                <label className="advertencia">* Campos obligatorios</label>
             </form>
 
             <FormBotones                    

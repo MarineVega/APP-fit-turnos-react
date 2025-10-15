@@ -3,85 +3,85 @@
         "hora_id": 1,
         "horaInicio": "08:00",
         "horaFin": "09:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 2,
         "horaInicio": "09:00",
         "horaFin": "10:00",
-        "activo": true
+        "activa": true
     }, 
     {
         "hora_id": 3,
         "horaInicio": "10:00",
         "horaFin": "11:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 4,
         "horaInicio": "11:00",
         "horaFin": "12:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 5,
         "horaInicio": "12:00",
         "horaFin": "13:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 6,
         "horaInicio": "13:00",
         "horaFin": "14:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 7,
         "horaInicio": "14:00",
         "horaFin": "15:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 8,
         "horaInicio": "15:00",
         "horaFin": "16:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 9,
         "horaInicio": "16:00",
         "horaFin": "17:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 10,
         "horaInicio": "17:00",
         "horaFin": "18:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 11,
         "horaInicio": "18:00",
         "horaFin": "19:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 12,
         "horaInicio": "19:00",
         "horaFin": "20:00",
-        "activo": true
+        "activa": true
     },
     {
         "hora_id": 13,
         "horaInicio": "20:00",
         "horaFin": "21:00",
-        "activo": true
+        "activa": true
     }    ,
     {
         "hora_id": 14,
         "horaInicio": "21:00",
         "horaFin": "22:00",
-        "activo": true
+        "activa": true
     }
 ]
 

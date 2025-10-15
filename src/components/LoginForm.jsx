@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import TituloConFlecha from "./TituloConFlecha.jsx";
+import checkmark from "../assets/img/exito.png"   
 
 export default function LoginForm({ onSwitch }) {
   const navigate = useNavigate();
@@ -42,11 +43,16 @@ export default function LoginForm({ onSwitch }) {
         window.dispatchEvent(new Event("usuarioActualizado"));
 
         Swal.fire({
-          title: "¡Bienvenido!",
+          title: "¡Bienvenido!"+ (usuario.esAdmin ? " Administrador" : ""),
+          imageUrl: checkmark,
+          imageHeight: 100,
+          imageAlt: "Checkmark",
           icon: "success",
-          timer: 1500,
-          showConfirmButton: false,
+          confirmButtonText: "Cerrar"
+
         }).then(() => navigate("/turnos"));
+            
+      
       } else {
         setError("Usuario o contraseña incorrecta");
       }

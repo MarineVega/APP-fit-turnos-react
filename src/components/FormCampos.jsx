@@ -30,7 +30,7 @@ const FormCampos = ({               // desestructuro las props
     return (
         <div>
             {/* <label>{label}</label> */}
-            <label htmlFor={inputId}>{label}</label>
+            <label htmlFor={inputId} name={name}>{label}</label>
 
             {isFile ? (
             <>

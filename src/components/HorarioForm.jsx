@@ -24,26 +24,23 @@ const swalEstilo = Swal.mixin({
 
 export default function HorarioForm({ guardar, horarios = [], datoInicial = null }) {
     const [params] = useSearchParams();
-    const modo = params.get("modo") || "agregar";    
+    const modo = params.get("modo") || "agregar";       
 
-    
-
-    // Cuando no haya parámetro id en la URL, uso el que viene del objeto datoInicial (que el padre le pasa correctamente)
-    //const id = parseInt(params.get("id")) || datoInicial?.id || null;
-
-    const id = datoInicial?.horario_id || null;
+    //const id = datoInicial?.horario_id || null;
+    const horario_id = datoInicial?.horario_id || null;
 
     // Estados del formulario
-    const [profesor, setProfesor] = useState(datoInicial?.profesor || null);
-    const [actividad, setActividad] = useState(datoInicial?.actividad || "");
+    const [profesorID, setProfesorID] = useState("");
+    const [actividadID, setActividadID] = useState("");
     const [cupoMaximo, setCupoMaximo] = useState(datoInicial?.cupoMaximo || null);
-    //const [dias, setDias] = useState(datoInicial?.dias || "");
-    const [hora, setHora] = useState(datoInicial?.hora || "");
-
+    const [diasSeleccionados, setDiasSeleccionados] = useState([]);
+    const [horaID, setHoraID] = useState("");    
+   
     // Estados de errores
     const [errores, setErrores] = useState({
         profesor: "",
         actividad: "",
+        cupoMaximo: "",
         dias: "",
         hora: "",
     });
@@ -51,30 +48,24 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
     // Si estoy en modo editar, cargo los datos del horario
     useEffect(() => {        
         if (modo === "editar" && datoInicial) {
-            setProfesor(datoInicial.profesor || null);
-            setActividad(datoInicial.actividad);
-            setCupoMaximo(datoInicial.cupoMaximo || null);
-            setDias(datoInicial.dias);
-            setHora(datoInicial.hora);    
-            
-            // 👇 Si en la BD viene como string JSON, lo convierto a array:    
-            // entonces, cuando se abre el formulario en modo editar, los checkboxes se marcan automáticamente ✅.        
-            if (typeof datoInicial.dias === "string") {
+            setProfesorID(datoInicial.profesor_id || null);
+            setActividadID(datoInicial.actividad_id);
+            setCupoMaximo(datoInicial.cupoMaximo || null);            
+            setHoraID(datoInicial.hora_id);    
+
+            if (Array.isArray(datoInicial.dias_id)) {
+                setDiasSeleccionados(datoInicial.dias_id);
+            } else if (typeof datoInicial.dias_id === "string") {      // Si en la BD viene como string JSON, lo convierto a array; entonces, cuando se abre el formulario en modo editar, los checkboxes se marcan automáticamente ✅.        
             try {
-                setDiasSeleccionados(JSON.parse(datoInicial.dias));
+                setDiasSeleccionados(JSON.parse(datoInicial.dias_id));
             } catch {
                 setDiasSeleccionados([]);
             }
             } else {
-                setDiasSeleccionados(datoInicial.dias || []);
-            }
+                setDiasSeleccionados([]);
+            }            
         }
     }, [modo, datoInicial]);
-
-
-    console.log("🟢 Modo:", modo);
-    console.log("🟢 Dato inicial recibido:", datoInicial);
-    console.log("🟢 ID actual:", id);
 
     // Validación y guardado
     const validarGuardar = (e) => {
@@ -104,54 +95,65 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
             esValido = false;
         }
 
-        console.log("diasSeleccionados", diasSeleccionados);
-        console.log("👉 Listado de Horas:", hora);
-        console.log("👉 Horario a modificar:", id);
+        // Evito duplicados (excepto cuando se está editando el mismo horario)
+        const yaExiste = horarios.some((h) => {
+            let diasExistentes = [];
 
-/*
-        // Valido que no se ingrese un nombre de actividad existente (usando las actividades del estado)
-        const nombreIngresado = nombre.trim().toLowerCase();            // normalizo el texto ingresado (quito espacios y lo paso a minúscula)        
-        const nombreDuplicado = actividades.some((act) =>               // recorro todas las actividades y busco si hay otra con el mismo nombre
-            act.nombre.trim().toLowerCase() === nombreIngresado &&
-            Number(act.actividad_id) !== Number(id)   // permito mismo nombre solo si estoy editando esa misma actividad
-                                            // 👈 realizo una omparación numérica
-        );
-*/
+            if (Array.isArray(h.dias_id)) {
+                diasExistentes = h.dias_id;
+                } else if (typeof h.dias_id === "string") {     // si los días vienen como string de la BD, los convierto a array
+                try {
+                    diasExistentes = JSON.parse(h.dias_id);
+                } catch {
+                    diasExistentes = [];
+                }
+            }
+            
+            // Chequeo si hay al menos un día en común          
+            const diasCoinciden = diasSeleccionados.some((d) =>
+                diasExistentes.includes(d)
+            );
 
-        console.log("🟢 ID actual:", id);
-        console.log("🟢 Comparando contra horarios:", horarios.map(a => a.id));
-
-        /*      código para mostrar que tiene actividades e ir comparando
-        // 🔹 Validar nombre duplicado (usando las actividades del estado)
-        const nombreIngresado = nombre.trim().toLowerCase();
-
-        console.log("👉 Nombre ingresado:", nombreIngresado);
-        console.log("👉 Lista de actividades actuales:", actividades);
-
-        const nombreDuplicado = actividades.some((act) => {
-            const nombreAct = act.nombre.trim().toLowerCase();
-            const esDuplicado = nombreAct === nombreIngresado && act.id !== id//;
-
-            console.log(`Comparando con "${act.nombre}" (id: ${act.id}) → duplicado: ${esDuplicado}`);
-
-            return esDuplicado;
+            // Comparo todo
+            const esDuplicado =
+                Number(h.actividad_id) === Number(actividadID) &&
+                Number(h.profesor_id || 0) === Number(profesorID || 0) &&
+                Number(h.hora_id) === Number(horaID) &&
+                diasCoinciden &&
+                Number(h.horario_id) !== Number(horario_id);    // excluyo el mismo si se edita                
+           
+             // debug opcional en consola
+            console.log(
+                `Comparando con horario_id=${h.horario_id}:`,
+                { actividad: h.actividad_id === Number(actividadID),
+                profesor: h.profesor_id === Number(profesorID),
+                hora: h.hora_id === Number(horaID),
+                diasCoinciden,
+                esDuplicado
+                }
+            );            
+            return esDuplicado
         });
-        */
 
-        
-/*
-        if (nombreDuplicado) {
-            nuevosErrores.nombre = "Ya existe una actividad con ese nombre.";
-            esValido = false;
+        if (yaExiste) {
+            swalEstilo.fire({
+                icon: 'error',
+                title: 'Horario duplicado',
+                text: 'Ya existe un horario con la misma actividad, profesor y hora.',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Cerrar',
+                customClass: ''
+            });
+            return;             // cancela el guardado
         }
-*/
-
+            
+        // Aplico los errores visuales si existen
         setErrores(nuevosErrores);
 
         // Si hay errores SALGO
         if (!esValido) return;
 
-        // Si pasa todas las validaciones
+        // Si pasa todas las validaciones, continua el guardado
         guardar({ 
             profesor: profesorID || null, 
             actividad: actividadID, 
@@ -160,6 +162,12 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
             dias: JSON.stringify(diasSeleccionados),            // "dias": "[\"lunes\",\"miércoles\",\"viernes\"]", --> para recibirlo en SQL como texto "["lunes","miércoles","viernes"]".
             hora: horaID 
         });
+
+        console.log("Profesor: ", profesorID);
+        console.log("Actividad: ", actividadID);
+        console.log("Cupo: ", cupoMaximo);
+        console.log("Días : ", diasSeleccionados);
+        console.log("Hora: ", horaID);
 
         const mensaje = 
             modo === "editar"
@@ -185,7 +193,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
             } else {
                 window.location.href = "/horario?modo=postAlta";      // para distinguirlo del consultar normal
             }        
-        });
+        });        
     };
 
 
@@ -202,15 +210,14 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
 
     // Limpio campos
     function limpiarFormulario() {
-        setProfesor("");
-        setActividad("");
+        setProfesorID("");
+        setActividadID("");
         setCupoMaximo(null);
-        setDias("");
-        setHora("");
+        setDiasSeleccionados("");
+        setHoraID("");
 
         setErrores({ actividad: "", dias: "", hora: "" });    
     };
-
     
 
     // Limpia el mensaje de error al hacer foco o modificar el campo
@@ -218,37 +225,13 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
         setErrores((prev) => ({ ...prev, [campo]: "" }));           // se actualiza así -> setErrores(prev => ({ ...prev, nombre: "" }));
     };
 
-    // Combo Profesores
-    const [profesorID, setProfesorID] = useState("");
-    const handleProfesor = (e) => {
-        //e.preventDefault() --> evita que el formulario se recargue (comportamiento por defecto del navegador).
-        e.preventDefault();
-        console.log("Profesor seleccionado:", profesorID);
-    };
-
-    // Combo Actividades
-    const [actividadID, setActividadID] = useState("");
-    const handleActividad = (e) => {
-        e.preventDefault();
-        console.log("Actividad seleccionada:", actividadID);
-    };
-
-    const [diasSeleccionados, setDiasSeleccionados] = useState([]);
-
-    // Combo Horas
-    const [horaID, setHoraID] = useState("");
-    const handleHora = (e) => {
-        e.preventDefault();
-        console.log("Hora seleccionada:", horaID);
-    };
-
+    
     return (
         <section className="seccionHorario">        
             <form onSubmit={validarGuardar} className="formHorario">
                 
                 <ComboProfesores 
                     value={profesorID} 
-                    //onChange={setProfesorID}
                     onChange={(e) => {
                         setProfesorID(e);
                         limpiarError("profesor");
@@ -264,8 +247,8 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                         setActividadID(e);
                         limpiarError("actividad");
                     }}
+                    
                     onFocus={() => limpiarError("actividad")}
-                   // onChange={setActividadID} 
                     incluirTodos={false}
                     className="inputHorario"
                     label="Actividad *"
@@ -289,7 +272,6 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                 
                 <DiasSemana
                     diasSeleccionados={diasSeleccionados}
-                    //onChange={setDiasSeleccionados}
                     onChange={(e) => {
                         setDiasSeleccionados(e);
                         limpiarError("dias");

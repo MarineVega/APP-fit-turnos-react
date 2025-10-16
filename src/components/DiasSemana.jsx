@@ -5,7 +5,7 @@ export default function DiasSemana({
   onChange, 
   onFocus,
   error = "" 
-}) {
+  }) {
   const dias = [
     { id: "lunes", label: "Lunes" },
     { id: "martes", label: "Martes" },

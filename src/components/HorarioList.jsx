@@ -120,7 +120,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
                                         <td>{horario.actividad_nombre}</td>
                                         <td>{horario.profesor_nombre} {horario.profesor_apellido}</td>
                                         <td id="cupo">{horario.cupoMaximo ?? ""}</td>
-                                        <td>{horario.dia}</td>
+                                        <td>{horario.dias}</td>
                                         <td>{horario.horaInicio} a {horario.horaFin}</td>
                                         
                                         {modo !== "consultar" && (

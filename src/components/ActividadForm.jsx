@@ -43,28 +43,13 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
 
     // Si estoy en modo editar, cargo los datos de la actividad
     useEffect(() =>{
-        //if (modo === "editar" && id && actividades.length > 0) {
         if (modo === "editar" && datoInicial) {
             setNombre(datoInicial.nombre);
             setDescripcion(datoInicial.descripcion);
             setCupoMaximo(datoInicial.cupoMaximo);
-            setImagen(datoInicial.imagen ||null);
-           /*
-            const act = actividades.find((a) => a.id === id);
-            if (act) {
-                setNombre(act.nombre),
-                setDescripcion(act.descripcion);
-                setCupoMaximo(act.cupoMaximo);
-                setImagen(act.imagen || null);
-            }
-            */
+            setImagen(datoInicial.imagen ||null);           
         }
     }, [modo, datoInicial]);      //[modo, id, actividades]);
-
-
-    console.log("🟢 Modo:", modo);
-    console.log("🟢 Dato inicial recibido:", datoInicial);
-    console.log("🟢 ID actual:", id);
 
     // Validación y guardado
     const validarGuardar = (e) => {
@@ -87,10 +72,7 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
             nuevosErrores.cupoMaximo = "El cupo debe estar entre 1 y 100.";
             esValido = false;
         }
-        
-        console.log("👉 Listado de Actividades:", actividades);
-        console.log("👉 Actividad a modificar:", id);
-
+       
         // Valido que no se ingrese un nombre de actividad existente (usando las actividades del estado)
         const nombreIngresado = nombre.trim().toLowerCase();            // normalizo el texto ingresado (quito espacios y lo paso a minúscula)        
         const nombreDuplicado = actividades.some((act) =>               // recorro todas las actividades y busco si hay otra con el mismo nombre
@@ -98,34 +80,11 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
             Number(act.actividad_id) !== Number(id)   // permito mismo nombre solo si estoy editando esa misma actividad
                                             // 👈 realizo una omparación numérica
         );
-        
-        console.log("🟢 ID actual:", id);
-        console.log("🟢 Comparando contra actividades:", actividades.map(a => a.id));
-
-        /*      código para mostrar que tiene actividades e ir comparando
-        // 🔹 Validar nombre duplicado (usando las actividades del estado)
-        const nombreIngresado = nombre.trim().toLowerCase();
-
-        console.log("👉 Nombre ingresado:", nombreIngresado);
-        console.log("👉 Lista de actividades actuales:", actividades);
-
-        const nombreDuplicado = actividades.some((act) => {
-            const nombreAct = act.nombre.trim().toLowerCase();
-            const esDuplicado = nombreAct === nombreIngresado && act.id !== id//;
-
-            console.log(`Comparando con "${act.nombre}" (id: ${act.id}) → duplicado: ${esDuplicado}`);
-
-            return esDuplicado;
-        });
-        */
-
-        
-
+      
         if (nombreDuplicado) {
             nuevosErrores.nombre = "Ya existe una actividad con ese nombre.";
             esValido = false;
         }
-
 
         setErrores(nuevosErrores);
 
@@ -133,6 +92,10 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
         if (!esValido) return;
 
         guardar({ nombre, descripcion, cupoMaximo, imagen });
+
+        console.log("Nombre: ", nombre);
+        console.log("Descripcion: ", descripcion);
+        console.log("Cupo: ", cupoMaximo);
 
         const mensaje = 
             modo === "editar"
@@ -156,12 +119,10 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
             if (modo === "editar") {
                 window.location.href = "/actividad?modo=editar";
             } else {
-                //window.location.href = "/actividad?modo=consultar";
                 window.location.href = "/actividad?modo=postAlta";      // para distinguirlo del consultar normal
             }        
         });
     };
-
 
     function cancelar () {
         limpiarFormulario();

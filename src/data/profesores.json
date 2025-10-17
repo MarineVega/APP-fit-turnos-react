@@ -5,6 +5,7 @@
     "apellido": "Pérez",
     "nombre": "María",
     "titulo": "Lic. en Educación Física",
+    "documento": "35123555",
     "activo": true
   },
   {
@@ -13,6 +14,7 @@
     "apellido": "Gómez",
     "nombre": "Carlos",
     "titulo": "Instructor de Yoga",
+    "documento": "33111222",
     "activo": false
   },
   {
@@ -21,6 +23,7 @@
     "apellido": "Fernández",
     "nombre": "Laura",
     "titulo": "Profesora de Pilates",
+    "documento": "40333777",
     "activo": true
   }
 ]

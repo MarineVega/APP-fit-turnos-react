@@ -69,6 +69,37 @@ export default function Administrar() {
         </section>
         
         
+        <section className="card">
+          <button
+            className="btnAceptar"
+            type="button"
+            onClick={() => navigate("/Profesor?modo=agregar")}
+          >Agregar Profesor
+          </button>
+
+          <button
+            className="btnAceptar"
+            type="button"
+            onClick={() => navigate("/Profesor?modo=editar")}
+          >Modificar Profesor
+          </button>
+
+          <button
+            className="btnAceptar"
+            type="button"
+            onClick={() => navigate("/Profesor?modo=eliminar")}
+          >Eliminar Profesor
+          </button>
+
+          <button
+            className="btnAceptar"
+            type="button"
+            onClick={() => navigate("/Profesor?modo=consultar")}
+          >Profesores
+          </button>       
+        </section>
+        
+        
       </main>
 
     </>

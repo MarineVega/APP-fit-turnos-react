@@ -239,7 +239,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                             })
                             ) : (
                             <tr>
-                                <td colSpan={modo !== "consultar" ? 5 : 4}>No hay actividades</td>
+                                <td colSpan={modo !== "consultar" ? 5 : 4}>No hay actividades registradas</td>
                             </tr>
                         )}
                     </tbody>

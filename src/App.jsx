@@ -15,6 +15,7 @@ import Turnos from "./pages/Turnos";
 import Cuenta from "./pages/Cuenta";
 import Actividad from './pages/Actividad';
 import Horario from './pages/Horario';
+import Profesor from './pages/Profesor';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/turnos" element={<Turnos />} />        
         <Route path="/actividad" element={<Actividad />} />
         <Route path="/horario" element={<Horario />} />
+        <Route path="/profesor" element={<Profesor />} />
       </Routes>
           
       <Footer />

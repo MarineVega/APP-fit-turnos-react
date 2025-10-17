@@ -1292,15 +1292,6 @@ main {
   display: none;
 }
 
-/* Mostrar solo en pantallas de escritorio (por ejemplo, a partir de 992px) */
-/*
-@media screen and (min-width: 992px) {
-  .desktop-only {
-    display: block;    */ /* o flex, grid, según lo que uses */
-    /*
-  }
-}
-*/
 
 
 
@@ -1343,3 +1334,81 @@ main {
   .imagen-lateral-actividad.derecha, .imagen-lateral-profesor.derecha { right: 2%; }
 }
 
+
+
+
+
+
+/* --- Layout general --- */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;  /* ocupa toda la pantalla */
+}
+
+/* El contenido principal debe crecer para empujar el footer */
+main {
+  flex: 1;
+}
+
+/* --- Footer --- */
+footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  margin-top: auto;  /* empuja el footer hacia abajo */
+}
+
+/* === Estructura general para mantener el footer abajo === */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#root, .App {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 100vh;
+}
+
+/* El contenido principal crece y empuja el footer hacia abajo */
+main, .mainProfesor, .mainActividad, .seccionHorario {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === Footer fijo al fondo === */
+footer, .footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 10px 0;
+  width: 100%;
+}
+
+/* === Ajuste especial para pantallas pequeñas === */
+@media (max-width: 480px) {
+  html, body, #root, .App {
+    min-height: 100vh;
+  }
+
+  footer, .footer {
+    position: relative;
+    bottom: 0;
+    left: 0;
+  }
+}

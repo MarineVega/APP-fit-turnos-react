@@ -1,3 +1,4 @@
+
 /* configuro la fuente, nombre y ubicación -> Principal Poppins y alternativa Roboto*/
 /* Poppins */
 @font-face {
@@ -50,6 +51,7 @@
   --color-contraste-oscuro: #222222;
 }
 
+
 .header {
   nav {        
     display: flex;
@@ -93,6 +95,7 @@
   }
 }
 
+    
 /* menu desplegable hamburguesa */
 .menu-desplegable {
   position: fixed;
@@ -704,12 +707,16 @@ a.btnAceptar:hover {
 .inputCuenta:focus::placeholder {
   color: transparent;
 }
+.contenedorBotones {
+  display: flex;           /* hace que los botones estén en fila */
+  justify-content: center; /* o flex-end, center, space-between */
+  gap: 10px;               /* separación entre botones */
+  margin-top: 20px;
+}
+
 
 .btnCuentaLogin {
-  margin-top: 10%;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  display: inline-block; /* antes estaba block */
   border-radius: 8px;
   background-color: var(--color-secundario);
   border: 1.5px solid var(--color-secundario);
@@ -760,21 +767,46 @@ a.btnAceptar:hover {
   padding-left: 0;
   margin: top 15px;;
 }
-/* Estilo mejorado para el checkbox "Crear como administrador" */
-#formCrear label {
-  display: block;
-  margin-top: 15px;
-  font-weight: 600;           /* Negrita */
-  font-size: 1rem;
-  padding-left: 0;
-  text-align: left;
+/* Checkbox personalizado */
+.check-admin {
+  display: flex;          /* pone los elementos en fila */
+  align-items: flex-start;    /* centra verticalmente el checkbox y el texto */
+  gap: 10px;              /* espacio entre el checkbox y el label */
+  margin-top: 0px;
 }
 
-#formCrear input[type="checkbox"] {
-  transform: scale(1.4);      /* Agranda el checkbox */
-  margin-right: 10px;
-  accent-color: var(--color-terciario); /* Color del tilde (mejor compatibilidad moderna) */
+.checkboxAdmin {
+  transform: scale(1.7);               /* agranda el checkbox */
+  accent-color: var(--color-terciario); /* color del tilde */
   cursor: pointer;
+}
+
+.check-admin label {
+  font-weight: 600;
+  display: flex;
+  align-items: flex-start; 
+  font-size: 1rem;
+  cursor: pointer;        /* hace clickable el texto también */
+}
+
+/* Clase para el link */
+.link {
+  color: #007bff;          /* azul por defecto */
+  text-decoration: underline;
+  cursor: pointer;
+  display: block;          /* para poder centrarlo */
+  text-align: center;      /* centra el texto */
+  transition: color 0.3s;  /* transición suave al cambiar de color */
+}
+
+/* Cuando se hace clic y se mantiene activo */
+.link:active {
+  color: #a109c0;          /* color cuando está presionada */
+}
+
+/* Opcional: cambio de color al pasar el mouse */
+.link:hover {
+  color: #0652a3;          /* un azul más oscuro al pasar el mouse */
 }
 /*__________TERMINA CSS CUENTA___________*/
 
@@ -790,13 +822,13 @@ a.btnAceptar:hover {
   bottom: 0;
   left: 0;  
 }
-
+/* 
 .footer-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-}
+} */
 
 .footer-logo img {
   height: 45px;

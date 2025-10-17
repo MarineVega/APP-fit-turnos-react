@@ -5,10 +5,9 @@ import './styles/style.css';
 // Componentes comunes
 import Header from './components/Header';
 import Footer from './components/Footer';
-//import Navbar from './components/Navbar';
+// import Navbar from './components/Navbar';
 
 // Páginas
-//import Index from "./pages/";
 import MainPrincipal from './components/MainPrincipal';
 import Administrar from "./pages/Administrar";
 import Turnos from "./pages/Turnos";
@@ -19,12 +18,10 @@ import Profesor from './pages/Profesor';
 
 function App() {
   return (
-
     <>      
       <Header />
-       {/* <Navbar></Navbar> */}     
       
-      {/* Acá van las páginas según la ruta */}
+      {/* Ahora solo se renderiza la ruta activa */}
       <Routes>
         <Route path="/" element={<MainPrincipal />} />
         <Route path="/cuenta" element={<Cuenta />} />
@@ -37,8 +34,7 @@ function App() {
           
       <Footer />
     </>
-
   );
 }
 
-export default App
+export default App;

@@ -1,3 +1,5 @@
+import React from "react";
+
 export default function ImagenLateral({ imgIzquierda, imgDerecha, altIzq, altDer }) {
   return (
     <div className="contenedor-lateral desktop-only">

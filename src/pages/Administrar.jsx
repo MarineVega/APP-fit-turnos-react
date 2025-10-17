@@ -37,10 +37,10 @@ export default function Administrar() {
       imagen: estocada,
       base: "/actividad",
       acciones: [
-        { texto: "Agregar", modo: "agregar", icono: "➕" },
-        { texto: "Modificar", modo: "editar", icono: "📝" },
-        { texto: "Eliminar", modo: "eliminar", icono: "🗑️" },
-        { texto: "Consultar", modo: "consultar", icono: "💬" },
+        { texto: "Agregar", modo: "agregar", icono: "➕", base: "/Actividad" },
+        { texto: "Modificar", modo: "editar", icono: "📝", base: "/Actividad" },
+        { texto: "Eliminar", modo: "eliminar", icono: "🗑️", base: "/Actividad" },
+        { texto: "Consultar", modo: "consultar", icono: "💬", base: "/Actividad" },
       ],
     },
     {
@@ -49,10 +49,10 @@ export default function Administrar() {
       imagen: reloj,
       base: "/horario",
       acciones: [
-        { texto: "Agregar", modo: "agregar", icono: "➕" },
-        { texto: "Modificar", modo: "editar", icono: "📝" },
-        { texto: "Eliminar", modo: "eliminar", icono: "🗑️" },
-        { texto: "Consultar", modo: "consultar", icono: "💬" },
+        { texto: "Agregar", modo: "agregar", icono: "➕", base: "/Horario" },
+        { texto: "Modificar", modo: "editar", icono: "📝" , base: "/Horario" },
+        { texto: "Eliminar", modo: "eliminar", icono: "🗑️" , base: "/Horario" },
+        { texto: "Consultar", modo: "consultar", icono: "💬" , base: "/Horario" },
       ],
     },
     {
@@ -61,10 +61,10 @@ export default function Administrar() {
       imagen: abdominales,
       base: "/profesores",
       acciones: [
-        { texto: "Agregar", modo: "agregar", icono: "➕" },
-        { texto: "Modificar", modo: "editar", icono: "📝" },
-        { texto: "Eliminar", modo: "eliminar", icono: "🗑️" },
-        { texto: "Consultar", modo: "consultar", icono: "💬" },
+        { texto: "Agregar", modo: "agregar", icono: "➕", base: "/Profesor" },
+        { texto: "Modificar", modo: "editar", icono: "📝", base: "/Profesor" },
+        { texto: "Eliminar", modo: "eliminar", icono: "🗑️", base: "/Profesor" },
+        { texto: "Consultar", modo: "consultar", icono: "💬", base: "/Profesor" },
       ],
     },
     {

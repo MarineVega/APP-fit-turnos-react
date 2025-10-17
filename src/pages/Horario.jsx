@@ -63,7 +63,7 @@ export default function Horario() {
 
       {modo === "agregar" && (
         <>
-          <TituloConFlecha>Agregar Horario</TituloConFlecha>
+          <TituloConFlecha destino="/administrar">Agregar Horario</TituloConFlecha>
 
           <ImagenLateral
             imgIzquierda={imgIzquierda}
@@ -84,7 +84,7 @@ export default function Horario() {
       {/* Primero muestro la tabla, y al hacer clic en editar se abre el form */}
       {modo === "editar" && !datoInicial && (
         <>
-          <TituloConFlecha>Modificar Horario</TituloConFlecha>
+          <TituloConFlecha destino="/administrar">Modificar Horario</TituloConFlecha>
           <HorarioList
             horarios={horarios}
             modo="editar"
@@ -95,7 +95,7 @@ export default function Horario() {
 
       {modo === "editar" && datoInicial && (
         <>          
-          <TituloConFlecha>Modificar Horario</TituloConFlecha>
+          <TituloConFlecha destino="/administrar">Modificar Horario</TituloConFlecha>
           <ImagenLateral />
           <HorarioForm
             guardar={guardarHorario}
@@ -107,21 +107,21 @@ export default function Horario() {
 
       {modo === "eliminar" && (
         <>
-          <TituloConFlecha>Eliminar Horario</TituloConFlecha>
+          <TituloConFlecha destino="/administrar">Eliminar Horario</TituloConFlecha>
           <HorarioList horarios={horarios} modo="eliminar" />
         </>
       )}
 
       {modo === "consultar" && (
         <>
-          <TituloConFlecha>Listado de Horarios</TituloConFlecha>
+          <TituloConFlecha destino="/administrar">Listado de Horarios</TituloConFlecha>
           <HorarioList horarios={horarios} modo="consultar" />
         </>
       )}
 
       {modo === "postAlta" && (
         <>
-          <TituloConFlecha>Listado de Horarios</TituloConFlecha>
+          <TituloConFlecha destino="/administrar">Listado de Horarios</TituloConFlecha>
           <HorarioList horarios={horarios} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
         </>
     )}

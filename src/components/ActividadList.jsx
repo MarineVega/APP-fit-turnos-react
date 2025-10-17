@@ -76,9 +76,6 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
         return resultado;
         
     };
-
-    console.log("Actividades recibidas:", actividades);
-    console.log("Modo:", modo);
       
     // ✅ Manejo de modificación con validación   
     const editarActividad = (actividad) => {
@@ -136,8 +133,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
             }
         });
     };
-
-    
+   
 
     
     // Cargo la imagen desde src/assets/img dinámicamente
@@ -155,6 +151,8 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
         }
     };
 
+    // Si el modo es "postAlta", lo trato como "consultar"
+    const modoEfectivo = modo === "postAlta" ? "consultar" : modo;
     
     return (
         <main className="mainActividad">
@@ -166,7 +164,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                         <th>Detalle</th>
                         <th>Cupo Max.</th>
                         <th>Imagen</th>
-                        {modo !== "consultar" && <th>Acciones</th>}
+                        {modoEfectivo !== "consultar" && <th>Acciones</th>}
                         </tr>
                     </thead>
 
@@ -197,9 +195,9 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
 
                                         </td>
                                         
-                                        {modo !== "consultar" && (
+                                        {modoEfectivo !== "consultar" && (
                                             <td>
-                                                {modo === "editar" && (
+                                                {modoEfectivo === "editar" && (
                                                     <button
                                                         className="btnTabla"
                                                         // Redirigir al formulario en modo editar
@@ -217,7 +215,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                                                     </button>
                                                 )}
 
-                                                {modo === "eliminar" && (
+                                                {modoEfectivo === "eliminar" && (
                                                     <button
                                                         className="btnTabla"
                                                         onClick={() => eliminarActividad(actividad)}    // ✅ paso por la validación
@@ -239,7 +237,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                             })
                             ) : (
                             <tr>
-                                <td colSpan={modo !== "consultar" ? 5 : 4}>No hay actividades registradas</td>
+                                <td colSpan={modoEfectivo !== "consultar" ? 5 : 4}>No hay actividades registradas</td>
                             </tr>
                         )}
                     </tbody>

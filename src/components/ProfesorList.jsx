@@ -120,6 +120,9 @@ export default function ProfesorList({ profesores = [], modo, onEditar }) {
             }
         });
     };    
+
+    // Si el modo es "postAlta", lo trato como "consultar"
+    const modoEfectivo = modo === "postAlta" ? "consultar" : modo;
  
     console.log(profesores)
     return (
@@ -133,7 +136,7 @@ export default function ProfesorList({ profesores = [], modo, onEditar }) {
                         <th>Documento</th>
                         <th>Título</th>
                         <th>Activo</th>
-                        {modo !== "consultar" && <th>Acciones</th>}
+                        {modoEfectivo !== "consultar" && <th>Acciones</th>}
                         </tr>
                     </thead>
 
@@ -148,9 +151,9 @@ export default function ProfesorList({ profesores = [], modo, onEditar }) {
                                         <td>{profesor.titulo}</td>
                                         <td id="activo" >{profesor.activo ? "Sí" : "No"}</td>
                                         
-                                        {modo !== "consultar" && (
+                                        {modoEfectivo !== "consultar" && (
                                             <td>
-                                                {modo === "editar" && (
+                                                {modoEfectivo === "editar" && (
                                                     <button
                                                         className="btnTabla"
                                                         // Redirigir al formulario en modo editar                                                       
@@ -166,7 +169,7 @@ export default function ProfesorList({ profesores = [], modo, onEditar }) {
                                                     </button>
                                                 )}
 
-                                                {modo === "eliminar" && (
+                                                {modoEfectivo === "eliminar" && (
                                                     <button
                                                         className="btnTabla"
                                                         onClick={() => eliminarProfesor(profesor)}    // ✅ paso por la validación
@@ -188,7 +191,7 @@ export default function ProfesorList({ profesores = [], modo, onEditar }) {
                             })
                             ) : (
                             <tr>
-                                <td colSpan={modo !== "consultar" ? 5 : 4}>No hay profesores registrados</td>
+                                <td colSpan={modoEfectivo !== "consultar" ? 5 : 4}>No hay profesores registrados</td>
                             </tr>
                         )}
                     </tbody>

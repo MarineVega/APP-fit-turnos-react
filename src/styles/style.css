@@ -729,19 +729,7 @@ a.btnAceptar:hover {
   background-color: var(--color-primario);
   color: var(--color-contraste-claro);
 }
-/*
-.tituloConFlecha {
-  width: 100%;
-  padding: 5% 3%;
-  display: flex;
-  color: var(--color-contraste-oscuro);
-  font-weight: 600;
-  letter-spacing: 0.1rem;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 1.3rem;
-}
-*/
+
 .flecha {
   cursor: pointer;
 }
@@ -1095,7 +1083,7 @@ h2#fc-dom-1 {
   .mainTurno .tituloConFlecha,
   .mainProfesor .tituloConFlecha,
   .mainAdministrar .tituloConFlecha {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     padding: 2% 5%;
   }
 

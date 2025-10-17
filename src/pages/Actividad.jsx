@@ -61,10 +61,8 @@ export default function Actividad() {
 
       {modo === "agregar" && (
         <>
-          <TituloConFlecha> Agregar Actividad </TituloConFlecha>
-          {/*  <TituloConFlecha titulo="Agregar Actividad" destino="/administrar" />*/}
-          {/* <TituloConFlecha titulo="Agregar Actividad" destino="/actividad?modo=consultar" /> */}
-          
+          <TituloConFlecha destino="/administrar"> Agregar Actividad </TituloConFlecha>
+
           <ImagenLateral
             imgIzquierda={imgIzquierda}
             imgDerecha={imgDerecha}
@@ -79,9 +77,8 @@ export default function Actividad() {
 
       {/* Primero muestro la tabla, y al hacer clic en editar se abre el form */}
       {modo === "editar" && !datoInicial && (
-        <>
-          {/* <TituloConFlecha titulo="Modificar Actividad" destino="/administrar" /> */}
-          <TituloConFlecha> Modificar Actividad </TituloConFlecha>
+        <>          
+          <TituloConFlecha destino="/administrar"> Modificar Actividad </TituloConFlecha>
           <ActividadList
             actividades={actividades}
             modo="editar"
@@ -92,7 +89,7 @@ export default function Actividad() {
 
       {modo === "editar" && datoInicial && (
         <>
-          <TituloConFlecha> Modificar Actividad </TituloConFlecha>
+          <TituloConFlecha destino="/administrar"> Modificar Actividad </TituloConFlecha>
            <ImagenLateral
             imgIzquierda={imgIzquierda}
             imgDerecha={imgDerecha}
@@ -109,21 +106,21 @@ export default function Actividad() {
 
       {modo === "eliminar" && (
         <>          
-          <TituloConFlecha> Eliminar Actividad </TituloConFlecha>
+          <TituloConFlecha destino="/administrar"> Eliminar Actividad </TituloConFlecha>
           <ActividadList actividades={actividades} modo="eliminar" />
         </>
       )}
 
       {modo === "consultar" && (
         <>
-          <TituloConFlecha> Listado de Actividades </TituloConFlecha>
+          <TituloConFlecha destino="/administrar"> Listado de Actividades </TituloConFlecha>
           <ActividadList actividades={actividades} modo="consultar" />
         </>
       )}
 
       {modo === "postAlta" && (
         <>
-          <TituloConFlecha> Listado de Actividades </TituloConFlecha>
+          <TituloConFlecha destino="/administrar"> Listado de Actividades </TituloConFlecha>
           <ActividadList actividades={actividades} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
         </>
     )}

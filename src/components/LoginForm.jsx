@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import TituloConFlecha from "./TituloConFlecha.jsx";
-import checkmark from "../assets/img/exito.png"   
+import checkmark from "../assets/img/exito.png";
 
 export default function LoginForm({ onSwitch }) {
   const navigate = useNavigate();
@@ -13,10 +13,10 @@ export default function LoginForm({ onSwitch }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Si ya hay usuario logueado, redirige
+  // Si ya hay usuario logueado, redirige a la página principal
   useEffect(() => {
     const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
-    if (usuarioActivo) navigate("/turnos");
+    if (usuarioActivo) navigate("/"); // 🔹 Cambiado de /turnos a /
   }, [navigate]);
 
   const handleSubmit = (e) => {
@@ -43,16 +43,13 @@ export default function LoginForm({ onSwitch }) {
         window.dispatchEvent(new Event("usuarioActualizado"));
 
         Swal.fire({
-          title: "¡Bienvenido!"+ (usuario.esAdmin ? " Administrador" : ""),
+          title: "¡Bienvenido!" + (usuario.esAdmin ? " Administrador" : ""),
           imageUrl: checkmark,
           imageHeight: 100,
           imageAlt: "Checkmark",
           icon: "success",
-          confirmButtonText: "Cerrar"
-
-        }).then(() => navigate("/turnos"));
-            
-      
+          confirmButtonText: "Cerrar",
+        }).then(() => navigate("/")); // 🔹 Cambiado de /turnos a /
       } else {
         setError("Usuario o contraseña incorrecta");
       }

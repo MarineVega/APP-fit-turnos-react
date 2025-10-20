@@ -123,7 +123,7 @@ export default function Actividad() {
           <TituloConFlecha destino="/administrar"> Listado de Actividades </TituloConFlecha>
           <ActividadList actividades={actividades} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
         </>
-    )}
+      )}
 
     </main>
   );

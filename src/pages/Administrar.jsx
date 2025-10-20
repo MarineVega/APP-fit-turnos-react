@@ -50,8 +50,8 @@ export default function Administrar() {
       base: "/horario",
       acciones: [
         { texto: "Agregar", modo: "agregar", icono: "➕" },
-        { texto: "Modificar", modo: "editar", icono: "📝" },
-        { texto: "Eliminar", modo: "eliminar", icono: "🗑️" },
+        { texto: "Modificar", modo: "editar", icono: "📝"  },
+        { texto: "Eliminar", modo: "eliminar", icono: "🗑️"  },
         { texto: "Consultar", modo: "consultar", icono: "💬" },
       ],
     },
@@ -59,7 +59,7 @@ export default function Administrar() {
       titulo: "Profesores",
       tipo: "acciones",
       imagen: abdominales,
-      base: "/profesores",
+      base: "/profesor",
       acciones: [
         { texto: "Agregar", modo: "agregar", icono: "➕" },
         { texto: "Modificar", modo: "editar", icono: "📝" },

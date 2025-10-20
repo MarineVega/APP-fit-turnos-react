@@ -6,7 +6,8 @@ const FormCampos = ({               // desestructuro las props
     placeholder,
     value,
     onChange,
-    className="",
+    onFocus,
+    className = "",
     error,
     name,
     isTextArea = false,
@@ -29,7 +30,7 @@ const FormCampos = ({               // desestructuro las props
     return (
         <div>
             {/* <label>{label}</label> */}
-            <label htmlFor={inputId}>{label}</label>
+            <label htmlFor={inputId} name={name}>{label}</label>
 
             {isFile ? (
             <>
@@ -39,6 +40,7 @@ const FormCampos = ({               // desestructuro las props
                 name={name}
                 className={className}
                 onChange={handleFileChange}
+                onFocus={onFocus}
             />
             {preview && filePreview && (
                 <img src={filePreview} alt="Vista previa" width="100" />
@@ -48,8 +50,9 @@ const FormCampos = ({               // desestructuro las props
                 <textarea
                     className={className}
                     placeholder={placeholder}
-                    value={value}
+                    value={value ?? ""}
                     onChange={onChange}
+                    onFocus={onFocus}
                     name={name}
                 />
             ) : (
@@ -57,8 +60,9 @@ const FormCampos = ({               // desestructuro las props
                     type={type}
                     className={className}
                     placeholder={placeholder}
-                    value={value}
-                    onChange={onChange}
+                    value={value ?? ""}
+                    onChange={onChange}                    
+                    onFocus={onFocus}
                     name={name}
                 />
             )}

@@ -1,9 +1,7 @@
-function Turnos() {
+export default function Turnos() {
   return (
     <>      
       
     </>
   )
 }
-
-export default Turnos

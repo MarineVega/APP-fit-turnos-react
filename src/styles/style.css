@@ -3,14 +3,14 @@
 /* Poppins */
 @font-face {
   font-family: "Poppins";
-  src: url("./assets/fonts/Poppins/Poppins-Regular.ttf") format("truetype");  
+  src: url("/fonts/Poppins/Poppins-Regular.ttf") format("truetype");  
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Poppins";
-  src: url("./assets/fonts/Poppins/Poppins-Bold.ttf") format("truetype");
+  src: url("/fonts/Poppins/Poppins-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
 }
@@ -18,7 +18,7 @@
 /* Roboto */
 @font-face {
   font-family: "Roboto";
-  src: url("./assets/fonts/Roboto/Roboto-Italic-VariableFont_wdth,wght.ttf")
+  src: url("/fonts/Roboto/Roboto-Italic-VariableFont_wdth,wght.ttf")
     format("truetype");
   font-weight: 400;
   font-style: normal;
@@ -26,7 +26,7 @@
 
 @font-face {
   font-family: "Roboto";
-  src: url("./assets/fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf")
+  src: url("/fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf")
     format("truetype");
   font-weight: 700;
   font-style: normal;
@@ -202,8 +202,8 @@ body {
 /*____________________________________________________________*/
 
 
-/* Estilos de index.html, actividad.html, horario.html, profesores.html, administrar.html */
-.mainPrincipal, .mainActividad, .mainHorario, .mainTurno, .mainProfesores, .mainAdministrar {
+/* Estilos de index.html, actividad.html, horario.html, profesor.html, administrar.html */
+.mainPrincipal, .mainActividad, .mainHorario, .mainTurno, .mainProfesor, .mainAdministrar {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -315,16 +315,16 @@ a.btnAceptar:hover {
 }
 
 
-/* Estilos de las páginas Actividad, Horario y profesores */
-.mainActividad, .mainHorario, .mainTurno, .mainProfesores {
-  .seccionActividad, .seccionHorario, .seccionProfesores {
+/* Estilos de las páginas Actividad, Horario y profesor */
+.mainActividad, .mainHorario, .mainTurno, .mainProfesor {
+  .seccionActividad, .seccionHorario, .seccionProfesor {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;    
     justify-items: center;
 
-    .formActividad, .formHorario, .formProfesores {
+    .formActividad, .formHorario, .formProfesor {
       width: 100%;
       color: var(--color-contraste-oscuro);
       display: flex;
@@ -339,7 +339,7 @@ a.btnAceptar:hover {
         flex-direction: column;        
         padding: 1%;
         
-        .inputActividad, .inputHorario, .inputProfesores {
+        .inputActividad, .inputHorario, .inputProfesor {
           background: var(--color-contraste-claro);
           width: 100%;
           padding: 2%;
@@ -350,12 +350,12 @@ a.btnAceptar:hover {
           justify-content: flex-start;          
         }
 
-        .inputActividad::placeholder, .inputProfesores::placeholder {
+        .inputActividad::placeholder, .inputProfesor::placeholder {
           color: var(--color-fondo);
         }
 
         /* para que desaparezca el placeholder al hacer clic en el input */
-        .inputActividad:focus::placeholder, .inputProfesores:focus::placeholder {
+        .inputActividad:focus::placeholder, .inputProfesor:focus::placeholder {
           color: transparent;
         }
       }
@@ -428,14 +428,14 @@ a.btnAceptar:hover {
         }
 
         .etiquetaDias {
-          font-weight: bold;
+          /*font-weight: bold;*/
           display: block;
         }
       }
     }
     
     .etiquetaHoras {
-      font-weight: bold;      
+      /*font-weight: bold; */
       display: block;
     }
         
@@ -484,7 +484,7 @@ a.btnAceptar:hover {
     width: 120%;
   }
   
-  #tablaActividades, #tablaHorarios, #tablaProfesores {
+  #tablaActividades, #tablaHorarios, #tablaProfesor {
     width: 100%;
     border-collapse: collapse;
     margin: 20px auto;    
@@ -506,7 +506,8 @@ a.btnAceptar:hover {
 
   #tablaActividades #cupo,
   #tablaActividades #imagen, 
-  #tablaHorarios #cupo {
+  #tablaHorarios #cupo,
+  #tablaProfesores #activo {
     text-align: center;    
   }
 
@@ -732,19 +733,7 @@ a.btnAceptar:hover {
   background-color: var(--color-primario);
   color: var(--color-contraste-claro);
 }
-/*
-.tituloConFlecha {
-  width: 100%;
-  padding: 5% 3%;
-  display: flex;
-  color: var(--color-contraste-oscuro);
-  font-weight: 600;
-  letter-spacing: 0.1rem;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 1.3rem;
-}
-*/
+
 .flecha {
   cursor: pointer;
 }
@@ -822,6 +811,8 @@ a.btnAceptar:hover {
   bottom: 0;
   left: 0;  
 }
+
+
 /* 
 .footer-content {
   display: flex;
@@ -1075,7 +1066,7 @@ h2#fc-dom-1 {
 @media (min-width: 481px) {
   .mainActividad .seccionActividad, 
   .mainHorario .seccionHorario,
-  .mainProfesores .seccionProfesores {
+  .mainProfesor .seccionProfesor {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
@@ -1083,26 +1074,26 @@ h2#fc-dom-1 {
 
   .mainActividad .formActividad,
   .mainHorario .formHorario,
-  .mainProfesores .formProfesores {
+  .mainProfesor .formProfesor {
     font-size: 1rem;
     padding: 0 10%;
   }
 
   .mainActividad .formActividad .inputActividad,
   .mainHorario .formHorario .inputHorario,
-  .mainProfesores .formProfesores .inputProfesores {
+  .mainProfesor .formProfesor .inputProfesor {
     font-size: 1rem;
     padding: 10px;
   }
 
   .mainActividad .formActividad .advertencia,
   .mainHorario .formHorario .advertencia,
-  .mainProfesores .formProfesores .adventencia {
+  .mainProfesor .formProfesor .adventencia {
     font-size: 0.85rem;
   }
 
   .mainActividad .btnTabla,
-  .mainProfesores .btnTabla {
+  .mainProfesor .btnTabla {
     width: 80%;
   }
 
@@ -1110,8 +1101,8 @@ h2#fc-dom-1 {
   .mainActividad .btnCancelar,
   .mainHorario .btnAceptar,
   .mainHorario .btnCancelar,
-  .mainProfesores .btnAceptar,
-  .mainProfesores .btnCancelar {
+  .mainProfesor .btnAceptar,
+  .mainProfesor .btnCancelar {
     width: 150px;
     font-size: 1rem;
   }
@@ -1119,9 +1110,9 @@ h2#fc-dom-1 {
   .mainActividad .tituloConFlecha,
   .mainHorario .tituloConFlecha,
   .mainTurno .tituloConFlecha,
-  .mainProfesores .tituloConFlecha,
+  .mainProfesor .tituloConFlecha,
   .mainAdministrar .tituloConFlecha {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     padding: 2% 5%;
   }
 
@@ -1202,13 +1193,13 @@ h2#fc-dom-1 {
 
   .mainActividad .seccionActividad,
   .mainHorario .seccionHorario,
-  .mainProfesores .seccionProfesores {
+  .mainProfesor .seccionProfesor {
     max-width: 700px;
   }
 
   .mainActividad .seccionActividad .contenedorBotones,
   .mainHorario .seccionHorario .contenedorBotones,
-  .mainProfesores .seccionProfesores .contenedorBotones {
+  .mainProfesor .seccionProfesor .contenedorBotones {
     width: 70%;
     display: flex;
     align-items: center;
@@ -1217,7 +1208,7 @@ h2#fc-dom-1 {
 
   .mainActividad .formActividad,
   .mainHorario .formHorario,
-  .mainProfesores .formProfesores {
+  .mainProfesor .formProfesor {
     font-size: 0.95rem;
     display: grid;    
     gap: 20px;
@@ -1226,7 +1217,7 @@ h2#fc-dom-1 {
   
   .mainActividad .formActividad .inputActividad,
   .mainHorario .formHorario .inputHorario,
-  .mainProfesores .formProfesores .inputProfesores {
+  .mainProfesor .formProfesor .inputProfesor {
     font-size: 0.95rem;
   }
 
@@ -1234,8 +1225,8 @@ h2#fc-dom-1 {
   .mainActividad .seccionActividad .btnCancelar,
   .mainHorario .btnAceptar,
   .mainHorario .btnCancelar,
-  .mainProfesores .btnAceptar,
-  .mainProfesores .btnCancelar {
+  .mainProfesor .btnAceptar,
+  .mainProfesor .btnCancelar {
     font-size: 1rem;
     height: 50px;    
     width: 200px;
@@ -1244,39 +1235,39 @@ h2#fc-dom-1 {
   .mainActividad .tituloConFlecha,
   .mainHorario .tituloConFlecha,
   .mainTurno .tituloConFlecha,
-  .mainProfesores .tituloConFlecha,
+  .mainProfesor .tituloConFlecha,
   .mainAdministrar .tituloConFlecha {
     font-size: 1.5rem;
   }
 
   .mainActividad .formActividad > div,
   .mainHorario .formHorario > div,
-  .mainProfesores .formProfesores > div {
+  .mainProfesor .formProfesor > div {
     padding: 0; 
   }
 
   .mainActividad .formActividad .mensaje-error,
   .mainHorario .formHorario .mensaje-error,
-  .mainProfesores .formProfesores .mensaje-error {
+  .mainProfesor .formProfesor .mensaje-error {
     font-size: 0.85rem;
   }
 
   .mainActividad .formActividad label.advertencia,
   .mainHorario .formHorario label.advertencia,
-  .mainProfesores .formProfesores label.advertencia  {
+  .mainProfesor .formProfesor label.advertencia  {
     grid-column: span 2;
     font-size: 0.85rem;
   }
 
   .mainActividad .btnTabla,
-  .mainProfesores .btnTabla {
+  .mainProfesor .btnTabla {
     width: 70%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 1);    /* sombra */
   }
 
   .mainActividad .btnAceptar, 
   .mainHorario .btnAceptar,
-  .mainProfesores .btnAceptar {
+  .mainProfesor .btnAceptar {
     grid-column: 2;
     justify-self: end;
     margin-top: 30px;
@@ -1284,7 +1275,7 @@ h2#fc-dom-1 {
 
   .mainActividad .btnCancelar, 
   .mainHorario .btnCancelar,
-  .mainProfesores .btnCancelar {
+  .mainProfesor .btnCancelar {
     grid-column: 1;
     justify-self: start;
     margin-top: 30px;
@@ -1292,8 +1283,8 @@ h2#fc-dom-1 {
 
   .mainActividad #tablaActividades th,
   .mainActividad #tablaActividades td,
-  .mainProfesores #tablaProfesores th, 
-  .mainProfesores #tablaProfesores td {
+  .mainProfesor #tablaProfesores th, 
+  .mainProfesor #tablaProfesores td {
     font-size: 1.1rem;    
   }
 
@@ -1308,7 +1299,7 @@ h2#fc-dom-1 {
 
 }
 
-.mainPrincipal, .mainActividad, .mainHorario, .mainTurno, .mainCuenta, .mainProfesores, .mainAdministrar {
+.mainPrincipal, .mainActividad, .mainHorario, .mainTurno, .mainCuenta, .mainProfesor, .mainAdministrar {
   margin-top: 100px; /* deja espacio para el header */
 }
 
@@ -1330,15 +1321,9 @@ main {
   display: none;
 }
 
-/* Mostrar solo en pantallas de escritorio (por ejemplo, a partir de 992px) */
-/*
-@media screen and (min-width: 992px) {
-  .desktop-only {
-    display: block;    */ /* o flex, grid, según lo que uses */
-    /*
-  }
-}
-*/
+
+
+
 
 @media (min-width: 1024px) {
   /* Mostrar solo en pantallas de escritorio (por ejemplo, a partir de 1024) */
@@ -1376,6 +1361,83 @@ main {
   /* Desplazamiento lateral */
   .imagen-lateral-actividad.izquierda, .imagen-lateral-profesor.izquierda { left: 2%; }
   .imagen-lateral-actividad.derecha, .imagen-lateral-profesor.derecha { right: 2%; }
+}
 
 
+
+
+
+
+/* --- Layout general --- */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;  /* ocupa toda la pantalla */
+}
+
+/* El contenido principal debe crecer para empujar el footer */
+main {
+  flex: 1;
+}
+
+/* --- Footer --- */
+footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  margin-top: auto;  /* empuja el footer hacia abajo */
+}
+
+/* === Estructura general para mantener el footer abajo === */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#root, .App {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 100vh;
+}
+
+/* El contenido principal crece y empuja el footer hacia abajo */
+main, .mainProfesor, .mainActividad, .seccionHorario {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === Footer fijo al fondo === */
+footer, .footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 10px 0;
+  width: 100%;
+}
+
+/* === Ajuste especial para pantallas pequeñas === */
+@media (max-width: 480px) {
+  html, body, #root, .App {
+    min-height: 100vh;
+  }
+
+  footer, .footer {
+    position: relative;
+    bottom: 0;
+    left: 0;
+  }
 }

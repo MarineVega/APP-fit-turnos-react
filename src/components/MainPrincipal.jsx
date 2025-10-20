@@ -10,7 +10,7 @@ import icono_instructor from "../../public/assets/img/icono_instructor.png"
 import icono_rehabilitacion from "../../public/assets/img/icono_rehabilitacion.png"
 import icono_natacion from "../../public/assets/img/icono_natacion.png"
 */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";       
 
 import Logo_Fit from "../assets/img/Logo_Fit.png";
@@ -26,6 +26,24 @@ import icono_natacion from "../assets/img/icono_natacion.png";
 
 function MainPrincipal() {
   const navigate = useNavigate();     
+  const [usuarioActivo, setUsuarioActivo] = useState(null);
+
+  useEffect(() => {
+    // Verifica si hay usuario logueado en localStorage
+    const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+    setUsuarioActivo(usuario);
+
+    // Escucha cambios de sesión (login/logout)
+    const actualizarUsuario = () => {
+      const nuevoUsuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+      setUsuarioActivo(nuevoUsuario);
+    };
+
+    window.addEventListener("usuarioActualizado", actualizarUsuario);
+    return () => {
+      window.removeEventListener("usuarioActualizado", actualizarUsuario);
+    };
+  }, []);
 
   return (
     <main className="mainPrincipal">
@@ -49,24 +67,29 @@ function MainPrincipal() {
         <p>Tu entrenamiento, tu horario, tu control</p>
       </div>        
 
-      {/* Botón que navega a Cuenta */}
-      <button
-        id="botonIniciarSesion"
-        className="btnAceptar"
-        type="button"
-        onClick={() => navigate("/cuenta")}
-      >
-        INICIAR SESIÓN
-      </button>
+      {/* 👇 Ocultar los botones si hay usuario activo */}
+      {!usuarioActivo && (
+        <>
+          {/* Botón que navega a Cuenta */}
+          <button
+            id="botonIniciarSesion"
+            className="btnAceptar"
+            type="button"
+            onClick={() => navigate("/cuenta")}
+          >
+            INICIAR SESIÓN
+          </button>
 
-      {/* Link que abre directo el formulario de registro */}
-      <Link
-        id="linkRegistrarse"
-        to="/cuenta?form=crear"
-        className="btnAceptar"
-      >
-        REGISTRARSE
-      </Link>
+          {/* Link que abre directo el formulario de registro */}
+          <Link
+            id="linkRegistrarse"
+            to="/cuenta?form=crear"
+            className="btnAceptar"
+          >
+            REGISTRARSE
+          </Link>
+        </>
+      )}
 
       <img className="logoMedusa" src={Logo_Medusa} alt="Logo Medusa Soft" />
 

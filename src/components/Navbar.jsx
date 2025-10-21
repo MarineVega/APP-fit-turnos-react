@@ -20,7 +20,6 @@ function Navbar() {
     };
 
     actualizarUsuario();
-
     window.addEventListener("storage", actualizarUsuario);
     window.addEventListener("usuarioActualizado", actualizarUsuario);
 
@@ -57,69 +56,11 @@ function Navbar() {
     });
   };
 
-  // ===== Menú de escritorio =====
-  const DesktopMenu = () => (
-    <>
-      <div className="nav-left desktop-only">
-        {/* Logo */}
-        <Link to="/" className="logo">
-          <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
-        </Link>
-
-        {/* Turnos y Administrar si está logueado */}
-        {usuarioActivo && (
-          <>
-            <Link className="menu-link" to="/turnos">
-              Turnos
-            </Link>
-            {usuarioActivo.esAdmin && (
-              <Link className="menu-link" to="/administrar">
-                Administrar
-              </Link>
-            )}
-          </>
-        )}
-      </div>
-
-      <div className="nav-right desktop-only">
-        {/* Nombre y Cerrar sesión si está logueado */}
-        {usuarioActivo && (
-          <>
-            <span
-              className="menu-link"
-              style={{ fontSize: "1.1rem", fontWeight: 600, color: "white" }}
-            >
-              {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
-            </span>
-            <span
-              className="menu-link logout"
-              style={{ cursor: "pointer" }}
-              onClick={cerrarSesion}
-            >
-              Cerrar sesión
-            </span>
-          </>
-        )}
-
-        {/* Iconos siempre visibles */}
-        <a href="#" className="icon" aria-label="Buscar">
-          <img src={buscar} alt="Buscar" loading="lazy" />
-        </a>
-        <a href="#" className="icon" aria-label="Notificaciones">
-          <img src={notif} alt="Notificaciones" loading="lazy" />
-        </a>
-      </div>
-    </>
-  );
-
-  // ===== Menú mobile =====
+  // ===== Menú móvil desplegable =====
   const MobileMenu = () => (
     <div className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}>
       {usuarioActivo ? (
         <>
-          <span className="menu-link">
-            {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
-          </span>
           <Link to="/turnos" onClick={() => setMenuAbierto(false)}>
             Turnos
           </Link>
@@ -148,18 +89,62 @@ function Navbar() {
   return (
     <header className="header">
       <div className="navbar">
-        {/* Botón de menú móvil */}
-        <button
-          id="btnMenu"
-          className="icon btnMenu desktop-hidden"
-          onClick={toggleMenu}
-          aria-label="Abrir menú"
-        >
-          <img src={menuIcon} alt="Menú" loading="lazy" />
-        </button>
+        {/* === IZQUIERDA === */}
+        <div className="nav-left">
+          {/* Logo siempre visible */}
+          <Link to="/" className="logo">
+            <img src={Logo_Fit_Home} alt="Logo Fit Turnos" loading="lazy" />
+          </Link>
 
-        {/* Menú de escritorio */}
-        <DesktopMenu />
+          {/* Links Turnos y Administrar solo en escritorio */}
+          <div className="desktop-only">
+            {usuarioActivo && (
+              <>
+                <Link className="menu-link" to="/turnos">
+                  Turnos
+                </Link>
+                {usuarioActivo.esAdmin && (
+                  <Link className="menu-link" to="/administrar">
+                    Administrar
+                  </Link>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Botón menú hamburguesa solo en mobile */}
+          <button
+            id="btnMenu"
+            className="icon btnMenu mobile-only"
+            onClick={toggleMenu}
+            aria-label="Abrir menú"
+          >
+            <img src={menuIcon} alt="Menú" loading="lazy" />
+          </button>
+        </div>
+
+        {/* === DERECHA === */}
+        <div className="nav-right">
+          {/* Nombre y cerrar sesión solo si logueado (escritorio) */}
+          {usuarioActivo && (
+            <div className="desktop-only user-info">
+              <span className="menu-link nombre">
+                {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
+              </span>
+              <span className="menu-link logout" onClick={cerrarSesion}>
+                Cerrar sesión
+              </span>
+            </div>
+          )}
+
+          {/* Íconos siempre visibles */}
+          <a href="#" className="icon" aria-label="Buscar">
+            <img src={buscar} alt="Buscar" loading="lazy" />
+          </a>
+          <a href="#" className="icon" aria-label="Notificaciones">
+            <img src={notif} alt="Notificaciones" loading="lazy" />
+          </a>
+        </div>
       </div>
 
       {/* Menú móvil */}

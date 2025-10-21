@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-//import ActividadRow from "./ActividadRow";
 import FormBotones from "./FormBotones";
-
 import Swal from "sweetalert2";
 
 import reservasData from "../data/reservas.json";       // 👈 Importa las reservas

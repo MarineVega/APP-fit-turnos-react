@@ -16,6 +16,7 @@ import Actividad from './pages/Actividad';
 import Horario from './pages/Horario';
 import Profesor from './pages/Profesor';
 
+
 function App() {
   return (
     <>      
@@ -38,3 +39,10 @@ function App() {
 }
 
 export default App;
+
+
+/*
+ componente layout -> header y footer
+ en app las rutas quedan dentro del layout
+ copyrigth en footer del login
+*/

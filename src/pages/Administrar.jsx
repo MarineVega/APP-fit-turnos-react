@@ -1,17 +1,20 @@
 import React from "react";
-import "../styles/style.css";
-import Card from "../components/Card";
 
+import Card from "../components/Card";
+import "../styles/style.css";
 // 🖼️ Imágenes
 import soga from "../assets/img/soga.png";
 import estocada from "../assets/img/estocada.png";
 import reloj from "../assets/img/reloj.png";
 import abdominales from "../assets/img/abdominales.png";
 import publicidad from "../assets/img/publicidad.png";
+import TituloConFlecha from "../components/TituloConFlecha";
 
 
 export default function Administrar() {
+  
   const secciones = [
+   
     {
       titulo: "Usuarios",
       tipo: "acciones",
@@ -70,7 +73,10 @@ export default function Administrar() {
   ];
 
   return (
+    
     <main className="mainAdministrar">
+      <TituloConFlecha>Administrar</TituloConFlecha>
+
       {secciones.map((sec, i) => (
         <Card key={i} {...sec} />
       ))}

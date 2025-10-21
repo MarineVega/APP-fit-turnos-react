@@ -1,39 +1,37 @@
-import React from 'react'
+// src/App.jsx
 import { Routes, Route } from "react-router-dom";
-import './styles/style.css';
+import "./styles/style.css";
 
-// Componentes comunes
-import Header from './components/Header';
-import Footer from './components/Footer';
-// import Navbar from './components/Navbar';
-
+// Layouts
+import LayoutPublic from "../src/components/layouts/LayoutPublic";
+import LayoutPrivate from "../src/components/layouts/LayoutPrivate";
 // Páginas
-import MainPrincipal from './components/MainPrincipal';
-import Administrar from "./pages/Administrar";
-import Turnos from "./pages/Turnos";
+import MainPrincipal from "./components/MainPrincipal";
 import Cuenta from "./pages/Cuenta";
-import Actividad from './pages/Actividad';
-import Horario from './pages/Horario';
-import Profesor from './pages/Profesor';
+import Turnos from "./pages/Turnos";
+import Administrar from "./pages/Administrar";
+import Actividad from "./pages/Actividad";
+import Horario from "./pages/Horario";
+import Profesor from "./pages/Profesor";
 
 function App() {
   return (
-    <>      
-      <Header />
-      
-      {/* Ahora solo se renderiza la ruta activa */}
-      <Routes>
+    <Routes>
+      {/* Layout público */}
+      <Route element={<LayoutPublic />}>
         <Route path="/" element={<MainPrincipal />} />
         <Route path="/cuenta" element={<Cuenta />} />
+      </Route>
+
+      {/* Layout privado */}
+      <Route element={<LayoutPrivate />}>
+        <Route path="/turnos" element={<Turnos />} />
         <Route path="/administrar" element={<Administrar />} />
-        <Route path="/turnos" element={<Turnos />} />        
         <Route path="/actividad" element={<Actividad />} />
         <Route path="/horario" element={<Horario />} />
         <Route path="/profesor" element={<Profesor />} />
-      </Routes>
-          
-      <Footer />
-    </>
+      </Route>
+    </Routes>
   );
 }
 

@@ -61,6 +61,10 @@ function Navbar() {
     <div className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}>
       {usuarioActivo ? (
         <>
+          <span className="menu-link nombre">
+            {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
+          </span>
+        
           <Link to="/turnos" onClick={() => setMenuAbierto(false)}>
             Turnos
           </Link>

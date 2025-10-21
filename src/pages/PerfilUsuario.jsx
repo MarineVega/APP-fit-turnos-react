@@ -1,0 +1,129 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import TituloConFlecha from "../components/TituloConFlecha.jsx";
+import FormBotones from "../components/FormBotones.jsx"; // ✅
+import "../styles/style.css";
+
+export default function PerfilUsuario() {
+  const navigate = useNavigate();
+  const [usuario, setUsuario] = useState(null);
+  const [editando, setEditando] = useState(false);
+  const [actual, setActual] = useState("");
+  const [nueva, setNueva] = useState("");
+  const [confirmar, setConfirmar] = useState("");
+
+  // 🔹 Cargar usuario activo desde localStorage
+  useEffect(() => {
+    const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
+    if (usuarioActivo) {
+      setUsuario(usuarioActivo);
+    } else {
+      Swal.fire("Atención", "No hay usuario activo", "warning");
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  // 🔹 Cambiar contraseña
+  const handleCambiarPassword = (e) => {
+    e.preventDefault();
+
+    if (nueva !== confirmar) {
+      Swal.fire("Error", "Las contraseñas nuevas no coinciden", "error");
+      return;
+    }
+
+    if (actual !== usuario.password) {
+      Swal.fire("Error", "La contraseña actual no es correcta", "error");
+      return;
+    }
+
+    const usuarioActualizado = { ...usuario, password: nueva };
+    localStorage.setItem("usuarioActivo", JSON.stringify(usuarioActualizado));
+
+    // Actualizar también el listado general
+    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+    const actualizados = usuarios.map((u) =>
+      u.email === usuario.email ? usuarioActualizado : u
+    );
+    localStorage.setItem("usuarios", JSON.stringify(actualizados));
+
+    setUsuario(usuarioActualizado);
+    setEditando(false);
+    Swal.fire("Éxito", "La contraseña se cambió correctamente", "success");
+  };
+
+  if (!usuario) return null;
+
+  return (
+    <main className="mainAdministrar">
+      <TituloConFlecha>Mi perfil</TituloConFlecha>
+
+      <div className="perfilCard">
+        <section className="perfilDatos">
+          <p><strong>Nombre:</strong> <span>{usuario.nombre || "-"}</span></p>
+          <p><strong>Email:</strong> <span>{usuario.email}</span></p>
+          <p><strong>Rol:</strong> <span>{usuario.esAdmin ? "Administrador" : "Usuario"}</span></p>
+        </section>
+        
+         {/* 🔹 línea separadora */}
+        <hr className="lineaPerfil" />
+
+        {!editando ? (
+          <button className="btnCambiar" onClick={() => setEditando(true)}>
+            Cambiar contraseña
+          </button>
+        ) : (
+          <form onSubmit={handleCambiarPassword} className="formCambiarPassword">
+            <label>
+              Contraseña actual:
+              <input
+                type="password"
+                value={actual}
+                onChange={(e) => setActual(e.target.value)}
+                required
+                className="inputCuenta"
+              />
+            </label>
+
+            <label>
+              Nueva contraseña:
+              <input
+                type="password"
+                value={nueva}
+                onChange={(e) => setNueva(e.target.value)}
+                required
+                className="inputCuenta"
+              />
+            </label>
+
+            <label>
+              Confirmar nueva contraseña:
+              <input
+                type="password"
+                value={confirmar}
+                onChange={(e) => setConfirmar(e.target.value)}
+                required
+                className="inputCuenta"
+              />
+            </label>
+
+            {/* ✅ Reemplazamos los botones manuales por FormBotones */}
+            <FormBotones
+              boton1={{
+                label: "Guardar",
+                className: "btnAceptar",
+                onClick: handleCambiarPassword,
+              }}
+              boton2={{
+                label: "Cancelar",
+                className: "btnCancelar",
+                onClick: () => setEditando(false),
+              }}
+            />
+          </form>
+        )}
+      </div>
+    </main>
+  );
+}

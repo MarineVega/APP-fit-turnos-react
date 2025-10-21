@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "usuario": "profesor1",
+    "nombre": "Carlos Gómez",
+    "rol": "Profesor",
+    "email": "carlos@fitturnos.com",
+    "contraseña": "1234"
+  },
+  {
+    "id": 2,
+    "usuario": "cliente1",
+    "nombre": "Lucía Pérez",
+    "rol": "Cliente",
+    "email": "lucia@fitturnos.com",
+    "contraseña": "abcd"
+  },
+  {
+    "id": 3,
+    "usuario": "admin1",
+    "nombre": "Ana Fernández",
+    "rol": "Administrador",
+    "email": "ana@fitturnos.com",
+    "contraseña": "admin"
+  }
+]

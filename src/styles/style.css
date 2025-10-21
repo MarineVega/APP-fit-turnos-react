@@ -470,8 +470,6 @@ a.btnAceptar:hover {
 }
 
 
-
-
 /*ESTILO DE HTML CUENTA,LOGIN,ETC.*/
 .mainCuenta {
   display: flex;
@@ -876,6 +874,55 @@ h2#fc-dom-1 {
 .swal2-html-container .swal2-file,
 .swal2-html-container .advertencia {
   font-size: 0.9rem;
+}
+/* CSS DE PERFIL DE USUARIO */
+.perfilCard {
+  width: 85%;               /* 🔹 más ancho en pantallas grandes */
+  max-width: 800px;         /* 🔹 antes era 500px */
+  margin: 0 auto 4rem auto; /* 🔹 deja espacio debajo del card */
+  background: var(--color-primario);
+  color: #fff;
+  border-radius: 15px;
+  padding: 2rem;            /* un poco más de aire interno */
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* opcional, para resaltar */
+}
+.btnCambiar {
+  display: inline-flex;            /* 🔹 permite centrar contenido fácilmente */
+  align-items: center;             /* centra verticalmente */
+  justify-content: center;         /* centra horizontalmente */
+  margin: 2rem auto 0 auto;        /* centrado y con aire arriba */
+  background: #5fd48c;             /* verde suave */
+  color: #003b2e;                  /* texto oscuro */
+  border: none;
+  border-radius: 12px;
+  padding: 0.9rem 2.5rem;          /* más espacio interno */
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  line-height: 1;                  /* 🔹 evita que se corte texto */
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  text-align: center;
+  white-space: nowrap;             /* 🔹 evita salto de línea en el texto */
+}
+
+.btnCambiar:hover {
+  background: #4cc47c;             /* tono más oscuro al pasar el mouse */
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.lineaPerfil {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  margin: 1.2rem 0 1.5rem 0;
+  width: 100%;
 }
 
 /* Media Queries para pantallas de tablet */

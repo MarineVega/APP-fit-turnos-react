@@ -13,6 +13,7 @@ import Administrar from "./pages/Administrar";
 import Actividad from "./pages/Actividad";
 import Horario from "./pages/Horario";
 import Profesor from "./pages/Profesor";
+import PerfilUsuario from "./pages/PerfilUsuario";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/actividad" element={<Actividad />} />
         <Route path="/horario" element={<Horario />} />
         <Route path="/profesor" element={<Profesor />} />
+        <Route path="/perfil" element={<PerfilUsuario />} />  
       </Route>
     </Routes>
   );

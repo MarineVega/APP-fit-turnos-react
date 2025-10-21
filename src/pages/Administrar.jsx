@@ -68,7 +68,7 @@ export default function Administrar() {
       titulo: "Publicidad",
       tipo: "info",
       imagen: publicidad,
-      contenido: <p>Aquí puede promocionar sus productos, servicios o sponsor.</p>,
+      contenido: <p>PROXIMAMENTE podrá promocionar sus productos, servicios o sponsor.</p>,
     },
   ];
 

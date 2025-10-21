@@ -61,7 +61,10 @@ function Navbar() {
     <div className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}>
       {usuarioActivo ? (
         <>
-          <span className="menu-link nombre">
+          <span
+            className="menu-link nombre"
+            onClick={() => navigate("/perfil")}
+            style={{ cursor: "pointer" }}>
             {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
           </span>
         
@@ -132,9 +135,12 @@ function Navbar() {
           {/* Nombre y cerrar sesión solo si logueado (escritorio) */}
           {usuarioActivo && (
             <div className="desktop-only user-info">
-              <span className="menu-link nombre">
-                {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
-              </span>
+             <span
+              className="menu-link nombre"
+              onClick={() => navigate("/perfil")}
+              style={{ cursor: "pointer" }}>
+              {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
+            </span>
               <span className="menu-link logout" onClick={cerrarSesion}>
                 Cerrar sesión
               </span>

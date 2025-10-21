@@ -46,8 +46,11 @@ export default function RecuperarStep2({ onSwitch }) {
   };
 
   return (
+    <>
+    <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
+    
     <form onSubmit={handleNext} className="formCuenta">
-      <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
+      
 
       <FormCampos
         label="Código"
@@ -87,5 +90,6 @@ export default function RecuperarStep2({ onSwitch }) {
       </p>
       </div>
     </form>
+    </>
   );
 }

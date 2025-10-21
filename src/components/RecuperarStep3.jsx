@@ -24,8 +24,10 @@ export default function RecuperarStep3({ onSwitch }) {
   };
 
   return (
+    <>
+    <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
     <form onSubmit={handleReset} className="formCuenta">
-      <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
+      
 
       <FormCampos
         label="Nueva Contraseña"
@@ -73,5 +75,6 @@ export default function RecuperarStep3({ onSwitch }) {
       </p>
       </div>
     </form>
+    </>
   );
 }

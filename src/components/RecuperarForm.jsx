@@ -47,8 +47,10 @@ export default function RecuperarForm({ onSwitch }) {
   };
 
   return (
+    <>
+    <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
     <form onSubmit={handleRecover} className="formCuenta">
-      <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
+      
 
       <FormCampos
         label="Email"
@@ -83,5 +85,6 @@ export default function RecuperarForm({ onSwitch }) {
         />
       </div>
     </form>
+    </>
   );
 }

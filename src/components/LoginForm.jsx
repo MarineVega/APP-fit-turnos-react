@@ -5,6 +5,7 @@ import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import TituloConFlecha from "./TituloConFlecha.jsx";
 import checkmark from "../assets/img/exito.png";
+import "../styles/style.css";
 
 export default function LoginForm({ onSwitch }) {
   const navigate = useNavigate();
@@ -69,9 +70,11 @@ export default function LoginForm({ onSwitch }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="formCuenta">
-      <TituloConFlecha>Iniciar Sesión</TituloConFlecha>
-
+       <>
+      {/* 🔹 Título con flecha FUERA del formulario */}
+      <TituloConFlecha>Iniciar Sesión</TituloConFlecha> 
+      <form onSubmit={handleSubmit} className="formCuenta">
+      
       <FormCampos
         label="Email"
         type="email"
@@ -120,5 +123,6 @@ export default function LoginForm({ onSwitch }) {
         </p>
       </div>
     </form>
+     </>
   );
 }

@@ -92,8 +92,10 @@ export default function RegistrarForm({ onSwitch }) {
   };
 
   return (
+    <>
+    <TituloConFlecha>Crear Cuenta</TituloConFlecha>
     <form onSubmit={handleRegister} className="formCuenta">
-      <TituloConFlecha>Crear Cuenta</TituloConFlecha>
+      
 
       <FormCampos
         label="Nombre de Usuario"
@@ -171,5 +173,6 @@ export default function RegistrarForm({ onSwitch }) {
       </div>
       </div>
     </form>
+    </>
   );
 }

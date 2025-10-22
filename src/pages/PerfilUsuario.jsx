@@ -32,7 +32,7 @@ export default function PerfilUsuario() {
 
     if (nueva !== confirmar) {
      Swal.fire({
-              title: "Las contrsaseñas no coinciden",
+              title: "Las contraseñas no coinciden",
               imageUrl: error,
               imageHeight: 100,
               imageAlt: "Error",
@@ -134,7 +134,7 @@ export default function PerfilUsuario() {
               />
             </label>
 
-            {/* ✅ Reemplazamos los botones manuales por FormBotones */}
+            {/* ✅  FormBotones */}
             <FormBotones
               boton1={{
                 label: "Guardar",

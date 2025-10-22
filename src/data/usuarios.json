@@ -2,33 +2,42 @@
   "usuarios": [
     {
       "usuario_id": 1,
-      "usuario": "natalia",
-      "email": "natalia@gmail.com",
+      "tipoUsuario_id": 1,
       "tipoUsuario": "Administrador",
+      "usuario": "natalia",
+      "password": "123456",
+      "email": "nataliagelmi@gmail.com",
+      "activo": true,
+      "esAdmin": true,
+      "rol": "Administrador",
       "nombre": "Natalia",
-      "apellido": "Gelmi",
-      "rol": "Administrador General",
-      "activo": true
+      "apellido": "Gelmi"
     },
     {
       "usuario_id": 2,
+      "tipoUsuario_id": 2,
+      "tipoUsuario": "Profesor",
       "usuario": "mariano",
-      "email": "mariano@gmail.com",
-      "tipoUsuario": "Cliente",
+      "password": "123456",
+      "email": "mariano@email.com",
+      "activo": true,
+      "esAdmin": false,
+      "rol": "Profesor",
       "nombre": "Mariano",
-      "apellido": "Pérez",
-      "rol": "Cliente",
-      "activo": true
+      "apellido": "López"
     },
     {
       "usuario_id": 3,
-      "usuario": "carla",
-      "email": "carla@gmail.com",
-      "tipoUsuario": "Profesor",
-      "nombre": "Carla",
-      "apellido": "Domínguez",
-      "rol": "Profesor de Yoga",
-      "activo": false
+      "tipoUsuario_id": 3,
+      "tipoUsuario": "Cliente",
+      "usuario": "laura",
+      "password": "123456",
+      "email": "laura@email.com",
+      "activo": true,
+      "esAdmin": false,
+      "rol": "Cliente",
+      "nombre": "Laura",
+      "apellido": "Gómez"
     }
   ]
 }

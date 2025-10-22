@@ -5,6 +5,7 @@ import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import TituloConFlecha from "./TituloConFlecha.jsx";
 import checkmark from "../assets/img/exito.png";
+import usuariosData from "../data/usuarios.json"; // 👈 respaldo inicial
 import "../styles/style.css";
 
 export default function LoginForm({ onSwitch }) {
@@ -17,7 +18,7 @@ export default function LoginForm({ onSwitch }) {
   // Si ya hay usuario logueado, redirige a la página principal
   useEffect(() => {
     const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
-    if (usuarioActivo) navigate("/"); // 🔹 Cambiado de /turnos a /
+    if (usuarioActivo) navigate("/");
   }, [navigate]);
 
   const handleSubmit = (e) => {
@@ -32,7 +33,11 @@ export default function LoginForm({ onSwitch }) {
     setLoading(true);
 
     setTimeout(() => {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+      // 1️⃣ Trae usuarios desde localStorage o desde el JSON local
+      const usuariosLS = JSON.parse(localStorage.getItem("usuarios")) || [];
+      const usuarios = usuariosLS.length > 0 ? usuariosLS : usuariosData.usuarios;
+
+      // 2️⃣ Busca el usuario por email y contraseña
       const usuario = usuarios.find(
         (u) => u.email === email && u.password === password
       );
@@ -44,85 +49,80 @@ export default function LoginForm({ onSwitch }) {
         window.dispatchEvent(new Event("usuarioActualizado"));
 
         Swal.fire({
-          title: "¡Bienvenido!" + (usuario.esAdmin ? " Administrador" : ""),
+          title: `¡Bienvenido${usuario.esAdmin ? ", Administrador" : ""}!`,
           imageUrl: checkmark,
           imageHeight: 100,
           imageAlt: "Checkmark",
           icon: "success",
           confirmButtonText: "Cerrar",
-        }).then(() => navigate("/")); // 🔹 Cambiado de /turnos a /
+        }).then(() => navigate("/"));
       } else {
-        setError("Usuario o contraseña incorrecta");
+        setError("Usuario o contraseña incorrecta.");
       }
 
       setLoading(false);
     }, 300);
   };
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-    if (error) setError("");
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-    if (error) setError("");
-  };
-
   return (
-       <>
-      {/* 🔹 Título con flecha FUERA del formulario */}
-      <TituloConFlecha>Iniciar Sesión</TituloConFlecha> 
+    <>
+      <TituloConFlecha>Iniciar Sesión</TituloConFlecha>
       <form onSubmit={handleSubmit} className="formCuenta">
-      
-      <FormCampos
-        label="Email"
-        type="email"
-        value={email}
-        onChange={handleEmailChange}
-        name="email"
-        className="inputCuenta"
-      />
-
-      <FormCampos
-        label="Contraseña"
-        type="password"
-        value={password}
-        onChange={handlePasswordChange}
-        name="password"
-        className="inputCuenta"
-      />
-
-      {error && (
-        <div className="contenedorError">
-          <p className="adventencia">{error}</p>
-        </div>
-      )}
-
-      <div className="contenedorBotones">
-        <FormBotones
-          boton1={{
-            id: "btnIngresar",
-            label: loading ? "Cargando..." : "Ingresar",
-            className: "btnAceptar",
-            type: "submit",
+        <FormCampos
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (error) setError("");
           }}
-          boton2={{
-            id: "btnCancelar",
-            label: "Cancelar",
-            className: "btnCancelar",
-            onClick: () => navigate("/"),
-          }}
+          name="email"
+          className="inputCuenta"
         />
 
-        <p className="link" onClick={() => onSwitch("registrar")}>
-          Crear cuenta
-        </p>
-        <p className="link" onClick={() => onSwitch("recuperar1")}>
-          Olvidé mi contraseña
-        </p>
-      </div>
-    </form>
-     </>
+        <FormCampos
+          label="Contraseña"
+          type="password"
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (error) setError("");
+          }}
+          name="password"
+          className="inputCuenta"
+        />
+
+        {error && (
+          <div className="contenedorError">
+            <p className="adventencia">{error}</p>
+          </div>
+        )}
+
+        <div className="contenedorBotones">
+          <FormBotones
+            boton1={{
+              id: "btnIngresar",
+              label: loading ? "Cargando..." : "INGRESAR",
+              className: "btnCuentaLogin",
+              type: "submit",
+            }}
+            boton2={{
+              id: "btnCancelar",
+              label: "CANCELAR",
+              className: "btnCancelar",
+              onClick: () => navigate("/"),
+            }}
+            contenedorClass="contenedorBotones"
+          />
+
+          <p className="link" onClick={() => onSwitch("registrar")}>
+            Crear cuenta
+          </p>
+          <p className="link" onClick={() => onSwitch("recuperar1")}>
+            Olvidé mi contraseña
+          </p>
+        </div>
+      </form>
+    </>
   );
 }

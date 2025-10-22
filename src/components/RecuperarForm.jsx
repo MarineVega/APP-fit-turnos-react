@@ -4,6 +4,8 @@ import emailjs from "@emailjs/browser";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import TituloConFlecha from "./TituloConFlecha.jsx";
+import usuariosData from "../data/usuarios.json"; // 👈 respaldo local opcional
+import "../styles/style.css";
 
 export default function RecuperarForm({ onSwitch }) {
   const [email, setEmail] = useState("");
@@ -17,27 +19,42 @@ export default function RecuperarForm({ onSwitch }) {
     e.preventDefault();
     setError("");
 
-    if (!email) return setError("Ingresá tu correo.");
+    if (!email) return setError("Ingresá tu correo electrónico.");
+
     setLoading(true);
 
+    // 1️⃣ Buscar usuario en localStorage o JSON
+    const usuariosLS = JSON.parse(localStorage.getItem("usuarios")) || [];
+    const usuarios = usuariosLS.length > 0 ? usuariosLS : usuariosData.usuarios;
+    const usuarioExiste = usuarios.find((u) => u.email === email);
+
+    if (!usuarioExiste) {
+      setError("No existe una cuenta con ese correo.");
+      setLoading(false);
+      return;
+    }
+
+    // 2️⃣ Generar y guardar código de recuperación
     const codigo = generarCodigo();
     localStorage.setItem("codigoRecuperacion", codigo);
+    localStorage.setItem("emailRecuperacion", email);
 
     try {
       await emailjs.send(
-        "service_vq2s3hg",
-        "template_tth5c7f",
+        "service_vq2s3hg", // Tu ID de servicio
+        "template_tth5c7f", // Tu ID de plantilla
         { email, codigo },
-        "K_tWHwFkHy42ZpWnU"
+        "K_tWHwFkHy42ZpWnU" // Tu clave pública
       );
 
       Swal.fire({
-        title: "Código enviado",
-        text: "Revisá tu correo para continuar",
+        title: "Código enviado ✉️",
+        text: "Revisá tu correo para continuar con la recuperación.",
         icon: "success",
+        confirmButtonColor: "#6edc8c",
       }).then(() => {
         setLoading(false);
-        onSwitch("recuperar2");
+        onSwitch("recuperar2"); // pasa al siguiente paso
       });
     } catch (err) {
       console.error("Error:", err);
@@ -48,43 +65,44 @@ export default function RecuperarForm({ onSwitch }) {
 
   return (
     <>
-    <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
-    <form onSubmit={handleRecover} className="formCuenta">
-      
-
-      <FormCampos
-        label="Email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        name="email"
-        className="inputCuenta"
-      />
-
-       {/* Aquí el error */}
-      {error && (
-        <div className="contenedorError">
-          <p className="adventencia">{error}</p>
-        </div>
-      )}
-
-      <div className="contenedorBotones">
-        <FormBotones
-          boton1={{
-            id: "btnEnviarCodigo",
-            label: loading ? "Cargando..." : "Enviar código",
-            className: "btnAceptar",
-            onClick: handleRecover,
+      <TituloConFlecha>Recuperar Cuenta</TituloConFlecha>
+      <form onSubmit={handleRecover} className="formCuenta">
+        <FormCampos
+          label="Correo electrónico"
+          type="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (error) setError("");
           }}
-          boton2={{
-            id: "btnCancelar",
-            label: "Cancelar",
-            className: "btnCancelar",
-            onClick: () => onSwitch("login"),
-          }}
+          name="email"
+          className="inputCuenta"
         />
-      </div>
-    </form>
+
+        {/* Error debajo del campo */}
+        {error && (
+          <div className="contenedorError">
+            <p className="adventencia">{error}</p>
+          </div>
+        )}
+
+        <div className="contenedorBotones">
+          <FormBotones
+            boton1={{
+              id: "btnEnviarCodigo",
+              label: loading ? "Enviando..." : "Enviar código",
+              className: "btnCuentaLogin",
+              type: "submit",
+            }}
+            boton2={{
+              id: "btnCancelar",
+              label: "Cancelar",
+              className: "btnCancelar",
+              onClick: () => onSwitch("login"),
+            }}
+          />
+        </div>
+      </form>
     </>
   );
 }

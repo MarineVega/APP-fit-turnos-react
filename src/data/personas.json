@@ -1,0 +1,28 @@
+{
+  "personas": [
+    {
+      "persona_id": 1,
+      "apellido": "Gelmi",
+      "nombre": "Natalia",
+      "usuario_id": 1,
+      "rolPersona_id": 1,
+      "activo": true
+    },
+    {
+      "persona_id": 2,
+      "apellido": "López",
+      "nombre": "Mariano",
+      "usuario_id": 2,
+      "rolPersona_id": 2,
+      "activo": true
+    },
+    {
+      "persona_id": 3,
+      "apellido": "Gómez",
+      "nombre": "Laura",
+      "usuario_id": 3,
+      "rolPersona_id": 3,
+      "activo": true
+    }
+  ]
+}

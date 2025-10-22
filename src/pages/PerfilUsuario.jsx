@@ -4,6 +4,8 @@ import Swal from "sweetalert2";
 import TituloConFlecha from "../components/TituloConFlecha.jsx";
 import FormBotones from "../components/FormBotones.jsx"; // ✅
 import "../styles/style.css";
+import checkmark from "../assets/img/exito.png";
+import error from "../assets/img/error.png";
 
 export default function PerfilUsuario() {
   const navigate = useNavigate();
@@ -29,12 +31,29 @@ export default function PerfilUsuario() {
     e.preventDefault();
 
     if (nueva !== confirmar) {
-      Swal.fire("Error", "Las contraseñas nuevas no coinciden", "error");
+     Swal.fire({
+              title: "Las contrsaseñas no coinciden",
+              imageUrl: error,
+              imageHeight: 100,
+              imageAlt: "Error",
+              icon: "error",
+              confirmButtonText: "Cerrar",
+            });
+          
+
       return;
     }
 
     if (actual !== usuario.password) {
-      Swal.fire("Error", "La contraseña actual no es correcta", "error");
+        Swal.fire({
+              title: "La contraseña actual no es correcta",
+              imageUrl: error,
+              imageHeight: 100,
+              imageAlt: "Error",
+              icon: "error",
+              confirmButtonText: "Cerrar",
+            });
+          
       return;
     }
 
@@ -50,9 +69,16 @@ export default function PerfilUsuario() {
 
     setUsuario(usuarioActualizado);
     setEditando(false);
-    Swal.fire("Éxito", "La contraseña se cambió correctamente", "success");
-  };
-
+    
+     Swal.fire({
+              title: "La contraseña se cambió correctamente",
+              imageUrl: checkmark,
+              imageHeight: 100,
+              imageAlt: "Checkmark",
+              icon: "success",
+              confirmButtonText: "Cerrar",
+            });
+          };
   if (!usuario) return null;
 
   return (

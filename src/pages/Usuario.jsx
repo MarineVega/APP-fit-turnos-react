@@ -53,7 +53,7 @@ export default function Usuario() {
   };
 
   return (
-    <main className="mainUsuario">
+    <main className="mainProfesor">
       {modo === "agregar" && (
         <>
           <TituloConFlecha>Agregar Usuario</TituloConFlecha>

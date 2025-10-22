@@ -14,6 +14,7 @@ import Actividad from "./pages/Actividad";
 import Horario from "./pages/Horario";
 import Profesor from "./pages/Profesor";
 import PerfilUsuario from "./pages/PerfilUsuario";
+import Usuario from "./pages/Usuario";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/horario" element={<Horario />} />
         <Route path="/profesor" element={<Profesor />} />
         <Route path="/perfil" element={<PerfilUsuario />} />  
+        <Route path="/usuario" element={<Usuario />} />
       </Route>
     </Routes>
   );

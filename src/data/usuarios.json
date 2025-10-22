@@ -1,26 +1,34 @@
-[
-  {
-    "id": 1,
-    "usuario": "profesor1",
-    "nombre": "Carlos Gómez",
-    "rol": "Profesor",
-    "email": "carlos@fitturnos.com",
-    "contraseña": "1234"
-  },
-  {
-    "id": 2,
-    "usuario": "cliente1",
-    "nombre": "Lucía Pérez",
-    "rol": "Cliente",
-    "email": "lucia@fitturnos.com",
-    "contraseña": "abcd"
-  },
-  {
-    "id": 3,
-    "usuario": "admin1",
-    "nombre": "Ana Fernández",
-    "rol": "Administrador",
-    "email": "ana@fitturnos.com",
-    "contraseña": "admin"
-  }
-]
+{
+  "usuarios": [
+    {
+      "usuario_id": 1,
+      "usuario": "natalia",
+      "email": "natalia@gmail.com",
+      "tipoUsuario": "Administrador",
+      "nombre": "Natalia",
+      "apellido": "Gelmi",
+      "rol": "Administrador General",
+      "activo": true
+    },
+    {
+      "usuario_id": 2,
+      "usuario": "mariano",
+      "email": "mariano@gmail.com",
+      "tipoUsuario": "Cliente",
+      "nombre": "Mariano",
+      "apellido": "Pérez",
+      "rol": "Cliente",
+      "activo": true
+    },
+    {
+      "usuario_id": 3,
+      "usuario": "carla",
+      "email": "carla@gmail.com",
+      "tipoUsuario": "Profesor",
+      "nombre": "Carla",
+      "apellido": "Domínguez",
+      "rol": "Profesor de Yoga",
+      "activo": false
+    }
+  ]
+}

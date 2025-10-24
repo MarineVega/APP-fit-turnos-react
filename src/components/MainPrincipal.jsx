@@ -1,15 +1,4 @@
-/*
-import Logo_Fit from "../../public/assets/img/Logo_Fit.png"
-import Logo_Medusa from "../../public/assets/img/Logo_Medusa.jpg"
-import icono_pilates from "../../public/assets/img/icono_pilates.png"
-import icono_padel from "../../public/assets/img/icono_padel.png"
-import icono_club from "../../public/assets/img/icono_club.png"
-import icono_yoga from "../../public/assets/img/icono_yoga.png"
-import icono_pesas from "../../public/assets/img/icono_pesas.png"
-import icono_instructor from "../../public/assets/img/icono_instructor.png"
-import icono_rehabilitacion from "../../public/assets/img/icono_rehabilitacion.png"
-import icono_natacion from "../../public/assets/img/icono_natacion.png"
-*/
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";       
 
@@ -23,6 +12,8 @@ import icono_pesas from "../assets/img/icono_pesas.png";
 import icono_instructor from "../assets/img/icono_instructor.png";
 import icono_rehabilitacion from "../assets/img/icono_rehabilitacion.png";
 import icono_natacion from "../assets/img/icono_natacion.png";
+import videoIzquierda from "../assets/video/izquierda.mp4";
+import videoDerecha from "../assets/video/derecha.mp4";
 
 function MainPrincipal() {
   const navigate = useNavigate();     
@@ -93,43 +84,29 @@ function MainPrincipal() {
 
       <img className="logoMedusa" src={Logo_Medusa} alt="Logo Medusa Soft" />
 
-      {/* <!-- Video izquierdo --> */}
-      {/*
-      <video className="video-lateral izquierda" autoplay muted loop playsinline>
-          <source src="../assets/video/izquierda.mp4" type="video/mp4" />       
-      </video>
-      */}
-
-      {/*
-      <video
+     {/* Video izquierdo */}
+        <video
           className="video-lateral izquierda"
           autoPlay
           muted
           loop
           playsInline
-      >
-          <source src="/assets/video/izquierda.mp4" type="video/mp4" />
-      </video>
-      */}
+        >
+          <source src={videoIzquierda} type="video/mp4" />
+        </video>
 
-      {/* <!-- Video derecho --> */}
-      {/*
-      <video className="video-lateral derecha" autoplay muted loop playsinline>
-          <source src="../assets/video/derecha.mp4" type="video/mp4" />    
-      </video>  
-      */}
-
-      {/*
-      <video
+        {/* Video derecho */}
+        <video
           className="video-lateral derecha"
           autoPlay
           muted
           loop
           playsInline
-      >
-          <source src="/assets/video/derecha.mp4" type="video/mp4" />
-      </video>
-      */}
+        >
+          <source src={videoDerecha} type="video/mp4" />
+        </video>
+
+     
     </main>
   );
 }

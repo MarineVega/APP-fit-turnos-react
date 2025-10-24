@@ -42,32 +42,42 @@ export default function LoginForm({ onSwitch }) {
         (u) => u.email === email && u.password === password
       );
 
-      if (usuario) {
-        // 3️⃣ Guarda el usuario logueado
-        localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
-
-        // Notificar a otros componentes
-        window.dispatchEvent(new Event("usuarioActualizado"));
-
-        // 4️⃣ Determinar el tipo de persona
-        const tipo = usuario?.persona?.tipoPersona_id;
-
-        let rol = "";
-        if (tipo === 1) rol = "Administrador";
-        else if (tipo === 2) rol = "Profesor";
-        else if (tipo === 3) rol = "Cliente";
-
-        Swal.fire({
-          title: `¡Bienvenido${rol ? ", " + rol : ""}!`,
-          imageUrl: checkmark,
-          imageHeight: 100,
-          imageAlt: "Checkmark",
-          icon: "success",
-          confirmButtonText: "Cerrar",
-        }).then(() => navigate("/"));
-      } else {
+      // 🔸 Si no existe el usuario
+      if (!usuario) {
         setError("Usuario o contraseña incorrecta.");
+        setLoading(false);
+        return;
       }
+
+      // 🔒 Si el usuario está inactivo, no permitir login
+      if (!usuario.activo) {
+        setError("Tu cuenta está inactiva. Contactá con el administrador.");
+        setLoading(false);
+        return;
+      }
+
+      // 3️⃣ Guarda el usuario logueado
+      localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
+
+      // Notificar a otros componentes
+      window.dispatchEvent(new Event("usuarioActualizado"));
+
+      // 4️⃣ Determinar el tipo de persona
+      const tipo = usuario?.persona?.tipoPersona_id;
+
+      let rol = "";
+      if (tipo === 1) rol = "Administrador";
+      else if (tipo === 2) rol = "Profesor";
+      else if (tipo === 3) rol = "Cliente";
+
+      Swal.fire({
+        title: `¡Bienvenido${rol ? ", " + rol : ""}!`,
+        imageUrl: checkmark,
+        imageHeight: 100,
+        imageAlt: "Checkmark",
+        icon: "success",
+        confirmButtonText: "Cerrar",
+      }).then(() => navigate("/"));
 
       setLoading(false);
     }, 300);

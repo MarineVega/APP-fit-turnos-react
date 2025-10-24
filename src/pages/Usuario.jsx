@@ -146,6 +146,12 @@ export default function Usuario() {
           <UsuarioList usuarios={usuarios} modo="consultar" />
         </>
       )}
+      {modo === "postAlta" && (
+        <>
+          <TituloConFlecha> Listado de Usuarios </TituloConFlecha>
+          <UsuarioList usuarios={usuarios} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
+        </>
+    )}
     </main>
   );
 }

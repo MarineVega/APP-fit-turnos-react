@@ -3,7 +3,6 @@ import Swal from "sweetalert2";
 import FormBotones from "./FormBotones";
 import "../styles/style.css";
 
-// ✅ Configuración del SweetAlert (igual al ProfesorList)
 const swalEstilo = Swal.mixin({
   imageWidth: 200,
   imageHeight: 200,
@@ -18,7 +17,6 @@ const swalEstilo = Swal.mixin({
 export default function UsuarioList({ usuarios, modo, onEditar }) {
   const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
 
-  // 🧭 Traducir tipoPersona_id a texto
   const obtenerTipo = (u) => {
     const tipo = u?.persona?.tipoPersona_id;
     if (tipo === 1) return "Administrador";
@@ -28,7 +26,6 @@ export default function UsuarioList({ usuarios, modo, onEditar }) {
   };
 
   const handleEliminar = (usuario) => {
-    // 🔒 Evitar eliminar el usuario logueado
     if (usuarioActivo && usuario.usuario_id === usuarioActivo.usuario_id) {
       swalEstilo.fire({
         icon: "warning",
@@ -86,56 +83,67 @@ export default function UsuarioList({ usuarios, modo, onEditar }) {
 
           <tbody>
             {usuarios.length > 0 ? (
-              usuarios.map((u) => (
-                <tr key={u.usuario_id}>
-                  <td>{u.usuario}</td>
-                  <td>{u.email}</td>
-                  <td>{u.persona?.nombre || u.nombre || "—"}</td>
-                  <td>{u.persona?.apellido || u.apellido || "—"}</td>
-                  <td>{obtenerTipo(u)}</td>
-                  <td>{u.activo ? "Sí" : "No"}</td>
+              usuarios.map((u) => {
+                const esAdminPrincipal =
+                  u.usuario === "admin@fitturnos.com" ||
+                  u.email === "admin@fitturnos.com";
 
-                  {modo !== "consultar" && (
-                    <td>
-                      {modo === "editar" && (
-                        <button
-                          className="btnTabla"
-                          onClick={() => onEditar && onEditar(u)}
-                        >
-                          <img
-                            src={
-                              new URL(
-                                "../assets/img/icono_editar.png",
-                                import.meta.url
-                              ).href
-                            }
-                            alt="Editar"
-                            width="30"
-                          />
-                        </button>
-                      )}
+                return (
+                  <tr key={u.usuario_id}>
+                    <td>{u.usuario}</td>
+                    <td>{u.email}</td>
+                    <td>{u.persona?.nombre || u.nombre || "—"}</td>
+                    <td>{u.persona?.apellido || u.apellido || "—"}</td>
+                    <td>{obtenerTipo(u)}</td>
+                    <td>{u.activo ? "Sí" : "No"}</td>
 
-                      {modo === "eliminar" && (
-                        <button
-                          className="btnTabla"
-                          onClick={() => handleEliminar(u)}
-                        >
-                          <img
-                            src={
-                              new URL(
-                                "../assets/img/icono_eliminar.png",
-                                import.meta.url
-                              ).href
-                            }
-                            alt="Eliminar"
-                            width="30"
-                          />
-                        </button>
-                      )}
-                    </td>
-                  )}
-                </tr>
-              ))
+                    {modo !== "consultar" && (
+                      <td>
+                        {/* 🚫 Ocultar botones si es el admin principal */}
+                        {!esAdminPrincipal && (
+                          <>
+                            {modo === "editar" && (
+                              <button
+                                className="btnTabla"
+                                onClick={() => onEditar && onEditar(u)}
+                              >
+                                <img
+                                  src={
+                                    new URL(
+                                      "../assets/img/icono_editar.png",
+                                      import.meta.url
+                                    ).href
+                                  }
+                                  alt="Editar"
+                                  width="30"
+                                />
+                              </button>
+                            )}
+
+                            {modo === "eliminar" && (
+                              <button
+                                className="btnTabla"
+                                onClick={() => handleEliminar(u)}
+                              >
+                                <img
+                                  src={
+                                    new URL(
+                                      "../assets/img/icono_eliminar.png",
+                                      import.meta.url
+                                    ).href
+                                  }
+                                  alt="Eliminar"
+                                  width="30"
+                                />
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={modo !== "consultar" ? 7 : 6}>

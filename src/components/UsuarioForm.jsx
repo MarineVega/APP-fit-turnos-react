@@ -30,12 +30,22 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     email: datoInicial?.email || datoInicial?.persona?.email || "",
     usuario: datoInicial?.usuario || "",
     contrasenia: datoInicial?.password || datoInicial?.contrasenia || "",
-    repetirContrasenia: "",
-    tipoPersona_id: datoInicial?.persona?.tipoPersona_id || "", // 👈 reemplaza tipoUsuario
+    repetirContrasenia: "", // se completa abajo si es edición
+    tipoPersona_id: datoInicial?.persona?.tipoPersona_id || "",
     activo: datoInicial?.activo ?? true,
   });
 
   const [errores, setErrores] = useState({});
+
+  // ✅ Si está en modo edición, repetirContrasenia toma el valor de contrasenia
+  useEffect(() => {
+    if (modo === "editar" && usuario.contrasenia && !usuario.repetirContrasenia) {
+      setUsuario((prev) => ({
+        ...prev,
+        repetirContrasenia: prev.contrasenia,
+      }));
+    }
+  }, [modo, usuario.contrasenia]);
 
   const limpiarError = (campo) => setErrores((prev) => ({ ...prev, [campo]: "" }));
 
@@ -55,6 +65,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     const nuevosErrores = {};
     let esValido = true;
 
+    // 🔹 Validaciones básicas
     if (!usuario.nombre.trim()) {
       nuevosErrores.nombre = "El nombre es obligatorio.";
       esValido = false;
@@ -82,20 +93,33 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
       nuevosErrores.repetirContrasenia = "Las contraseñas no coinciden.";
       esValido = false;
     }
-
     if (!usuario.tipoPersona_id) {
       nuevosErrores.tipoPersona_id = "Debe seleccionar un tipo de usuario.";
       esValido = false;
     }
 
-    // Evita duplicados
-    const existe = usuarios.some(
+    // 🔹 Evita duplicados de usuario y email
+    const usuarioDuplicado = usuarios.some(
       (u) =>
-        u.usuario.toLowerCase() === usuario.usuario.toLowerCase() &&
+        u.usuario?.toLowerCase().trim() === usuario.usuario.toLowerCase().trim() &&
         u.usuario_id !== usuario_id
     );
-    if (existe) {
+
+    const emailDuplicado = usuarios.some(
+      (u) =>
+        u.email?.toLowerCase().trim() === usuario.email.toLowerCase().trim() &&
+        u.usuario_id !== usuario_id
+    );
+
+    if (usuarioDuplicado && emailDuplicado) {
       nuevosErrores.usuario = "Ya existe un usuario con ese nombre.";
+      nuevosErrores.email = "Ya existe un usuario con ese correo electrónico.";
+      esValido = false;
+    } else if (usuarioDuplicado) {
+      nuevosErrores.usuario = "Ya existe un usuario con ese nombre.";
+      esValido = false;
+    } else if (emailDuplicado) {
+      nuevosErrores.email = "Ya existe un usuario con ese correo electrónico.";
       esValido = false;
     }
 

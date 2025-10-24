@@ -42,27 +42,27 @@ export default function LoginForm({ onSwitch }) {
         (u) => u.email === email && u.password === password
       );
 
-      // 🔸 Si no existe el usuario
+      //  Si no existe el usuario
       if (!usuario) {
         setError("Usuario o contraseña incorrecta.");
         setLoading(false);
         return;
       }
 
-      // 🔒 Si el usuario está inactivo, no permitir login
+      //  Si el usuario está inactivo, no permitir login
       if (!usuario.activo) {
         setError("Tu cuenta está inactiva. Contactá con el administrador.");
         setLoading(false);
         return;
       }
 
-      // 3️⃣ Guarda el usuario logueado
+      // 3️ Guarda el usuario logueado
       localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
 
       // Notificar a otros componentes
       window.dispatchEvent(new Event("usuarioActualizado"));
 
-      // 4️⃣ Determinar el tipo de persona
+      //  Determinar el tipo de persona
       const tipo = usuario?.persona?.tipoPersona_id;
 
       let rol = "";

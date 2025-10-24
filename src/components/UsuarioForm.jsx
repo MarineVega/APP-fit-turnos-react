@@ -49,7 +49,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
 
   const limpiarError = (campo) => setErrores((prev) => ({ ...prev, [campo]: "" }));
 
-  // ✅ Manejo de cambios
+  //  Manejo de cambios
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setUsuario({
@@ -98,7 +98,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
       esValido = false;
     }
 
-    // 🔹 Evita duplicados de usuario y email
+    //  Evita duplicados de usuario y email
     const usuarioDuplicado = usuarios.some(
       (u) =>
         u.usuario?.toLowerCase().trim() === usuario.usuario.toLowerCase().trim() &&
@@ -126,7 +126,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     setErrores(nuevosErrores);
     if (!esValido) return;
 
-    // 🧩 Estructura compatible con tu modelo
+    // Estructura compatible 
     const usuarioFormateado = {
       usuario_id: usuario_id || usuarios.length + 1,
       usuario: usuario.usuario,
@@ -195,6 +195,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
   };
 
   return (
+    
     <section className="seccionProfesor">
       <form onSubmit={validarGuardar} className="formProfesor">
         <FormCampos
@@ -284,7 +285,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           <p className="adventencia">{errores.tipoPersona_id}</p>
         )}
 
-        <label className="checkLabel">
+        <label className="checkAdmin">
           <input
             type="checkbox"
             name="activo"
@@ -296,10 +297,10 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
 
         <label className="advertencia">* Campos obligatorios</label>
       </form>
-
+     
       {/* ✅ Botones */}
       <FormBotones
-        className="contenedorBotones"
+        
         boton1={{
           id: "agregar",
           label: modo === "editar" ? "GUARDAR" : "AGREGAR",
@@ -312,7 +313,8 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           className: "btnCancelar",
           onClick: cancelar,
         }}
+        
       />
-    </section>
+     </section>
   );
 }

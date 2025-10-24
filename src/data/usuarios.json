@@ -2,42 +2,21 @@
   "usuarios": [
     {
       "usuario_id": 1,
-      "tipoUsuario_id": 1,
-      "tipoUsuario": "Administrador",
-      "usuario": "natalia",
+      "usuario": "admin",
+      "email": "admin@fitturnos.com",
       "password": "123456",
-      "email": "nataliagelmi@gmail.com",
       "activo": true,
-      "esAdmin": true,
-      "rol": "Administrador",
-      "nombre": "Natalia",
-      "apellido": "Gelmi"
-    },
-    {
-      "usuario_id": 2,
-      "tipoUsuario_id": 2,
-      "tipoUsuario": "Profesor",
-      "usuario": "mariano",
-      "password": "123456",
-      "email": "mariano@email.com",
-      "activo": true,
-      "esAdmin": false,
-      "rol": "Profesor",
-      "nombre": "Mariano",
-      "apellido": "López"
-    },
-    {
-      "usuario_id": 3,
-      "tipoUsuario_id": 3,
-      "tipoUsuario": "Cliente",
-      "usuario": "laura",
-      "password": "123456",
-      "email": "laura@email.com",
-      "activo": true,
-      "esAdmin": false,
-      "rol": "Cliente",
-      "nombre": "Laura",
-      "apellido": "Gómez"
+      "persona": {
+        "persona_id": 1,
+        "nombre": "Administrador",
+        "apellido": "Del Sistema",
+        "documento": "10000000",
+        "telefono": "2284000000",
+        "domicilio": "Sede Central",
+        "fecha_nac": "1980-01-01",
+        "tipoPersona_id": 1,
+        "activo": true
+      }
     }
   ]
 }

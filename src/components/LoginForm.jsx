@@ -43,13 +43,22 @@ export default function LoginForm({ onSwitch }) {
       );
 
       if (usuario) {
+        // 3️⃣ Guarda el usuario logueado
         localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
 
         // Notificar a otros componentes
         window.dispatchEvent(new Event("usuarioActualizado"));
 
+        // 4️⃣ Determinar el tipo de persona
+        const tipo = usuario?.persona?.tipoPersona_id;
+
+        let rol = "";
+        if (tipo === 1) rol = "Administrador";
+        else if (tipo === 2) rol = "Profesor";
+        else if (tipo === 3) rol = "Cliente";
+
         Swal.fire({
-          title: `¡Bienvenido${usuario.esAdmin ? ", Administrador" : ""}!`,
+          title: `¡Bienvenido${rol ? ", " + rol : ""}!`,
           imageUrl: checkmark,
           imageHeight: 100,
           imageAlt: "Checkmark",

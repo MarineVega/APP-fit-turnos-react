@@ -56,6 +56,17 @@ function Navbar() {
     });
   };
 
+  // 🧭 Función auxiliar para identificar el rol
+  const obtenerRol = () => {
+    const tipo = usuarioActivo?.persona?.tipoPersona_id;
+    if (tipo === 1) return "Administrador";
+    if (tipo === 2) return "Profesor";
+    if (tipo === 3) return "Cliente";
+    return "";
+  };
+
+  const esAdmin = usuarioActivo?.persona?.tipoPersona_id === 1;
+
   // ===== Menú móvil desplegable =====
   const MobileMenu = () => (
     <div className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}>
@@ -65,17 +76,20 @@ function Navbar() {
             className="menu-link nombre"
             onClick={() => navigate("/perfil")}
             style={{ cursor: "pointer" }}>
-            {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
+            {usuarioActivo.nombre || usuarioActivo.usuario}{" "}
+            {obtenerRol() && `(${obtenerRol()})`}
           </span>
-        
+
           <Link to="/turnos" onClick={() => setMenuAbierto(false)}>
             Turnos
           </Link>
-          {usuarioActivo.esAdmin && (
+
+          {esAdmin && (
             <Link to="/administrar" onClick={() => setMenuAbierto(false)}>
               Administrar
             </Link>
           )}
+
           <span className="menu-link logout" onClick={cerrarSesion}>
             Cerrar sesión
           </span>
@@ -110,7 +124,7 @@ function Navbar() {
                 <Link className="menu-link" to="/turnos">
                   Turnos
                 </Link>
-                {usuarioActivo.esAdmin && (
+                {esAdmin && (
                   <Link className="menu-link" to="/administrar">
                     Administrar
                   </Link>
@@ -135,12 +149,13 @@ function Navbar() {
           {/* Nombre y cerrar sesión solo si logueado (escritorio) */}
           {usuarioActivo && (
             <div className="desktop-only user-info">
-             <span
-              className="menu-link nombre"
-              onClick={() => navigate("/perfil")}
-              style={{ cursor: "pointer" }}>
-              {usuarioActivo.nombre} {usuarioActivo.esAdmin && "(Admin)"}
-            </span>
+              <span
+                className="menu-link nombre"
+                onClick={() => navigate("/perfil")}
+                style={{ cursor: "pointer" }}>
+                {usuarioActivo.nombre || usuarioActivo.usuario}{" "}
+                {obtenerRol() && `(${obtenerRol()})`}
+              </span>
               <span className="menu-link logout" onClick={cerrarSesion}>
                 Cerrar sesión
               </span>

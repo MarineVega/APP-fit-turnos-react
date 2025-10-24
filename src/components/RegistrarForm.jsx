@@ -58,18 +58,26 @@ export default function RegistrarForm({ onSwitch }) {
         "Ya existe una cuenta registrada con ese email o nombre de usuario."
       );
 
-    // Crear nuevo usuario (tipo CLIENTE)
+    // 🧩 Crear nuevo usuario coherente con el modelo (tipoPersona_id)
     const nuevoUsuario = {
       usuario_id: usuariosGuardados.length + 1,
       usuario: username,
-      nombre: username,
-      apellido: "",
       email,
-      password: password,
-      tipoUsuario: "Cliente",
-      rol: "Cliente",
+      password,
       activo: true,
-      esAdmin: false,
+
+      // Estructura similar a la de base de datos:
+      persona: {
+        persona_id: usuariosGuardados.length + 1,
+        nombre: username,
+        apellido: "",
+        documento: "",
+        telefono: "",
+        domicilio: "",
+        fecha_nac: "",
+        tipoPersona_id: 3, // 3 = Cliente
+        activo: true,
+      },
     };
 
     usuariosGuardados.push(nuevoUsuario);

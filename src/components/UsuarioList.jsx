@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import FormBotones from "./FormBotones";
 import "../styles/style.css";
 
-// ✅ Configuro el estilo del SweetAlert (igual al ProfesorList)
+// ✅ Configuración del SweetAlert (igual al ProfesorList)
 const swalEstilo = Swal.mixin({
   imageWidth: 200,
   imageHeight: 200,
@@ -16,11 +16,19 @@ const swalEstilo = Swal.mixin({
 });
 
 export default function UsuarioList({ usuarios, modo, onEditar }) {
-  // ✅ Supongamos que el usuario logueado se guarda en localStorage
   const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
 
+  // 🧭 Traducir tipoPersona_id a texto
+  const obtenerTipo = (u) => {
+    const tipo = u?.persona?.tipoPersona_id;
+    if (tipo === 1) return "Administrador";
+    if (tipo === 2) return "Profesor";
+    if (tipo === 3) return "Cliente";
+    return "—";
+  };
+
   const handleEliminar = (usuario) => {
-    // 🔒 Validar si es el usuario activo
+    // 🔒 Evitar eliminar el usuario logueado
     if (usuarioActivo && usuario.usuario_id === usuarioActivo.usuario_id) {
       swalEstilo.fire({
         icon: "warning",
@@ -71,7 +79,6 @@ export default function UsuarioList({ usuarios, modo, onEditar }) {
               <th>Nombre</th>
               <th>Apellido</th>
               <th>Tipo</th>
-              <th>Rol</th>
               <th>Activo</th>
               {modo !== "consultar" && <th>Acciones</th>}
             </tr>
@@ -83,10 +90,9 @@ export default function UsuarioList({ usuarios, modo, onEditar }) {
                 <tr key={u.usuario_id}>
                   <td>{u.usuario}</td>
                   <td>{u.email}</td>
-                  <td>{u.nombre}</td>
-                  <td>{u.apellido}</td>
-                  <td>{u.tipoUsuario}</td>
-                  <td>{u.rol}</td>
+                  <td>{u.persona?.nombre || u.nombre || "—"}</td>
+                  <td>{u.persona?.apellido || u.apellido || "—"}</td>
+                  <td>{obtenerTipo(u)}</td>
                   <td>{u.activo ? "Sí" : "No"}</td>
 
                   {modo !== "consultar" && (
@@ -132,7 +138,7 @@ export default function UsuarioList({ usuarios, modo, onEditar }) {
               ))
             ) : (
               <tr>
-                <td colSpan={modo !== "consultar" ? 8 : 7}>
+                <td colSpan={modo !== "consultar" ? 7 : 6}>
                   No hay usuarios registrados
                 </td>
               </tr>

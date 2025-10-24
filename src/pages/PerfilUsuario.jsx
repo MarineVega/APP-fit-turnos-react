@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import TituloConFlecha from "../components/TituloConFlecha.jsx";
-import FormBotones from "../components/FormBotones.jsx"; // ✅
+import FormBotones from "../components/FormBotones.jsx";
 import "../styles/style.css";
 import checkmark from "../assets/img/exito.png";
 import error from "../assets/img/error.png";
@@ -26,34 +26,40 @@ export default function PerfilUsuario() {
     }
   }, [navigate]);
 
+  // 🧭 Función para obtener el rol a partir de tipoPersona_id
+  const obtenerRol = () => {
+    const tipo = usuario?.persona?.tipoPersona_id;
+    if (tipo === 1) return "Administrador";
+    if (tipo === 2) return "Profesor";
+    if (tipo === 3) return "Cliente";
+    return "Usuario";
+  };
+
   // 🔹 Cambiar contraseña
   const handleCambiarPassword = (e) => {
     e.preventDefault();
 
     if (nueva !== confirmar) {
-     Swal.fire({
-              title: "Las contraseñas no coinciden",
-              imageUrl: error,
-              imageHeight: 100,
-              imageAlt: "Error",
-              icon: "error",
-              confirmButtonText: "Cerrar",
-            });
-          
-
+      Swal.fire({
+        title: "Las contraseñas no coinciden",
+        imageUrl: error,
+        imageHeight: 100,
+        imageAlt: "Error",
+        icon: "error",
+        confirmButtonText: "Cerrar",
+      });
       return;
     }
 
     if (actual !== usuario.password) {
-        Swal.fire({
-              title: "La contraseña actual no es correcta",
-              imageUrl: error,
-              imageHeight: 100,
-              imageAlt: "Error",
-              icon: "error",
-              confirmButtonText: "Cerrar",
-            });
-          
+      Swal.fire({
+        title: "La contraseña actual no es correcta",
+        imageUrl: error,
+        imageHeight: 100,
+        imageAlt: "Error",
+        icon: "error",
+        confirmButtonText: "Cerrar",
+      });
       return;
     }
 
@@ -69,16 +75,17 @@ export default function PerfilUsuario() {
 
     setUsuario(usuarioActualizado);
     setEditando(false);
-    
-     Swal.fire({
-              title: "La contraseña se cambió correctamente",
-              imageUrl: checkmark,
-              imageHeight: 100,
-              imageAlt: "Checkmark",
-              icon: "success",
-              confirmButtonText: "Cerrar",
-            });
-          };
+
+    Swal.fire({
+      title: "La contraseña se cambió correctamente",
+      imageUrl: checkmark,
+      imageHeight: 100,
+      imageAlt: "Checkmark",
+      icon: "success",
+      confirmButtonText: "Cerrar",
+    });
+  };
+
   if (!usuario) return null;
 
   return (
@@ -87,12 +94,19 @@ export default function PerfilUsuario() {
 
       <div className="perfilCard">
         <section className="perfilDatos">
-          <p><strong>Nombre:</strong> <span>{usuario.nombre || "-"}</span></p>
-          <p><strong>Email:</strong> <span>{usuario.email}</span></p>
-          <p><strong>Rol:</strong> <span>{usuario.esAdmin ? "Administrador" : "Usuario"}</span></p>
+          <p>
+            <strong>Nombre:</strong>{" "}
+            <span>{usuario?.persona?.nombre || usuario.nombre || "-"}</span>
+          </p>
+          <p>
+            <strong>Email:</strong> <span>{usuario.email}</span>
+          </p>
+          <p>
+            <strong>Rol:</strong> <span>{obtenerRol()}</span>
+          </p>
         </section>
-        
-         {/* 🔹 línea separadora */}
+
+        {/* 🔹 línea separadora */}
         <hr className="lineaPerfil" />
 
         {!editando ? (

@@ -25,38 +25,27 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
 
   // Estados del formulario
   const [usuario, setUsuario] = useState({
-    nombre: datoInicial?.nombre || "",
-    apellido: datoInicial?.apellido || "",
-    email: datoInicial?.email || "",
+    nombre: datoInicial?.persona?.nombre || datoInicial?.nombre || "",
+    apellido: datoInicial?.persona?.apellido || datoInicial?.apellido || "",
+    email: datoInicial?.email || datoInicial?.persona?.email || "",
     usuario: datoInicial?.usuario || "",
-    contrasenia: datoInicial?.contrasenia || "",
-    repetirContrasenia: "", // 👈 campo adicional
-    tipoUsuario: datoInicial?.tipoUsuario || "",
-    rol: datoInicial?.rol || "",
+    contrasenia: datoInicial?.password || datoInicial?.contrasenia || "",
+    repetirContrasenia: "",
+    tipoPersona_id: datoInicial?.persona?.tipoPersona_id || "", // 👈 reemplaza tipoUsuario
     activo: datoInicial?.activo ?? true,
-    esAdmin: datoInicial?.esAdmin ?? false,
   });
 
   const [errores, setErrores] = useState({});
 
   const limpiarError = (campo) => setErrores((prev) => ({ ...prev, [campo]: "" }));
 
-  // ✅ Manejo del cambio de campos
+  // ✅ Manejo de cambios
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
-    if (name === "tipoUsuario") {
-      setUsuario({
-        ...usuario,
-        tipoUsuario: value,
-        esAdmin: value === "Administrador", // 👑 si elije admin, se activa
-      });
-    } else {
-      setUsuario({
-        ...usuario,
-        [name]: type === "checkbox" ? checked : value,
-      });
-    }
+    setUsuario({
+      ...usuario,
+      [name]: type === "checkbox" ? checked : value,
+    });
   };
 
   // ✅ Validación y guardado
@@ -94,6 +83,11 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
       esValido = false;
     }
 
+    if (!usuario.tipoPersona_id) {
+      nuevosErrores.tipoPersona_id = "Debe seleccionar un tipo de usuario.";
+      esValido = false;
+    }
+
     // Evita duplicados
     const existe = usuarios.some(
       (u) =>
@@ -108,7 +102,27 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     setErrores(nuevosErrores);
     if (!esValido) return;
 
-    guardar(usuario);
+    // 🧩 Estructura compatible con tu modelo
+    const usuarioFormateado = {
+      usuario_id: usuario_id || usuarios.length + 1,
+      usuario: usuario.usuario,
+      email: usuario.email,
+      password: usuario.contrasenia,
+      activo: usuario.activo,
+      persona: {
+        persona_id: usuario_id || usuarios.length + 1,
+        nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        documento: "",
+        telefono: "",
+        domicilio: "",
+        fecha_nac: "",
+        tipoPersona_id: parseInt(usuario.tipoPersona_id),
+        activo: true,
+      },
+    };
+
+    guardar(usuarioFormateado);
 
     const mensaje =
       modo === "editar"
@@ -139,10 +153,8 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
       usuario: "",
       contrasenia: "",
       repetirContrasenia: "",
-      tipoUsuario: "",
-      rol: "",
+      tipoPersona_id: "",
       activo: true,
-      esAdmin: false,
     });
     setErrores({});
   };
@@ -233,26 +245,20 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
         {/* 🔹 Selector de Tipo de Usuario */}
         <label className="labelGeneral">Tipo de Usuario *</label>
         <select
-          name="tipoUsuario"
-          value={usuario.tipoUsuario}
+          name="tipoPersona_id"
+          value={usuario.tipoPersona_id}
           onChange={handleChange}
           className="inputProfesor"
           required
         >
           <option value="">Seleccione...</option>
-          <option value="Administrador">Administrador</option>
-          <option value="Profesor">Profesor</option>
-          <option value="Cliente">Cliente</option>
+          <option value="1">Administrador</option>
+          <option value="2">Profesor</option>
+          <option value="3">Cliente</option>
         </select>
-
-        <FormCampos
-          label="Rol"
-          name="rol"
-          placeholder="Ejemplo: Coordinador, Profesor, Alumno..."
-          value={usuario.rol}
-          onChange={handleChange}
-          className="inputProfesor"
-        />
+        {errores.tipoPersona_id && (
+          <p className="adventencia">{errores.tipoPersona_id}</p>
+        )}
 
         <label className="checkLabel">
           <input
@@ -265,25 +271,24 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
         </label>
 
         <label className="advertencia">* Campos obligatorios</label>
-  
       </form>
-        {/* ✅ Botones alineados horizontalmente */}
-        
-          <FormBotones className="contenedorBotones"
-            boton1={{
-              id: "agregar",
-              label: modo === "editar" ? "GUARDAR" : "AGREGAR",
-              className: "btnAceptar",
-              onClick: validarGuardar,
-            }}
-            boton2={{
-              id: "cancelar",
-              label: "CANCELAR",
-              className: "btnCancelar",
-              onClick: cancelar,
-            }}
-          />
-      
+
+      {/* ✅ Botones */}
+      <FormBotones
+        className="contenedorBotones"
+        boton1={{
+          id: "agregar",
+          label: modo === "editar" ? "GUARDAR" : "AGREGAR",
+          className: "btnAceptar",
+          onClick: validarGuardar,
+        }}
+        boton2={{
+          id: "cancelar",
+          label: "CANCELAR",
+          className: "btnCancelar",
+          onClick: cancelar,
+        }}
+      />
     </section>
   );
 }

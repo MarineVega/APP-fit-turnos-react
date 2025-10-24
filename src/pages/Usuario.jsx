@@ -21,7 +21,35 @@ export default function Usuario() {
   );
   const [datoInicial, setDatoInicial] = useState(null);
 
-  // Detectar si hay usuario seleccionado para editar
+  // 🔹 Asegurar compatibilidad: si los usuarios antiguos no tienen estructura "persona"
+  useEffect(() => {
+    const actualizados = usuarios.map((u) => {
+      if (!u.persona) {
+        return {
+          ...u,
+          persona: {
+            persona_id: u.usuario_id,
+            nombre: u.nombre || u.usuario || "",
+            apellido: "",
+            documento: "",
+            telefono: "",
+            domicilio: "",
+            fecha_nac: "",
+            tipoPersona_id: u.esAdmin ? 1 : 3, // 1=Admin, 3=Cliente (por compatibilidad)
+            activo: true,
+          },
+        };
+      }
+      return u;
+    });
+
+    if (JSON.stringify(actualizados) !== JSON.stringify(usuarios)) {
+      setUsuarios(actualizados);
+      localStorage.setItem("usuarios", JSON.stringify(actualizados));
+    }
+  }, []); // se ejecuta solo una vez al cargar
+
+  // 🔹 Detectar si hay usuario seleccionado para editar
   useEffect(() => {
     if (modo === "editar" && usuario_id) {
       const usuario = usuarios.find((u) => u.usuario_id === usuario_id);
@@ -31,7 +59,7 @@ export default function Usuario() {
     }
   }, [modo, usuario_id, usuarios]);
 
-  // Guardar usuario nuevo o editado
+  // 🔹 Guardar usuario nuevo o editado
   const guardarUsuario = (usuario) => {
     if (modo === "editar" && datoInicial) {
       const actualizados = usuarios.map((u) =>
@@ -40,7 +68,21 @@ export default function Usuario() {
       setUsuarios(actualizados);
       localStorage.setItem("usuarios", JSON.stringify(actualizados));
     } else {
-      const nuevo = { ...usuario, usuario_id: usuarios.length + 1 };
+      const nuevo = {
+        ...usuario,
+        usuario_id: usuarios.length + 1,
+        persona: usuario.persona || {
+          persona_id: usuarios.length + 1,
+          nombre: usuario.nombre || usuario.usuario || "",
+          apellido: "",
+          documento: "",
+          telefono: "",
+          domicilio: "",
+          fecha_nac: "",
+          tipoPersona_id: 3, // por defecto Cliente
+          activo: true,
+        },
+      };
       const actualizados = [...usuarios, nuevo];
       setUsuarios(actualizados);
       localStorage.setItem("usuarios", JSON.stringify(actualizados));

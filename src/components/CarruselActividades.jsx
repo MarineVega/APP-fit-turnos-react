@@ -19,10 +19,10 @@ export default function CarruselActividades({ seleccion, onSeleccion }) {
         setActividades(activas);
     }, []);
 
-    // 3. Hook de selección (¡MOVIDO AQUÍ!)
+    // 3. Hook de selección 
     // Lo movemos aquí porque tiene que ejecutarse en CADA render para que React lo registre.
     // Aunque use variables que aún no se han calculado, el Hook debe estar arriba.
-    // Nota: Declararemos 'actividadesVisibles' y 'indiceSeleccionada' como 'let'
+    // Nota: Declararemos 'actividadesVisibles' e 'indiceSeleccionada' como 'let'
     // o moveremos el código que lo usa dentro del useEffect, como se hace a continuación:
 
     // NOTA IMPORTANTE: Para que el segundo useEffect siempre se ejecute, 

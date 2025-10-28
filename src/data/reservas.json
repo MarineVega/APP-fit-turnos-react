@@ -4,38 +4,52 @@
     "actividad_id": 2,
     "profesor_id": 3,
     "cliente_id": 1,
+    "usuario_id": 1,
     "horario_id": 1,
     "activo": true
   },
   {
     "reserva_id": 2,
-    "actividad_id": 1,
+    "actividad_id": 2,
     "profesor_id": 3,
     "cliente_id": 2,
-    "horario_id": 3,
-    "activo": true
-  },
-  {
-    "reserva_id": 3,
-    "actividad_id": 4,
-    "profesor_id": 2,
-    "cliente_id": 2,
-    "horario_id": 5,
-    "activo": false
-  },
-  {
-    "reserva_id": 4,
-    "actividad_id": 3,
-    "profesor_id": 1,
-    "cliente_id": 2,
+    "usuario_id": 2,
     "horario_id": 2,
     "activo": true
   },
   {
+    "reserva_id": 3,
+    "actividad_id": 2,
+    "profesor_id": 3,
+    "cliente_id": 2,
+    "usuario_id": 2,
+    "horario_id": 1,
+    "activo": false
+  },
+  {
+    "reserva_id": 4,
+    "actividad_id": 2,
+    "profesor_id": 3,
+    "cliente_id": 2,
+    "usuario_id": 2,
+    "horario_id": 3,
+    "activo": true
+  },
+  {
     "reserva_id": 5,
-    "actividad_id": 4,
+    "actividad_id": 2,
     "profesor_id": 3,
     "cliente_id": 1,
+    "usuario_id": 1,
+    "horario_id": 2,
+    "activo": true
+  },
+  {
+    "reserva_id": 6,
+    "actividad_id": 2,
+    "profesor_id": 3,
+    "cliente_id": 1,
+    "usuario_id": 1,
     "horario_id": 4,
     "activo": true
   }

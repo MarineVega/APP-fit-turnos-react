@@ -14,8 +14,7 @@ export default function Turnos() {
     }
   }, []); // solo una vez al montar
 
-  // Para debug
-  // console.log("🎯 Actividad seleccionada:", actividadSeleccionada);
+  // console.log("Actividad seleccionada:", actividadSeleccionada);
   
 
   return (
@@ -25,7 +24,7 @@ export default function Turnos() {
       <CarruselActividades
         seleccion={actividadSeleccionada}
         onSeleccion={(actividad) => setActividadSeleccionada(actividad)}
-        />
+      />
 
       <CalendarioTurnos actividadSeleccionada={actividadSeleccionada} />
 

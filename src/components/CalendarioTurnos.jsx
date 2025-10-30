@@ -12,16 +12,18 @@ import horariosData from "../data/horarios.json";
 import reservasData from "../data/reservas.json";
 
 import imgPensando from "../assets/img/pensando.png";
+import error from "../assets/img/error.png";
+import chica_ok from "../assets/img/chica_ok.png";
 
 const swalEstilo = Swal.mixin({
-    imageWidth: 200,       // ancho en píxeles
-    imageHeight: 200,      // alto en píxeles 
-    background: '#bababa',
-    confirmButtonColor: '#6edc8c',
-    customClass: {
-        confirmButton: 'btnAceptar',
-        cancelButton: 'btnCancelar'
-    }
+  imageWidth: 200, // ancho en píxeles
+  imageHeight: 200, // alto en píxeles
+  background: "#bababa",
+  confirmButtonColor: "#6edc8c",
+  customClass: {
+    confirmButton: "btnAceptar",
+    cancelButton: "btnCancelar",
+  },
 });
 
 // mapeo de nombre de día -> número (JS Date.getDay)
@@ -61,8 +63,8 @@ function parseDias(diasCampo) {
 function normalizeHora(h) {
   // acepta formatos distintos: "08:00", "8.00", numbers 8 or "8" o objetos con horaInicio/hora_inicio
   if (!h) return null;
-  if (typeof h === "string" && /^\d{1,2}:\d{2}$/.test(h)) return h;       // si viene "08:00" lo devolvemos tal cual                            
-  if (typeof h === "number") return `${String(h).padStart(2, "0")}:00`;   // si viene "8.00" o "8.0" o "8" => convertir a "08:00"
+  if (typeof h === "string" && /^\d{1,2}:\d{2}$/.test(h)) return h; // si viene "08:00" lo devolvemos tal cual
+  if (typeof h === "number") return `${String(h).padStart(2, "0")}:00`; // si viene "8.00" o "8.0" o "8" => convertir a "08:00"
   return null;
 }
 
@@ -76,7 +78,6 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
 
   // Generar eventos según actividad
   useEffect(() => {
-
     // si no recibimos actividad seleccionada, limpiamos
     if (!actividadSeleccionada) {
       setEventos([]);
@@ -90,11 +91,19 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
 
     // Recorro horarios y genero eventos solamente para la actividad seleccionada
     horariosData.forEach((horario) => {
-      if (Number(horario.actividad_id) !== Number(actividadSeleccionada.actividad_id)) return;
+      if (
+        Number(horario.actividad_id) !==
+        Number(actividadSeleccionada.actividad_id)
+      )
+        return;
       if (!horario.activo) return;
 
-      const horaObj = horasData.find((h) => Number(h.hora_id) === Number(horario.hora_id)) || {};
-      const horaInicio = normalizeHora(horaObj.horaInicio || horaObj.hora_inicio);
+      const horaObj =
+        horasData.find((h) => Number(h.hora_id) === Number(horario.hora_id)) ||
+        {};
+      const horaInicio = normalizeHora(
+        horaObj.horaInicio || horaObj.hora_inicio
+      );
       const horaFin = normalizeHora(horaObj.horaFin || horaObj.hora_fin);
       if (!horaInicio || !horaFin) return;
 
@@ -104,34 +113,56 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
       const dias = parseDias(horario.dias_id || horario.dias);
 
       dias.forEach((dia) => {
-        for (let d = new Date(inicioMes); d <= finMes; d.setDate(d.getDate() + 1)) {
+        for (
+          let d = new Date(inicioMes);
+          d <= finMes;
+          d.setDate(d.getDate() + 1)
+        ) {
           const nombreDia = Object.keys(diasSemana).find(
             (key) => diasSemana[key] === d.getDay()
           );
           if (!nombreDia) continue;
 
           const diaNorm = dia.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          const diaActualNorm = nombreDia.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          const diaActualNorm = nombreDia
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
           if (diaNorm !== diaActualNorm) continue;
 
-          const fechaISO = d.toISOString().split("T")[0];
+          const fechaISO = d.toISOString().split("T")[0]; // toISOString -> convierte un objeto de fecha (d) a una cadena de fecha y hora en formato ISO 8601, separa esa cadena por la letra 'T' y luego toma el primer elemento, obteniendo así la fecha en formato YYYY-MM-DD. Ej: 2025-10-29T10:30:00.000Z, se dividiría en dos partes: ["2025-10-29", "10:30:00.000Z"].
+          // [0]: Al agregar [0] al final, se accede al primer elemento de ese array. En el ejemplo anterior, esto devolvería solo la fecha: "2025-10-29".
+
           const start = `${fechaISO}T${horaInicio}`;
 
           const reservasHorario = reservas.filter(
-            (r) => Number(r.horario_id) === Number(horario.horario_id) && r.activo
-          );
-          const cuposDisponibles = Math.max(horario.cupoMaximo - reservasHorario.length, 0);
-          const yaReservado = reservasHorario.some(
-            (r) => r.usuario_id === usuario.usuario_id
+            (r) =>
+              Number(r.horario_id) === Number(horario.horario_id) && r.activo
           );
 
-          //const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}/${horario.cupoMaximo}`; 
-          const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}`; 
+          const cuposDisponibles = Math.max(
+            horario.cupoMaximo - reservasHorario.length,
+            0
+          );
+
+          const yaReservado = reservas.some(
+            (r) =>
+              r.usuario_id === usuario.usuario_id &&
+              Number(r.horario_id) === Number(horario.horario_id) &&
+              r.fecha === fechaISO &&
+              r.activo
+          );
+
+          //const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}/${horario.cupoMaximo}`;
+          const titulo = `${
+            profesor ? profesor.nombre + " " + profesor.apellido : ""
+          } \nCupo: ${cuposDisponibles}`;
 
           // asigno colores según el estado de las reservas
           const colorEvento = yaReservado
-            ? "#5cb85c"         // verde si está reservado por el usuario logueado
-            : (cuposDisponibles > 0 ? "#3788d8" : "#d9534f"); 
+            ? "#5cb85c" // verde si está reservado por el usuario logueado
+            : cuposDisponibles > 0
+            ? "#3788d8"
+            : "#d9534f";
 
           eventosGenerados.push({
             // creo un id para cada evento del calendario
@@ -168,54 +199,137 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
   // Manejador de clics
   const manejarClick = (info) => {
     const evento = info.event.extendedProps;
-    console.log(evento)
-    const { horario_id, fecha, yaReservado, cuposDisponibles, horaInicio, profesor } = evento;
+
+    const {
+      horario_id,
+      fecha,
+      yaReservado,
+      cuposDisponibles,
+      horaInicio,
+      profesor,
+    } = evento;
 
     if (yaReservado) {
       // Cancelar reserva
-      swalEstilo.fire({
-        title: "¿Querés cancelar tu reserva?",
-        imageUrl: imgPensando,  
-         html: `
+      swalEstilo
+        .fire({
+          title: "¿Querés cancelar tu reserva?",
+          imageUrl: imgPensando,
+          html: `
           <p><b>Actividad:</b> ${actividadSeleccionada.nombre}</p>
           <p><b>Profesor:</b> ${profesor} </p>
           <p><b>Fecha y hora:</b> ${fecha}  ⏱  ${horaInicio} hs</p>
-        `,        
-        showCancelButton: true,
-        confirmButtonText: "Sí, cancelar",
-        cancelButtonText: "No",
-        confirmButtonColor: "#d33",
-        cancelButtonColor: '#6edc8c',customClass: {
-          cancelButton: 'btnAceptar'
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setReservas((prev) =>
-            prev.map((r) =>
-              r.usuario_id === 1 && r.horario_id === horario_id && r.activo
-                ? { ...r, activo: false }
-                : r
-            )
-          );
-          Swal.fire("Cancelada", "Tu reserva ha sido cancelada.", "success");
-        }
-      });
-    } else {
-      // Crear reserva
-      if (cuposDisponibles <= 0) {
-        Swal.fire("Sin cupos", "No hay lugares disponibles en este horario.", "error");
-        return;
-      }
+        `,
+          showCancelButton: true,
+          confirmButtonText: "Sí, cancelar",
+          cancelButtonText: "No",
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#6edc8c",
+          customClass: {
+            cancelButton: "btnAceptar",
+          },
+        })
+        .then((result) => {
+          if (result.isConfirmed) {
+            setReservas((prev) =>
+              prev.map((r) =>
+                r.usuario_id === usuario.usuario_id &&
+                r.horario_id === horario_id &&
+                r.fecha === fecha &&
+                r.activo
+                  ? { ...r, activo: false }
+                  : r
+              )
+            );
+            swalEstilo.fire({
+              title: "Reserva cancelada",
+              icon: "success",
+              confirmButtonColor: "#6edc8c",
+              customClass: {
+                confirmButton: "btnAceptar",
+              },
+            });
+          }
+        });
+      return;
+    }
 
-      Swal.fire({
-        title: "Reservar turno",
-        text: `¿Querés reservar este horario (${evento.horaInicio} - ${evento.horaFin})?`,
+    // Si no está reservado y no hay cupos
+    if (cuposDisponibles <= 0) {
+      swalEstilo.fire({
+        title: "",
+        text: "Sin cupos disponibles",
+        imageUrl: error,
+      });
+      return;
+    }
+
+    // Confirmar reserva
+    swalEstilo
+      .fire({
+        title: "¿Confirmás tu reserva?",
+        html: `
+      <p><b>Actividad:</b> ${actividadSeleccionada.nombre}</p>
+      <p><b>Profesor:</b> ${profesor} </p>
+      <p><b>Fecha y hora:</b> ${fecha}  ⏱  ${horaInicio} hs</p>
+      <p><b>Cupos disponibles:</b> ${cuposDisponibles}</p>
+      `,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Sí, reservar",
         cancelButtonText: "Cancelar",
-        confirmButtonColor: "#6edc8c",
-      }).then((result) => {
+        // confirmButtonColor: "#6edc8c",
+
+        // cambio dinámicamente el color del texto del botón Cancelar; tengo que agregar el bloque didRender dentro del swalEstilo... porque es una función que se ejecuta cuando se muestra el alerta, y el mixin solo define una configuración base.
+        didRender: () => {
+          const cancelButton = Swal.getCancelButton();
+          if (cancelButton) {
+            cancelButton.style.color = "#222222"; // cambio el color de texto del botón Cancelar
+            // cambia de color la letra cuando paso el mouse (sería el hover)
+            cancelButton.addEventListener("mouseover", () => {
+              cancelButton.style.color = "#f5f5f5";
+            });
+            cancelButton.addEventListener("mouseout", () => {
+              cancelButton.style.color = "#222222";
+            });
+          }
+        },
+      })
+      .then((result) => {
+        // Verifico si el usuario ya tiene una reserva en ese horario
+        const conflicto = reservas.find(
+          (r) =>
+            r.usuario_id === usuario.usuario_id &&
+            r.fecha === fecha &&
+            r.activo &&
+            r.horario_id !== horario_id // que no sea el mismo horario
+          /*
+            eventos.some(
+              (e) =>
+                e.extendedProps.horaInicio === horaInicio &&
+                e.extendedProps.fecha === r.fecha
+            )
+                /*/
+        );
+
+        if (conflicto) {
+          swalEstilo.fire({
+            // icon: 'error',
+            title: "Conflicto de horario",
+            imageUrl: error,
+            html: `
+            Ya tenés una reserva para ese día y hora.<br>
+            No podés reservar más de una actividad al mismo tiempo.
+          `,
+            confirmButtonColor: "#d33",
+            confirmButtonText: "Cerrar",
+            customClass: {
+              confirmButton: "", // elimino la clase
+            },
+          });
+          return;
+        }
+
         if (result.isConfirmed) {
           const nuevaReserva = {
             reserva_id: reservas.length + 1,
@@ -225,46 +339,51 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
             fecha,
           };
           setReservas((prev) => [...prev, nuevaReserva]);
-          Swal.fire("¡Listo!", "Tu reserva fue confirmada.", "success");
+          swalEstilo.fire({
+            title: "¡Reserva confirmada!",
+            text: "",
+            icon: "success",
+            imageUrl: chica_ok,
+          });
         }
       });
-    }
   };
 
   // Configuración visual del calendario
   // Levanto la hora mínima configurada para esta app
   const horaMin = horasData.map((h) => h.horaInicio).sort()[0] || "08:00";
   // Levanto la hora máxima configurada para esta app
-  const horaMax = horasData.map((h) => h.horaFin).sort().slice(-1)[0] || "22:00";
+  const horaMax =
+    horasData
+      .map((h) => h.horaFin)
+      .sort()
+      .slice(-1)[0] || "22:00";
 
   return (
     <section id="seccionCalendarioTurnos">
-      <div className="calendar-wrapper">        
+      <div className="calendar-wrapper">
         <div className="calendar-scroll">
-
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="timeGridWeek"
-          //  initialDate={new Date()}    // centra el calendario en el día actual
+            //  initialDate={new Date()}    // centra el calendario en el día actual
             headerToolbar={{
               left: "prev,next today",
               center: "title",
               right: "timeGridWeek,timeGridDay",
             }}
-            
             allDaySlot={false}
             locale="es"
             buttonText={{
               today: "hoy",
               month: "mes",
               week: "semana",
-              day: "día"
+              day: "día",
             }}
-            
             // cambio el puntero del mous en aquellas celdas que tienen info, para poder reservar/cancelar
-            dayCellDidMount={function(info) {
-              info.el.style.cursor = 'pointer'
-            }}  
+            dayCellDidMount={function (info) {
+              info.el.style.cursor = "pointer";
+            }}
             events={eventos}
             height="auto"
             nowIndicator={true}

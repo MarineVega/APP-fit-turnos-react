@@ -145,6 +145,7 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
           // [0]: Al agregar [0] al final, se accede al primer elemento de ese array. En el ejemplo anterior, esto devolvería solo la fecha: "2025-10-29".
 
           const start = `${fechaISO}T${horaInicio}`;
+          const horaFinEvento = `${fechaISO}T${horaFin}`; 
 
           const reservasHorario = reservas.filter(
             (r) =>
@@ -195,13 +196,37 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
             );
           });
 
+          // verifico si el evento ya pasó
+          const ahora = new Date();
+          const fechaYHoraEvento = new Date(horaFinEvento);   // uso la hora de fin para considerar que el evento terminó
+          
+          const eventoPasado = fechaYHoraEvento <= ahora;     // TRUE si el evento ya pasó
+          
+         // console.log(horaInicio)
+         // console.log(eventoPasado)
+        
+          eventosGenerados.push({
+            // ... (resto de las propiedades del evento)
+            extendedProps: {
+              // ... (otras extendedProps existentes)
+              yaReservado,
+              horaInicio,
+              horaFin,
+              eventoPasado,       // propiedad para el bloqueo en el click
+              reservas,           // borrarlo es para control
+            },
+          });
+
 
           //const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}/${horario.cupoMaximo}`;
           const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}`;
 
           // asigno colores según el estado de las reservas
-          const colorEvento = yaReservado
-            ? "#5cb85c" // verde si está reservado por el usuario logueado
+          // const colorEvento = yaReservado
+          const colorEvento = eventoPasado
+            ? "#7fa8d1ff"       // grisáceo : Si el evento ya pasó
+            : yaReservado 
+            ? "#5cb85c"       // verde si está reservado por el usuario logueado
             : cuposDisponibles > 0
             ? "#3788d8"
             : "#d9534f";
@@ -229,6 +254,7 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
               yaReservado,
               horaInicio,
               horaFin,
+              eventoPasado,
               reservas,           // borrarlo es para control
             },
           });
@@ -246,6 +272,21 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
     console.log(info.event.extendedProps)
     console.log(evento)
     
+    // bloqueo si si el evento ya pasó
+    if (evento.eventoPasado) {
+      swalEstilo.fire({
+          title: "Turno pasado",
+          text: "No es posible modificar reservas con fecha u hora anterior a la actual.",
+          imageUrl: error,
+          confirmButtonText: "Cerrar",
+          confirmButtonColor: "#d33",
+          customClass: {
+            confirmButton: "", // elimino la clase
+          },
+      });
+      return;
+    }
+
     const {
       horario_id,
       fecha,
@@ -354,29 +395,30 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
             (e) =>
               e.extendedProps.horaInicio === horaInicio &&
               e.extendedProps.fecha === r.fecha
-          )
+              )
               /*/
+              
       );
 
-      if (conflicto) {
-        swalEstilo.fire({
-          // icon: 'error',
-          title: "Conflicto de horario",
-          imageUrl: error,
-          html: `
-          Ya tenés una reserva para ese día y hora.<br>
-          No podés reservar más de una actividad al mismo tiempo.
-        `,
-          confirmButtonColor: "#d33",
-          confirmButtonText: "Cerrar",
-          customClass: {
-            confirmButton: "", // elimino la clase
-          },
-        });
-        return;
-      }
-
+        
       if (result.isConfirmed) {
+        if (conflicto) {
+          swalEstilo.fire({
+            // icon: 'error',
+            title: "Conflicto de horario",
+            imageUrl: error,
+            html: `
+              Ya tenés una reserva para ese día y hora.<br>
+              No podés reservar más de una actividad al mismo tiempo.`,
+            confirmButtonColor: "#d33",
+            confirmButtonText: "Cerrar",
+            customClass: {
+              confirmButton: "", // elimino la clase
+            },
+          });
+          return;
+        }
+      
         const nuevaReserva = {
           reserva_id: reservas.length + 1,
           horario_id,

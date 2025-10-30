@@ -229,6 +229,7 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
               yaReservado,
               horaInicio,
               horaFin,
+              reservas,           // borrarlo es para control
             },
           });
         }
@@ -241,7 +242,10 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
   // Manejador de clics
   const manejarClick = (info) => {
     const evento = info.event.extendedProps;
-
+    
+    console.log(info.event.extendedProps)
+    console.log(evento)
+    
     const {
       horario_id,
       fecha,
@@ -249,6 +253,7 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
       cuposDisponibles,
       horaInicio,
       profesor,
+      //reserva_id,         //borrar es solo para control
     } = evento;
 
     if (yaReservado) {
@@ -277,7 +282,7 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
               prev.map((r) =>
                 r.usuario_id === usuario.usuario_id &&
                 r.horario_id === horario_id &&
-                r.fecha === fecha &&                
+                r.fecha.substring(0, 10) === fecha &&                
                 r.activo
                   ? { ...r, activo: false }
                   : r                  
@@ -307,88 +312,87 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
     }
 
     // Confirmar reserva
-    swalEstilo
-      .fire({
-        title: "¿Confirmás tu reserva?",
-        html: `
-      <p><b>Actividad:</b> ${actividadSeleccionada.nombre}</p>
-      <p><b>Profesor:</b> ${profesor} </p>
-      <p><b>Fecha y hora:</b> ${fecha}  ⏱  ${horaInicio} hs</p>
-      <p><b>Cupos disponibles:</b> ${cuposDisponibles}</p>
-      `,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Sí, reservar",
-        cancelButtonText: "Cancelar",
-        // confirmButtonColor: "#6edc8c",
+    swalEstilo.fire({
+      title: "¿Confirmás tu reserva?",
+      html: `
+        <p><b>Actividad:</b> ${actividadSeleccionada.nombre}</p>
+        <p><b>Profesor:</b> ${profesor} </p>
+        <p><b>Fecha y hora:</b> ${fecha}  ⏱  ${horaInicio} hs</p>
+        <p><b>Cupos disponibles:</b> ${cuposDisponibles}</p>     
+        `,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, reservar",
+      cancelButtonText: "Cancelar",
+      // confirmButtonColor: "#6edc8c",
 
-        // cambio dinámicamente el color del texto del botón Cancelar; tengo que agregar el bloque didRender dentro del swalEstilo... porque es una función que se ejecuta cuando se muestra el alerta, y el mixin solo define una configuración base.
-        didRender: () => {
-          const cancelButton = Swal.getCancelButton();
-          if (cancelButton) {
-            cancelButton.style.color = "#222222"; // cambio el color de texto del botón Cancelar
-            // cambia de color la letra cuando paso el mouse (sería el hover)
-            cancelButton.addEventListener("mouseover", () => {
-              cancelButton.style.color = "#f5f5f5";
-            });
-            cancelButton.addEventListener("mouseout", () => {
-              cancelButton.style.color = "#222222";
-            });
-          }
-        },
-      })
-      .then((result) => {
-        // Verifico si el usuario ya tiene una reserva en ese horario
-        const conflicto = reservas.find(
-          (r) =>
-            r.usuario_id === usuario.usuario_id &&
-            r.fecha === fecha &&
-            r.activo &&
-            r.horario_id !== horario_id // que no sea el mismo horario
-          /*
-            eventos.some(
-              (e) =>
-                e.extendedProps.horaInicio === horaInicio &&
-                e.extendedProps.fecha === r.fecha
-            )
-                /*/
-        );
-
-        if (conflicto) {
-          swalEstilo.fire({
-            // icon: 'error',
-            title: "Conflicto de horario",
-            imageUrl: error,
-            html: `
-            Ya tenés una reserva para ese día y hora.<br>
-            No podés reservar más de una actividad al mismo tiempo.
-          `,
-            confirmButtonColor: "#d33",
-            confirmButtonText: "Cerrar",
-            customClass: {
-              confirmButton: "", // elimino la clase
-            },
+      // cambio dinámicamente el color del texto del botón Cancelar; tengo que agregar el bloque didRender dentro del swalEstilo... porque es una función que se ejecuta cuando se muestra el alerta, y el mixin solo define una configuración base.
+      didRender: () => {
+        const cancelButton = Swal.getCancelButton();
+        if (cancelButton) {
+          cancelButton.style.color = "#222222"; // cambio el color de texto del botón Cancelar
+          // cambia de color la letra cuando paso el mouse (sería el hover)
+          cancelButton.addEventListener("mouseover", () => {
+            cancelButton.style.color = "#f5f5f5";
           });
-          return;
-        }
-
-        if (result.isConfirmed) {
-          const nuevaReserva = {
-            reserva_id: reservas.length + 1,
-            horario_id,
-            usuario_id: usuario.usuario_id,
-            activo: true,
-            fecha,
-          };
-          setReservas((prev) => [...prev, nuevaReserva]);
-          swalEstilo.fire({
-            title: "¡Reserva confirmada!",
-            text: "",
-            icon: "success",
-            imageUrl: chica_ok,
+          cancelButton.addEventListener("mouseout", () => {
+            cancelButton.style.color = "#222222";
           });
         }
-      });
+      },
+    })
+    .then((result) => {
+      // Verifico si el usuario ya tiene una reserva en ese horario
+      const conflicto = reservas.find(
+        (r) =>
+          r.usuario_id === usuario.usuario_id &&
+          r.fecha.substring(0, 10) === fecha &&
+          r.activo &&
+          r.horario_id !== horario_id // que no sea el mismo horario
+        /*
+          eventos.some(
+            (e) =>
+              e.extendedProps.horaInicio === horaInicio &&
+              e.extendedProps.fecha === r.fecha
+          )
+              /*/
+      );
+
+      if (conflicto) {
+        swalEstilo.fire({
+          // icon: 'error',
+          title: "Conflicto de horario",
+          imageUrl: error,
+          html: `
+          Ya tenés una reserva para ese día y hora.<br>
+          No podés reservar más de una actividad al mismo tiempo.
+        `,
+          confirmButtonColor: "#d33",
+          confirmButtonText: "Cerrar",
+          customClass: {
+            confirmButton: "", // elimino la clase
+          },
+        });
+        return;
+      }
+
+      if (result.isConfirmed) {
+        const nuevaReserva = {
+          reserva_id: reservas.length + 1,
+          horario_id,
+          usuario_id: usuario.usuario_id,
+          activo: true,
+          fecha,
+        };
+        setReservas((prev) => [...prev, nuevaReserva]);
+        swalEstilo.fire({
+          title: "¡Reserva confirmada!",
+          text: "",
+          icon: "success",
+          imageUrl: chica_ok,
+        });
+      }
+    });
   };
 
   // Configuración visual del calendario

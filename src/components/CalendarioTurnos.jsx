@@ -148,14 +148,16 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
 
           const reservasHorario = reservas.filter(
             (r) =>
-              Number(r.horario_id) === Number(horario.horario_id) && r.activo
+              Number(r.horario_id) === Number(horario.horario_id) && 
+              r.fecha.substring(0, 10) === fechaISO &&
+              r.activo
           );
 
           const cuposDisponibles = Math.max(
             horario.cupoMaximo - reservasHorario.length,
             0
           );
-
+/*
           const yaReservado = reservas.some(
             (r) =>
               r.usuario_id === usuario.usuario_id &&
@@ -163,11 +165,39 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
               r.fecha === fechaISO &&
               r.activo
           );
+*/
+
+          const yaReservado = reservas.some((r) => {
+            // Definimos la fecha de la reserva extrayendo los primeros 10 caracteres (YYYY-MM-DD)
+            const fechaReservaNorm = r.fecha.substring(0, 10);
+          /*
+            if (r.usuario_id === usuario.usuario_id && Number(r.horario_id) === Number(horario.horario_id) && fechaISO === "2025-10-31") {
+              console.log(`--- DEBUG RESERVA EXISTENTE --- Usuario ${usuario.usuario_id}`);
+              console.log(`Evento (fechaISO): ${fechaISO}`);
+              //console.log(`Reserva (r.fecha): ${r.fecha}`);
+              console.log(`Reserva (r.fecha): ${fechaReservaNorm}`);
+              //console.log(`Reserva (r.fecha str): ${r.fecha.toString().split("T")[0]}`);
+              console.log(`Horario ID: ${r.horario_id}`);
+              //console.log(`¿Coinciden fechas?: ${r.fecha.toString().split("T")[0] === fechaISO}`);
+              console.log(`¿Coinciden fechas?: ${fechaReservaNorm === fechaISO}`);
+
+              console.log(`¿Reserva Activa?: ${r.activo}`);
+              console.log("Tipo de r.activo:", typeof r.activo);
+              console.log("-------------------------------");
+            }                        
+            */
+
+            return (
+              r.usuario_id === usuario.usuario_id &&
+              Number(r.horario_id) === Number(horario.horario_id) &&
+              fechaReservaNorm === fechaISO &&
+              r.activo
+            );
+          });
+
 
           //const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}/${horario.cupoMaximo}`;
-          const titulo = `${
-            profesor ? profesor.nombre + " " + profesor.apellido : ""
-          } \nCupo: ${cuposDisponibles}`;
+          const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}`;
 
           // asigno colores según el estado de las reservas
           const colorEvento = yaReservado
@@ -247,10 +277,10 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
               prev.map((r) =>
                 r.usuario_id === usuario.usuario_id &&
                 r.horario_id === horario_id &&
-                r.fecha === fecha &&
+                r.fecha === fecha &&                
                 r.activo
                   ? { ...r, activo: false }
-                  : r
+                  : r                  
               )
             );
             swalEstilo.fire({

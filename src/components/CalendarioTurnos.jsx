@@ -389,7 +389,8 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
           r.usuario_id === usuario.usuario_id &&
           r.fecha.substring(0, 10) === fecha &&
           r.activo &&
-          r.horario_id !== horario_id // que no sea el mismo horario
+          r.horaInicio === horaInicio
+          //r.horario_id !== horario_id // que no sea el mismo horario
         /*
           eventos.some(
             (e) =>
@@ -403,6 +404,7 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
         
       if (result.isConfirmed) {
         if (conflicto) {
+
           swalEstilo.fire({
             // icon: 'error',
             title: "Conflicto de horario",

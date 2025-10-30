@@ -5,7 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Swal from "sweetalert2";
 
-import actividadesData from "../data/actividades.json";
+//import actividadesData from "../data/actividades.json";
 import profesoresData from "../data/profesores.json";
 import horasData from "../data/horas.json";
 import horariosData from "../data/horarios.json";
@@ -86,8 +86,20 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
 
     const eventosGenerados = [];
     const hoy = new Date();
+
+    // Mostrar turnos desde 1 mes antes hasta 2 meses después
+    const inicioRango = new Date(hoy);
+    inicioRango.setMonth(hoy.getMonth() - 1);
+    inicioRango.setDate(1);
+
+    const finRango = new Date(hoy);
+    finRango.setMonth(hoy.getMonth() + 2);
+    finRango.setDate(30);
+
+    /*
     const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
     const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+    */
 
     // Recorro horarios y genero eventos solamente para la actividad seleccionada
     horariosData.forEach((horario) => {
@@ -114,8 +126,8 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
 
       dias.forEach((dia) => {
         for (
-          let d = new Date(inicioMes);
-          d <= finMes;
+          let d = new Date(inicioRango);
+          d <= finRango;
           d.setDate(d.getDate() + 1)
         ) {
           const nombreDia = Object.keys(diasSemana).find(

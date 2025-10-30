@@ -401,6 +401,9 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
               
       );
 
+      console.log(fecha)
+      console.log(horaInicio)
+
         
       if (result.isConfirmed) {
         if (conflicto) {
@@ -426,6 +429,7 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
           horario_id,
           usuario_id: usuario.usuario_id,
           activo: true,
+          horaInicio: horaInicio,
           fecha,
         };
         setReservas((prev) => [...prev, nuevaReserva]);

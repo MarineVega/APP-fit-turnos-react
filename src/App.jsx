@@ -16,6 +16,7 @@ import Profesor from "./pages/Profesor";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import Usuario from "./pages/Usuario";
 
+
 function App() {
   return (
     <Routes>
@@ -40,3 +41,10 @@ function App() {
 }
 
 export default App;
+
+
+/*
+ componente layout -> header y footer
+ en app las rutas quedan dentro del layout
+ copyrigth en footer del login
+*/

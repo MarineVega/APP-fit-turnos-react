@@ -744,14 +744,21 @@ a.btnAceptar:hover {
   width: 100%;
 }
 
-/* OJO!!!!! ver por qué no funciona */
-/* Fija la columna de horas (lado izquierdo) */
-.fc .fc-timegrid-slot-label {
-  position: sticky;           /* mantiene la columna pegada al borde izquierdo */
-  left: 0;                    /* indica que se "pegue" al borde izquierdo */
-  z-index: 5;                 /*  evita que se tape con otros elementos */
-  background-color: var(--color-fondo); /* evita que se superponga de forma traslúcida */
+/* Encabezado superior de los días (semana, día, mes) */
+.fc-col-header-cell {
+  background-color: var(--color-fondo) !important;    /* color de fondo */
+  color:var(--color-terciario) !important;              /* color del texto */
+  font-weight: bold;
+  text-transform: capitalize;
 }
+
+/* Columna de las horas (en vista semanal o diaria) */
+.fc-timegrid-slot-label {
+  background-color: var(--color-fondo) !important;  /* gris clarito */
+  color: var(--color-terciario) !important;
+  font-weight: 500;
+}
+
 
 h2#fc-dom-1 {
   font-size: 20px;

@@ -55,7 +55,7 @@ export default function Profesor() {
 
       {modo === "agregar" && (
         <>
-          <TituloConFlecha> Agregar Profesor </TituloConFlecha>
+          <TituloConFlecha destino="/administrar"> Agregar Profesor </TituloConFlecha>
           
           <ImagenLateral
             imgIzquierda={imgIzquierda}
@@ -72,7 +72,7 @@ export default function Profesor() {
       {/* Primero muestro la tabla, y al hacer clic en editar se abre el form */}
       {modo === "editar" && !datoInicial && (
         <>          
-          <TituloConFlecha> Modificar Profesor </TituloConFlecha>
+          <TituloConFlecha destino="/administrar"> Modificar Profesor </TituloConFlecha>
           <ProfesorList
             profesores={profesores}
             modo="editar"
@@ -83,7 +83,7 @@ export default function Profesor() {
 
       {modo === "editar" && datoInicial && (
         <>
-          <TituloConFlecha> Modificar Profesor </TituloConFlecha>
+          <TituloConFlecha destino="/administrar"> Modificar Profesor </TituloConFlecha>
            <ImagenLateral
             imgIzquierda={imgIzquierda}
             imgDerecha={imgDerecha}
@@ -100,21 +100,21 @@ export default function Profesor() {
 
       {modo === "eliminar" && (
         <>          
-          <TituloConFlecha> Eliminar Profesor </TituloConFlecha>
+          <TituloConFlecha destino="/administrar"> Eliminar Profesor </TituloConFlecha>
           <ProfesorList profesores={profesores} modo="eliminar" />
         </>
       )}
 
       {modo === "consultar" && (
         <>
-          <TituloConFlecha> Listado de Profesores </TituloConFlecha>
+          <TituloConFlecha destino="/administrar"> Listado de Profesores </TituloConFlecha>
           <ProfesorList profesores={profesores} modo="consultar" />
         </>
       )}
 
       {modo === "postAlta" && (
         <>
-          <TituloConFlecha> Listado de Profesores </TituloConFlecha>
+          <TituloConFlecha destino="/administrar"> Listado de Profesores </TituloConFlecha>
           <ProfesorList profesores={profesores} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
         </>
     )}

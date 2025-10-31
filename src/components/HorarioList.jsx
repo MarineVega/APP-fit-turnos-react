@@ -96,6 +96,9 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
         });
     };
     
+    // Si el modo es "postAlta", lo trato como "consultar"
+    const modoEfectivo = modo === "postAlta" ? "consultar" : modo;
+    
     return (
         <main className="mainHorario">
             <section id="listadoHorarios">
@@ -108,7 +111,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
                         <th>Días</th>
                         <th>Hora</th>
                         
-                        {modo !== "consultar" && <th>Acciones</th>}
+                        {modoEfectivo !== "consultar" && <th>Acciones</th>}
                         </tr>
                     </thead>
 
@@ -123,9 +126,9 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
                                         <td>{horario.dias}</td>
                                         <td>{horario.horaInicio} a {horario.horaFin}</td>
                                         
-                                        {modo !== "consultar" && (
+                                        {modoEfectivo !== "consultar" && (
                                             <td>
-                                                {modo === "editar" && (
+                                                {modoEfectivo === "editar" && (
                                                     <button
                                                         className="btnTabla"
                                                         // Redirigir al formulario en modo editar                                                    
@@ -142,7 +145,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
                                                     </button>
                                                 )}
 
-                                                {modo === "eliminar" && (
+                                                {modoEfectivo === "eliminar" && (
                                                     <button
                                                         className="btnTabla"
                                                         onClick={() => eliminarHorario(horario)}    // ✅ paso por la validación
@@ -164,7 +167,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
                             })
                             ) : (
                             <tr>
-                                <td colSpan={modo !== "consultar" ? 5 : 4}>No hay horarios registrados</td>
+                                <td colSpan={modoEfectivo !== "consultar" ? 5 : 4}>No hay horarios registrados</td>
                             </tr>
                         )}
                     </tbody>

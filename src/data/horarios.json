@@ -56,7 +56,7 @@
         "horaFin": "12:00",
         "dias_id": "miercoles",
         "dias": "Miércoles",
-        "cupoMaximo": 14,
+        "cupoMaximo": 1,
         "activo": true
     },
     {
@@ -72,6 +72,22 @@
         "dias_id": "[\"lunes\",\"miercoles\",\"viernes\"]",
         "dias": "Lunes, Miércoles, Viernes",
         "cupoMaximo": 16,
+        "activo": true
+    },
+    {
+        "horario_id": 6,
+        "actividad_id": 2,
+        "actividad_nombre": "Crossfit",
+        "profesor_id": 1,
+        "persona_id": 3,
+        "apellido": "Pérez",
+        "nombre": "María",
+        "hora_id": 1,
+        "horaInicio": "08:00",
+        "horaFin": "09:00",
+        "dias_id": "[\"lunes\",\"miercoles\",\"viernes\"]",
+        "dias": "Lunes, Miércoles, Viernes",
+        "cupoMaximo": 10,
         "activo": true
     }
 ]

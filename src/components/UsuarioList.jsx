@@ -42,9 +42,13 @@ export default function UsuarioList({ usuarios, modo, onEditar }) {
         text: `Se eliminará el usuario "${usuario.usuario}" de forma permanente.`,
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#d33",
         cancelButtonText: "Cancelar",
         confirmButtonText: "Sí, eliminar",
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6edc8c",
+        customClass: {
+          cancelButton: "btnAceptar",
+        },
       })
       .then((result) => {
         if (result.isConfirmed) {

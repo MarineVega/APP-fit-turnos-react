@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CarruselActividades from "../components/CarruselActividades";
 import CalendarioTurnos from "../components/CalendarioTurnos";
+import TituloConFlecha from "../components/TituloConFlecha";
 import actividadesData from "../data/actividades.json";
 
 export default function Turnos() {
@@ -20,13 +21,13 @@ export default function Turnos() {
   return (
     <>
       {/* <div className="turnos-container"> */}
+      <TituloConFlecha destino="/"> Reserva tu Turno </TituloConFlecha>
+        <CarruselActividades
+          seleccion={actividadSeleccionada}
+          onSeleccion={(actividad) => setActividadSeleccionada(actividad)}
+        />
 
-      <CarruselActividades
-        seleccion={actividadSeleccionada}
-        onSeleccion={(actividad) => setActividadSeleccionada(actividad)}
-      />
-
-      <CalendarioTurnos actividadSeleccionada={actividadSeleccionada} />
+        <CalendarioTurnos actividadSeleccionada={actividadSeleccionada} />
 
     </>
   );

@@ -1,18 +1,26 @@
+/* ==== LAYOUT GENERAL ==== */
 .mainAdministrar {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-  padding: 2rem;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-fondo);
+  color: var(--color-terciario);
 }
 
+/* ==== CARD ==== */
 .card {
-  background: #fff;
-  border-radius: 1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  width: 320px;
-  padding: 1.5rem;
-  text-align: left;
+  background: var(--color-primario);
+  border-radius: 15px;
+  padding: 1em 1.5em;
+  margin: 1.2em 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  position: relative;
+  color: var(--color-contraste-oscuro);
+  width: 70%;
+  max-width:  600px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -21,40 +29,135 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
+/* ==== TÍTULO ==== */
 .card h2 {
-  margin-bottom: 1rem;
-  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem;      /* un poco más chico */
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0.3em 0 0.6em 0em; /* 🔹 menos espacio abajo */
+  width: 100%;
+  text-align: left;
+  letter-spacing: 0.4px;
 }
 
+/* ==== LISTA ==== */
 .card ul {
   list-style: none;
-  padding: 0;
+  padding-left: 0;
+  margin: 0;
+  width: 60%;
 }
 
 .card li {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0.4rem 0;
+  margin: 0.25em 0 0.5em 2em; /* 🔹 menos espacio entre filas */
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  color: #f2f2f2;
 }
 
+/* ==== ENLACES ==== */
+.card a {
+  text-decoration: none;
+  color: #f2f2f2;
+  transition: color 0.3s ease;
+}
+
+.card a:hover {
+  color: #b9e4e1;
+}
+
+/* ==== ICONOS DE ACCIÓN ==== */
+.card .icon {
+  display: inline-block;
+  background: linear-gradient(to right, #a9cdbb, #b6cdda);
+  color: #ffffff;
+  padding: 0.25em 0.5em;
+  margin-left: 0.5em;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.card .icon:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+  background: linear-gradient(to right, #b6cdda, #a9cdbb);
+}
+
+/* ==== IMAGEN ==== */
 .card img {
-  width: 100%;
-  border-radius: 10px;
-  margin-top: 1rem;
+  width: 100px;                /* 🔹 apenas más chica */
+  border-radius: 0;
+  object-fit: contain;
+  position: absolute;
+  right: 2em;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s ease;
 }
 
+.card img:hover {
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* ==== PÁRRAFO (Publicidad) ==== */
+.card p {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  color: #ffffff;
+  line-height: 1.5;
+  width: 60%;
+  text-align: left;
+  margin-left: 1.2em;
+}
+
+/* ==== MOBILE ==== */
+@media (max-width: 768px) {
+  .card {
+    width: 85%;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.2em;
+  }
+
+  .card h2 {
+    font-size: 1.2rem;
+    margin-left: 0.5em;
+  }
+
+  .card ul,
+  .card p {
+    width: 100%;
+    margin-left: 0.5em;
+    text-align: justify;
+    font-size: 0.9rem;
+  }
+
+  .card img {
+    position: static;
+    transform: none;
+    display: block;
+    width: 85px;
+    margin: 1.5rem 0 0 10px;
+  }
+
+  .card .icon {
+    font-size: 0.95rem;
+    padding: 0.2em 0.4em;
+  }
+}
+
+/* ==== BOTONES Y LINKS ==== */
 .botonLink {
   background: none;
   border: none;
-  color: #333;
+  color: #f7efefef;
   font-weight: 500;
-  cursor: pointer;
-}
-
-.icon {
-  border: none;
-  background: none;
-  font-size: 1.2rem;
   cursor: pointer;
 }

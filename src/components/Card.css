@@ -72,14 +72,17 @@
 
 /* ==== ICONOS DE ACCIÓN ==== */
 .card .icon {
-  display: inline-block;
+  display: inline-flex; /* ✅ usa flex para centrar */
+  justify-content: center;
+  align-items: center;
   background: linear-gradient(to right, #a9cdbb, #b6cdda);
   color: #ffffff;
-  padding: 0.25em 0.5em;
+  width: 2.3em; /* 🔹 un poco más grande */
+  height: 2.3em;
   margin-left: 0.5em;
   border-radius: 8px;
-  font-size: 1rem;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  font-size: 1.1rem; /* 🔹 agranda un poco el ícono */
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
   text-align: center;
 }

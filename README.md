@@ -1,12 +1,38 @@
-# React + Vite
+APP-fit-turnos
+Aplicación móvil/web (realizada en React) que permite a los usuarios reservar turnos en gimnasios, gestionar sus horarios y acceder a disponibilidad en tiempo real.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+El objetivo es:
 
-Currently, two official plugins are available:
+Facilitar la reserva de turnos
+Evitar aglomeraciones y esperas
+Mejorar la gestión de horarios
+Digitalizar reservas o cancelaciones
+Funcionalidades según los distintos usuarios:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+ADMINISTRADORES:
 
-## Expanding the ESLint configuration
+Gestionan disciplinas, servicios, horarios, pagos, profesores, entrenadores, preparadores físicos, socios.
+Gestionan disponibilidad y controlan el aforo.
+Publican noticias, eventos deportivos, eventos sociales.
+Espacio Publicitario (patrocinadores).
+PROFESORES:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Consultan padrones de alumnos.
+Modifican horarios de sus clases notificando a los alumnos registrados en su clase y al administrador.
+Brindan información respecto de eventos en los que participan sus alumnos, fotos, resultados, etc.
+CLIENTES:
+
+Reservan, cancelan y modifican turnos.
+Preinscripción a través de un formulario (luego es el administrador quien autoriza el alta o no).
+Consultan disciplinas a inscribirse. Pueden darse de baja de la disciplina, modificar su inscripción (cantidad de días que realiza la actividad).
+Consultan su condición de socio. Si paga en término se le asigna una cantidad de puntos que luego puede canjear por algún beneficio.
+Pueden anotarse en los días y horarios que va a asistir a la disciplina.
+Consultan cantidad de clases que le quedan.
+
+Carpeta donde se encuentra la documentación: https://drive.google.com/drive/folders/1BtgJPC7n9gUOjOGjMKfeX54x_cfQyu96
+
+Trello: https://trello.com/b/GbD623W4/fit-turnos
+
+Figma: https://www.figma.com/design/63XgAFmGgcaJJdWkxzzirR/FIT-Turnos?node-id=0-1&p=f&t=0EIKcK00mA2oQCPr-0
+
+Miro (sprints): https://miro.com/app/board/uXjVJMIB0hA=/

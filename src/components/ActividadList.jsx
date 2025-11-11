@@ -21,14 +21,25 @@ const swalEstilo = Swal.mixin({
 //import actividadesData from "../data/actividades.json";     // 👈 importa el JSON local (provisorio hasta que levante los datos de la BD)
 
 export default function ActividadList({ actividades = [], modo, onEditar }) {
-    // const [actividades, setActividades] = useState([]);       // Cuando levante los datos de la BD
+
+    const [actividadesBD, setActividadesBD] = useState([]);          // Levanta los datos de la BD
+    
     /*
+    useEffect(() => {
+        fetch("http://localhost:3000/actividades")
+        .then((res) => res.json())
+        .then((data) => setActividades(data))
+        .catch((err) => console.error("Error:", err));
+    }, []);
+
+    */
+    
     useEffect(() => {
         const fetchActividades = async () => {
         try {
-            const response = await fetch("http://localhost:3000/api/actividades"); // el backend
+            const response = await fetch("http://localhost:3000/actividades"); // el backend
             const data = await response.json();
-            setActividades(data);
+            setActividadesBD(data);
         } catch (error) {
             console.error("Error cargando actividades:", error);
         }
@@ -36,7 +47,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
 
         fetchActividades();
     }, []);
-    */
+    
 /*
     useEffect(() => {        
         setActividades(actividadesData);        // Carga inicial de los datos mockeados
@@ -91,7 +102,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
     };
 
     // ✅ Manejo de eliminación con validación    
-    const eliminarActividad = (actividad) => {
+    const eliminarActividad = async (actividad) => {
         console.log('actividad.actividad_id ', actividad.actividad_id)
 
         if (tieneReservasActivas(actividad.actividad_id)) {
@@ -105,7 +116,8 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
 
         }
             
-        swalEstilo.fire({
+        //swalEstilo.fire({
+        const result = await swalEstilo.fire({
             title: "¿Eliminar actividad?",
             text: `Esta acción eliminará la actividad "${actividad.nombre}" permanentemente.`,
             icon: "warning",
@@ -117,19 +129,41 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
             confirmButtonColor: '#d33',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
-        }).then((result) => {
+        }); //.then((result) => {
+            
+            // <-- correr esta parte (tabular)
             if (result.isConfirmed) {
                 // Acá se agregan las instrucciones para eliminar la actividad desde la base o el estado
             
-                swalEstilo.fire({
-                    title: "Eliminada",
-                    text: "La actividad ha sido eliminada.",
-                    icon: "success",
-                    confirmButtonColor: "#6edc8c",
-                    confirmButtonText: "Cerrar",
-                });
+                try {
+                // 🔥 Llamada al backend DELETE
+                    const response = await fetch(`http://localhost:3000/actividades/${actividad.actividad_id}`, {
+                        method: 'DELETE',
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Error al eliminar la actividad");
+                    }
+
+                    // Actualizo la tabla local sin recargar
+                    setActividadesBD(prev =>
+                        prev.filter(a => a.actividad_id !== actividad.actividad_id)
+                    );
+
+                    
+                    swalEstilo.fire({
+                        title: "Eliminada",
+                        text: "La actividad ha sido eliminada.",
+                        icon: "success",
+                        confirmButtonColor: "#6edc8c",
+                        confirmButtonText: "Cerrar",
+                    });
+                } catch (error) {
+                    console.error(error);
+                    swalEstilo.fire("Error", "No se pudo eliminar la actividad.", "error");
+                }
             }
-        });
+        //});
     };
    
 
@@ -167,8 +201,8 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                     </thead>
 
                     <tbody>
-                        {actividades.length > 0 ? (                           
-                            actividades.map((actividad) => {
+                        {actividadesBD.length > 0 ? (                           
+                            actividadesBD.map((actividad) => {
                                 const imagenSrc =
                                     actividad.imagen instanceof File
                                         ? URL.createObjectURL(actividad.imagen)

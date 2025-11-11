@@ -33,6 +33,7 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
     const [descripcion, setDescripcion] = useState(datoInicial?.descripcion || "");
     const [cupoMaximo, setCupoMaximo] = useState(datoInicial?.cupoMaximo || "");
     const [imagen, setImagen] = useState(datoInicial?.imagen || null);
+    const [preview, setPreview] = useState(null);           // para manejar la previsualización de las imágenes
 
     // Estados de errores
     const [errores, setErrores] = useState({
@@ -47,12 +48,13 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
             setNombre(datoInicial.nombre);
             setDescripcion(datoInicial.descripcion);
             setCupoMaximo(datoInicial.cupoMaximo);
-            setImagen(datoInicial.imagen ||null);           
+            setImagen(datoInicial.imagen ||null);
+            setPreview(null);           // limpio cualquier preview anterior
         }
     }, [modo, datoInicial]);      //[modo, id, actividades]);
 
     // Validación y guardado
-    const validarGuardar = (e) => {
+    const validarGuardar = async (e) => {
         e.preventDefault();
 
         let nuevosErrores = { nombre: "", descripcion: "", cupoMaximo: "" };
@@ -91,37 +93,67 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
         // Si hay errores SALGO
         if (!esValido) return;
 
-        guardar({ nombre, descripcion, cupoMaximo, imagen });
-
         console.log("Nombre: ", nombre);
         console.log("Descripcion: ", descripcion);
         console.log("Cupo: ", cupoMaximo);
 
-        const mensaje = 
-            modo === "editar"
-                ? 'La actividad ha sido actualizada.'
-                : 'La actividad ha sido creada.';
+        
+        //guardar({ nombre, descripcion, cupoMaximo, imagen });
+        const actividadData = { nombre, descripcion, cupoMaximo, imagen, activa: true };
+        
+        try {
+            const url =
+            modo === "editar" && id
+                ? `http://localhost:3000/actividades/${id}`
+                : "http://localhost:3000/actividades";
 
-        swalEstilo.fire({
-            title: '¡Operación Exitosa!',
-            text: mensaje ,
-            imageUrl: exitoImg ,
-            imageAlt: 'Éxito',
-            icon: 'success',
-            confirmButtonText: 'Volver',
-            customClass: {
-                confirmButton: 'btnAceptar' 
-            },
-            buttonsStyling: false
-        }).then(() => {
-            limpiarFormulario();
-            // Redirección según modo
-            if (modo === "editar") {
-                window.location.href = "/actividad?modo=editar";
-            } else {
-                window.location.href = "/actividad?modo=postAlta";      // para distinguirlo del consultar normal
-            }        
-        });
+            const method = modo === "editar" ? "PUT" : "POST";
+
+            console.log("Enviando a backend:", actividadData);
+            console.log("URL:", url);
+            console.log("Método:", method);
+
+
+            const response = await fetch(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(actividadData),
+            });
+
+            if (!response.ok) throw new Error("Error al guardar en la base de datos");
+
+
+
+            const mensaje = 
+                modo === "editar"
+                    ? 'La actividad ha sido actualizada.'
+                    : 'La actividad ha sido creada.';
+
+            swalEstilo.fire({
+                title: '¡Operación Exitosa!',
+                text: mensaje ,
+                imageUrl: exitoImg ,
+                imageAlt: 'Éxito',
+                icon: 'success',
+                confirmButtonText: 'Volver',
+                customClass: {
+                    confirmButton: 'btnAceptar' 
+                },
+                buttonsStyling: false
+            }).then(() => {
+                limpiarFormulario();
+                // Redirección según modo
+                if (modo === "editar") {
+                    window.location.href = "/actividad?modo=editar";
+                } else {
+                    window.location.href = "/actividad?modo=postAlta";      // para distinguirlo del consultar normal
+                }        
+            });
+        } catch (err) {
+            console.error(err);
+            swalEstilo.fire("Error", "No se pudo guardar la actividad.", "error");
+        }
+
     };
 
     function cancelar () {
@@ -195,7 +227,7 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
                     className="inputActividad"
                     error={errores.cupoMaximo}
                 />
-                
+
                 <FormCampos
                     label="Imagen"
                     type="file"
@@ -203,19 +235,21 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
                     isFile={true}           // 👈 indicamos que es un input file
                     preview={true}          // 👈 mostramos vista previa
                     value={imagen}
-                   // onChange={(e) => setImagen(e.target.files[0])}
                     onChange={(e) => {
                         const archivo = e.target.files[0];
                         if (archivo) {
-                            // guardamos solo el nombre del archivo, no el objeto File; ej: "yoga.png"
-                            setImagen(archivo.name);        //sería lo que voy a mostrar luego desde /assets/img/yoga.png
+                            setImagen(archivo.name); // guardo el nombre del archivo
+                            const previewUrl = URL.createObjectURL(archivo);
+                            setPreview(previewUrl); // seteo la vista previa temporal
                         }
                     }}
                     className="inputActividad"
                     warning={"Coloque la imagen en la carpeta <b>src/assets/img</b> antes de seleccionarla."}
+                    imagenActual={imagen}    // 👈 agregamos esta nueva prop
+                    previewUrl={preview}     // 👈 y esta también
                 />
-                
-                <label className="advertencia">* Campos obligatorios</label>                
+                <label className="advertencia">* Campos obligatorios</label>
+              
             </form>
 
             <FormBotones                    

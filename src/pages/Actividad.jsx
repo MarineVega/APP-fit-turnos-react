@@ -1,4 +1,4 @@
-import React, { useState } from "react";         // React no se importa con llaves, solo el hook useState
+import React, { useState, useEffect } from "react";         // React no se importa con llaves, solo el hook useState
 import { useSearchParams } from "react-router-dom";
 import "../styles/style.css";
 
@@ -10,7 +10,7 @@ import ActividadList from "../components/ActividadList";
 import ImagenLateral from "../components/ImagenLateral";
 import TituloConFlecha from "../components/TituloConFlecha";
 
-import actividadesData from "../data/actividades.json";     // 👈 importo el JSON local (provisorio hasta que levante los datos
+//import actividadesData from "../data/actividades.json";     // 👈 importo el JSON local (provisorio hasta que levante los datos
 
 export default function Actividad() {
   //actividad → se mostrará "consultar"
@@ -19,10 +19,20 @@ export default function Actividad() {
   //actividad?modo=eliminar → mostrará la lista en modo eliminar
   //http://localhost:5173/actividad?modo=agregar
 
+  const [actividades, setActividades] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/actividades")
+      .then((res) => res.json())
+      .then((data) => setActividades(data))
+      .catch((err) => console.error("Error:", err));
+  }, []);
+
+
   const [params, setParams] = useSearchParams();
   const modo = params.get("modo") || "consultar";
   const id = parseInt(params.get("id"));            // 👈 identificador de la actividad a editar (si existe)
-  const [actividades, setActividades] = useState(actividadesData);
+ // const [actividades, setActividades] = useState(actividadesData);
   const [datoInicial, setDatoInicial] = useState(null);     // actividad seleccionada para editar
 
   // Detectar si hay una actividad seleccionada para editar  

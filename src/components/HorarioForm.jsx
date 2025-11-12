@@ -42,7 +42,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                     Promise.resolve([]), // OJO!!!!!! dejo vacío por ahora hasta tener el BE de profesores y horas
                     //fetch("http://localhost:3000/profesores").then(r => r.json()),
                     fetch("http://localhost:3000/actividades").then(r => r.json()),
-                    //fetch("http://localhost:3000/horas").then(r => r.json()),
+                    fetch("http://localhost:3000/horas").then(r => r.json()),
                 ]);
                 setProfesores((profRes || []).filter(p => p.activo));
                 setActividades((actRes || []).filter(a => a.activa));

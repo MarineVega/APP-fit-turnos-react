@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { registerUser } from "../services/api";
 import Swal from "sweetalert2";
 import exitoImg from "../assets/img/exito.png";
 import FormCampos from "./FormCampos";
@@ -58,9 +59,11 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     });
   };
 
-  // ✅ Validación y guardado
-  const validarGuardar = (e) => {
-    e.preventDefault();
+  // Validación y guardado
+ 
+  const validarGuardar = async (e) => {
+  e.preventDefault();
+
 
     const nuevosErrores = {};
     let esValido = true;
@@ -146,7 +149,12 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
       },
     };
 
-    guardar(usuarioFormateado);
+    try {
+      await registerUser(usuarioFormateado); // ✅ Llama al backend real
+    } catch (error) {
+      Swal.fire("Error", error.message || "No se pudo registrar el usuario", "error");
+      return; // 🔹 evita que siga si hubo error
+    }
 
     const mensaje =
       modo === "editar"

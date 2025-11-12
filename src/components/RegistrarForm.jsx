@@ -31,7 +31,7 @@ export default function RegistrarForm({ onSwitch }) {
     e.preventDefault();
     setError("");
 
-    // Validaciones básicas
+    // ✅ Validaciones básicas
     if (!username || !email || !password || !password2)
       return setError("Completá todos los campos.");
 
@@ -47,44 +47,38 @@ export default function RegistrarForm({ onSwitch }) {
     if (password !== password2)
       return setError("Las contraseñas no coinciden.");
 
-    // Recuperar usuarios existentes
-    const usuariosGuardados = JSON.parse(localStorage.getItem("usuarios")) || [];
-    const existe = usuariosGuardados.some(
-      (u) => u.email === email || u.usuario === username
-    );
+    setLoading(true);
 
-    if (existe)
-      return setError(
-        "Ya existe una cuenta registrada con ese email o nombre de usuario."
-      );
-
-    // 🧩 Crear nuevo usuario coherente con el modelo (tipoPersona_id)
+    // 🧩 Estructura de usuario que espera el backend
     const nuevoUsuario = {
-      usuario_id: usuariosGuardados.length + 1,
       usuario: username,
       email,
       password,
       activo: true,
-
-      // Estructura similar a la de base de datos:
       persona: {
-        persona_id: usuariosGuardados.length + 1,
         nombre: username,
         apellido: "",
         documento: "",
         telefono: "",
         domicilio: "",
         fecha_nac: "",
-        tipoPersona_id: 3, // 3 = Cliente
+        tipoPersona_id: 3, // Cliente
         activo: true,
       },
     };
 
-    usuariosGuardados.push(nuevoUsuario);
-    localStorage.setItem("usuarios", JSON.stringify(usuariosGuardados));
-
-    setLoading(true);
     try {
+      const response = await fetch("http://localhost:3000/usuarios", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nuevoUsuario),
+      });
+
+      if (!response.ok) {
+        const msg = await response.text();
+        throw new Error(msg || "Error al crear usuario");
+      }
+
       await swalEstilo.fire({
         title: "¡Cuenta creada con éxito!",
         text: "Bienvenid@ a Fit Turnos. Ya podés iniciar sesión.",
@@ -94,10 +88,11 @@ export default function RegistrarForm({ onSwitch }) {
         icon: "success",
         confirmButtonText: "Ir al inicio",
       });
+
       onSwitch("login");
     } catch (err) {
-      setError("Error al registrar el usuario");
       console.error(err);
+      setError("Error al registrar el usuario. " + err.message);
     } finally {
       setLoading(false);
     }

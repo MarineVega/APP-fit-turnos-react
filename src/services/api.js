@@ -1,82 +1,80 @@
-// src/services/api.js
-import emailjs from "emailjs-com";
+const API_URL = "http://localhost:3000"; // tu backend NestJS
 
-// Simulación de registro de usuario
-export async function registerUser({ nombre, email, password, esAdmin }) {
-  return new Promise((resolve, reject) => {
-    setTimeout(async () => {
-      try {
-        const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-        const existe = usuarios.some(
-          (u) => u.email === email || u.nombre === nombre
-        );
-
-        if (existe) {
-          reject(new Error("Ya existe un usuario con ese nombre o email"));
-        } else {
-          const nuevoUsuario = { nombre, email, password, esAdmin };
-          usuarios.push(nuevoUsuario);
-          localStorage.setItem("usuarios", JSON.stringify(usuarios));
-
-          // ✅ Enviar mail de bienvenida con EmailJS
-          await emailjs.send(
-            "service_xxx",       // tu Service ID
-            "template_bienvenida", // tu Template ID
-            { to_name: nombre, to_email: email },
-            "publicKey_xxx"      // tu Public Key
-          );
-
-          resolve(nuevoUsuario);
-        }
-      } catch (err) {
-        reject(new Error("Error en el registro"));
-      }
-    }, 500);
-  });
-}
-
-// Simulación de login
-export async function loginUser({ email, password }) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-      const usuario = usuarios.find((u) => u.email === email);
-
-      if (!usuario) {
-        reject(new Error("La cuenta no existe"));
-      } else if (usuario.password !== password) {
-        reject(new Error("Contraseña incorrecta"));
-      } else {
-        resolve(usuario);
-      }
-    }, 500);
-  });
-}
-
-// ✅ Enviar código de recuperación con EmailJS
-export async function sendRecoveryCode(email, code) {
+// === REGISTRO DE USUARIO ===
+export async function registerUser({ nombre, apellido, email, password, tipoPersona_id }) {
   try {
-    await emailjs.send(
-      "service_xxx",        // tu Service ID
-      "template_codigo",    // tu Template ID
-      { to_email: email, code },
-      "publicKey_xxx"       // tu Public Key
-    );
-    return true;
+    const response = await fetch(`${API_URL}/usuarios`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        usuario: email, // o podés usar nombre si querés
+        email,
+        password,
+        activo: true,
+        persona: {
+          nombre,
+          apellido,
+          tipoPersona_id,
+          activo: true
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Error en el registro: ${error}`);
+    }
+
+    return await response.json();
   } catch (err) {
-    throw new Error("No se pudo enviar el código");
+    console.error("Error al registrar usuario:", err);
+    throw err;
   }
 }
 
-// ✅ Actualizar contraseña en localStorage
-export async function updatePassword(email, newPassword) {
-  const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-  const usuarioIndex = usuarios.findIndex((u) => u.email === email);
+// === LOGIN ===
+export async function loginUser({ email, password }) {
+  try {
+    const response = await fetch(`${API_URL}/usuarios`);
+    const usuarios = await response.json();
 
-  if (usuarioIndex === -1) throw new Error("Usuario no encontrado");
+    const usuario = usuarios.find(
+      (u) => u.email === email && u.password === password
+    );
 
-  usuarios[usuarioIndex].password = newPassword;
-  localStorage.setItem("usuarios", JSON.stringify(usuarios));
+    if (!usuario) throw new Error("Credenciales inválidas");
+    return usuario;
+  } catch (err) {
+    console.error("Error al iniciar sesión:", err);
+    throw err;
+  }
+}
 
+// === RECUPERAR CONTRASEÑA (pendiente en backend) ===
+export async function sendRecoveryCode(email, code) {
+  console.warn("Función pendiente de implementar en backend");
   return true;
+}
+
+// === ACTUALIZAR CONTRASEÑA ===
+export async function updatePassword(email, newPassword) {
+  try {
+    const response = await fetch(`${API_URL}/usuarios`);
+    const usuarios = await response.json();
+    const usuario = usuarios.find((u) => u.email === email);
+
+    if (!usuario) throw new Error("Usuario no encontrado");
+
+    const res = await fetch(`${API_URL}/usuarios/${usuario.usuario_id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: newPassword })
+    });
+
+    if (!res.ok) throw new Error("No se pudo actualizar la contraseña");
+    return true;
+  } catch (err) {
+    console.error("Error al actualizar contraseña:", err);
+    throw err;
+  }
 }

@@ -19,6 +19,23 @@ const swalEstilo = Swal.mixin({
 
 
 export default function HorarioList({ horarios = [], modo, onEditar }) {
+    
+    const [horariosBD, setHorariosBD] = useState([]);          // Levanta los datos de la BD
+    
+    useEffect(() => {
+        const fetchHorarios = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/horarios");     // BE
+            const data = await response.json();
+            setHorariosBD(data);
+        } catch (error) {
+            console.error("Error cargando horarios:", error);
+        }
+        };
+
+        fetchHorarios();
+    }, []);
+    
     // Declaro el estado reservas
     const [reservas, setReservas] = useState([]);
 
@@ -39,6 +56,26 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
     };
 
 
+    const formatearDias = (dias) => {
+        if (!dias) return "";
+
+        // Mapeo base: sin tildes -> devuelvo con tildes y capitalizadas
+        const nombres = {
+            lunes: "Lunes",
+            martes: "Martes",
+            miercoles: "Miércoles",
+            jueves: "Jueves",
+            viernes: "Viernes",
+            sabado: "Sábado",
+            //domingo: "Domingo",
+        };
+
+        return dias
+            .split(',')
+            .map(d => nombres[d.trim().toLowerCase()] || d) 
+            .join(', ');
+    };
+
     // ✅ Manejo de modificación con validación   
     const editarHorario = (horario) => {
         
@@ -46,7 +83,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
         swalEstilo.fire({
             icon: "warning",
             title: "No se puede modificar",
-            text: `El horario de ${horario.horaInicio} a  ${horario.horaFin} de ${horario.actividad_nombre} (${horario.profesor_nombre} ${horario.profesor_apellido}), tiene reservas activas.`,
+            text: `El horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} (${horario.profesor.nombre} ${horario.profesor.apellido}), tiene reservas activas.`,
             confirmButtonText: "Cerrar",
         });
         return;
@@ -63,7 +100,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
             swalEstilo.fire({
                 icon: "warning",
                 title: "No se puede eliminar",
-                text: `El horario de ${horario.horaInicio} a  ${horario.horaFin} de ${horario.actividad_nombre} (${horario.profesor_nombre} ${horario.profesor_apellido}), tiene reservas activas.`,
+                text: `El horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} (${horario.profesor.nombre} ${horario.profesor.apellido}), tiene reservas activas.`,
                 confirmButtonText: "Cerrar",
             });
             return;
@@ -71,7 +108,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
             
         swalEstilo.fire({
             title: "¿Eliminar horario?",
-            text: `Esta acción eliminará el horario de ${horario.horaInicio} a  ${horario.horaFin} de ${horario.actividad_nombre} (${horario.profesor_nombre} ${horario.profesor_apellido}) permanentemente.`,            
+            text: `Esta acción eliminará el horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} (${horario.profesor.nombre} ${horario.profesor.apellido}) permanentemente.`,            
             icon: "warning",
             showCancelButton: true,
             cancelButtonColor: '#6edc8c',                        
@@ -116,16 +153,16 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
                     </thead>
 
                     <tbody>
-                        {horarios.length > 0 ? (                           
-                            horarios.map((horario) => {                                
+                        {horariosBD.length > 0 ? (                           
+                            horariosBD.map((horario) => {                                
                                 return (
                                     <tr key={horario.horario_id}>
-                                        <td>{horario.actividad_nombre}</td>
-                                        <td>{horario.profesor_nombre} {horario.profesor_apellido}</td>
+                                        <td>{horario.actividad.nombre}</td>
+                                        <td>{horario.profesor.nombre} {horario.profesor_apellido}</td>
                                         <td id="cupo">{horario.cupoMaximo ?? ""}</td>
-                                        <td>{horario.dias}</td>
-                                        <td>{horario.horaInicio} a {horario.horaFin}</td>
-                                        
+                                        <td>{formatearDias(horario.dias)}</td>
+                                        <td>{horario.hora?.horaInicio?.slice(0, 5)} a {horario.hora?.horaFin?.slice(0, 5)}</td>
+                                                                                
                                         {modoEfectivo !== "consultar" && (
                                             <td>
                                                 {modoEfectivo === "editar" && (

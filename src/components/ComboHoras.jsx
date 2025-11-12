@@ -4,6 +4,7 @@ import horasData from "../data/horas.json";       // 👈 Datos mock
 export default function ComboHoras({  
     value, 
     onChange = () => {},
+    opciones = [],
     onFocus,
     //incluirTodos = true, 
     className="",

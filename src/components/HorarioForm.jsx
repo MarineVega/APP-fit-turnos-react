@@ -29,6 +29,31 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
     //const id = datoInicial?.horario_id || null;
     const horario_id = datoInicial?.horario_id || null;
 
+     // Estados para los combos
+    const [profesores, setProfesores] = useState([]);
+    const [actividades, setActividades] = useState([]);
+    const [horas, setHoras] = useState([]);
+
+    // Cargo los combos desde la base de datos
+    useEffect(() => {
+        const fetchDatos = async () => {
+            try {
+                const [profRes, actRes, horaRes] = await Promise.all([
+                    Promise.resolve([]), // OJO!!!!!! dejo vacío por ahora hasta tener el BE de profesores y horas
+                    //fetch("http://localhost:3000/profesores").then(r => r.json()),
+                    fetch("http://localhost:3000/actividades").then(r => r.json()),
+                    //fetch("http://localhost:3000/horas").then(r => r.json()),
+                ]);
+                setProfesores((profRes || []).filter(p => p.activo));
+                setActividades((actRes || []).filter(a => a.activa));
+                setHoras((horaRes || []).filter(h => h.activa));
+            } catch (error) {
+                console.error("Error cargando datos iniciales:", error);
+            }
+        };
+        fetchDatos();
+    }, []);
+    
     // Estados del formulario
     const [profesorID, setProfesorID] = useState("");
     const [actividadID, setActividadID] = useState("");
@@ -47,9 +72,15 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
 
     // Si estoy en modo editar, cargo los datos del horario
     useEffect(() => {        
+        
         if (modo === "editar" && datoInicial) {
+            /*
+            console.log("datoInicial completo: ", datoInicial)
+            console.log("actividad?.actividad_id:", datoInicial.actividad?.actividad_id)
+            console.log("actividad_id: ", datoInicial.actividad_id)
+           */ 
             setProfesorID(datoInicial.profesor_id || null);
-            setActividadID(datoInicial.actividad_id);
+            setActividadID(datoInicial.actividad?.actividad_id);
             setCupoMaximo(datoInicial.cupoMaximo || null);            
             setHoraID(datoInicial.hora_id);    
 
@@ -66,6 +97,17 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
             }            
         }
     }, [modo, datoInicial]);
+
+    useEffect(() => {
+        if (modo === "editar" && datoInicial) {
+            if (profesores.length > 0) setProfesorID(datoInicial.profesor_id || null);
+            if (actividades.length > 0) {
+                const idActividad = datoInicial.actividad?.actividad_id || datoInicial.actividad_id;
+                setActividadID(idActividad);
+            }
+            if (horas.length > 0) setHoraID(datoInicial.hora?.hora_id || datoInicial.hora_id);
+        }
+    }, [modo, datoInicial, profesores, actividades, horas]);
 
     // Validación y guardado
     const validarGuardar = (e) => {
@@ -236,6 +278,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                         setProfesorID(e);
                         limpiarError("profesor");
                     }}
+                    opciones={profesores}
                     onFocus={() => limpiarError("profesor")}
                     className="inputHorario"
                     label="Profesor"
@@ -247,7 +290,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                         setActividadID(e);
                         limpiarError("actividad");
                     }}
-                    
+                    opciones={actividades} 
                     onFocus={() => limpiarError("actividad")}
                     incluirTodos={false}
                     className="inputHorario"
@@ -286,6 +329,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                         setHoraID(e);
                         limpiarError("hora");
                     }}
+                    opciones={horas}
                     onFocus={() => limpiarError("hora")}
                     incluirTodos={false}
                     className="inputHorario"

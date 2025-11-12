@@ -1,4 +1,4 @@
-import React, { useState } from "react";                // React no se importa con llaves, solo el hook useState
+import React, { useState, useEffect } from "react";                // React no se importa con llaves, solo el hook useState
 import { useSearchParams } from "react-router-dom";
 import "../styles/style.css";
 
@@ -10,7 +10,7 @@ import TituloConFlecha from "../components/TituloConFlecha";
 import imgIzquierda from "../assets/img/horario1.png";
 import imgDerecha from "../assets/img/horario2.png";
 
-import horariosData from "../data/horarios.json";         // 👈 importo el JSON local (provisorio hasta que levante los datos
+//import horariosData from "../data/horarios.json";         // 👈 importo el JSON local (provisorio hasta que levante los datos
 
 export default function Horario() {
   //horario → se mostrará "consultar"
@@ -19,10 +19,19 @@ export default function Horario() {
   //horario?modo=eliminar → mostrará la lista en modo eliminar
   //http://localhost:5173/horario?modo=agregar
 
+  const [horarios, setHorarios] = useState([]);
+  
+    useEffect(() => {
+      fetch("http://localhost:3000/horarios")
+        .then((res) => res.json())
+        .then((data) => setHorarios(data))
+        .catch((err) => console.error("Error:", err));
+    }, []);
+
   const [params, setParams] = useSearchParams();
   const modo = params.get("modo") || "consultar";
   const id = parseInt(params.get("id"));                    // 👈 identificador del horario a editar (si existe)
-  const [horarios, setHorarios] = useState(horariosData);
+ // const [horarios, setHorarios] = useState(horariosData);
   const [datoInicial, setDatoInicial] = useState(null);     // horario seleccionado para editar
 
   // Detecto si hay un horario seleccionado para editar  

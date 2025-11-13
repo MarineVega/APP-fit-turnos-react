@@ -229,6 +229,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
         });
 */
         const horarioData = { 
+           //horario_id: datoInicial?.horario_id,            // para el modificar
             profesor_id: profesorID || null, 
             actividad_id: actividadID, 
             cupoMaximo, 
@@ -239,7 +240,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
         }
 
         try {
-            const url =
+            const url = 
             modo === "editar" && id
                 ? `http://localhost:3000/horarios/${id}`
                 : "http://localhost:3000/horarios";

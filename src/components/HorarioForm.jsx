@@ -44,9 +44,20 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                     fetch("http://localhost:3000/actividades").then(r => r.json()),
                     fetch("http://localhost:3000/horas").then(r => r.json()),
                 ]);
+
                 setProfesores((profRes || []).filter(p => p.activo));
-                setActividades((actRes || []).filter(a => a.activa));
+                
+                //setActividades((actRes || []).filter(a => a.activa));
+                const acts = (actRes || []).filter((a) => a.activa);
+                setActividades(acts);
+
                 setHoras((horaRes || []).filter(h => h.activa));
+
+                // si no hay actividad seleccionada, usar la primera activa por defecto
+                if (!actividadID && acts.length > 0) {
+                    setActividadID(acts[0].actividad_id);
+                }
+                
             } catch (error) {
                 console.error("Error cargando datos iniciales:", error);
             }

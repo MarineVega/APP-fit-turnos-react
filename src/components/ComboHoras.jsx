@@ -42,11 +42,14 @@ export default function ComboHoras({
       >        
         <option value="">Elegir un horario</option>
 
-        {opciones.map((h) => (
-          <option key={h.hora_id} value={h.hora_id}>
-            {`${h.horaInicio.slice(0, 5)} a ${h.horaFin.slice(0, 5)}`}        
-          </option>
-        ))}
+        {opciones
+          .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio))
+          .map((h) => (
+            <option key={h.hora_id} value={h.hora_id}>
+              {`${h.horaInicio.slice(0, 5)} a ${h.horaFin.slice(0, 5)}`}        
+            </option>
+          ))
+        }
       </select>
 
       {/* Muestro el mensaje de error, si existe */}

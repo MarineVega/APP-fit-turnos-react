@@ -57,8 +57,8 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                 if (!actividadID && acts.length > 0) {
                     const actividadesOrdenadas = [...acts]
                         .filter(a => a.activa)
-                        .sort((a, b) => a.nombre.localCompare(b.nombre));
-
+                        .sort((a, b) => a.nombre.localeCompare(b.nombre))
+                    
                     setActividadID(actividadesOrdenadas[0].actividad_id);
                 }
                 

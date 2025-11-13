@@ -137,7 +137,8 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
     const modoEfectivo = modo === "postAlta" ? "consultar" : modo;
     
     return (
-        <main className="mainHorario">
+        //<main className="mainHorario">
+        <>
             <section id="listadoHorarios">
                 <table id="tablaHorarios">
                     <thead>
@@ -219,6 +220,6 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
                 />
             )}
             
-        </main>
+        </>
     );
 }

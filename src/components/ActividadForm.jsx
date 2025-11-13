@@ -115,9 +115,9 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
 
 
             const response = await fetch(url, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(actividadData),
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(actividadData),
             });
 
             if (!response.ok) throw new Error("Error al guardar en la base de datos");

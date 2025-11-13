@@ -67,9 +67,8 @@ export default function Horario() {
 
   console.log(horarios)
 
-  return (
+  return (   
     <main className="mainHorario">
-
       {modo === "agregar" && (
         <>
           <TituloConFlecha destino="/administrar">Agregar Horario</TituloConFlecha>

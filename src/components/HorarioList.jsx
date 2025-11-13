@@ -93,7 +93,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
     };
 
     // ✅ Manejo de eliminación con validación    
-    const eliminarHorario = (horario) => {
+    const eliminarHorario = async (horario) => {
         console.log('horario.horario_id ', horario.horario_id )
 
         if (tieneReservasActivas(horario.horario_id )) {
@@ -106,7 +106,8 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
             return;
         }
             
-        swalEstilo.fire({
+       // swalEstilo.fire({
+        const result = await swalEstilo.fire({
             title: "¿Eliminar horario?",
             text: `Esta acción eliminará el horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} (${horario.profesor.nombre} ${horario.profesor.apellido}) permanentemente.`,            
             icon: "warning",
@@ -118,10 +119,25 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
             confirmButtonColor: '#d33',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Acá se agregan las instrucciones para eliminar el horario desde la base o el estado
-            
+        });  //.then((result) => {
+
+        if (result.isConfirmed) {
+            try {
+            // 🔥 Llamada al backend DELETE
+                const response = await fetch(`http://localhost:3000/horarios/${horario.horario_id}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error al eliminar el horario");
+                }
+
+                // Actualizo la tabla local sin recargar
+                setHorariosBD(prev =>
+                    prev.filter(h => h.horario_id !== horario.horario_id)
+                );
+
+        
                 swalEstilo.fire({
                     title: "Eliminado",
                     text: "El horario ha sido eliminado.",
@@ -129,8 +145,11 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
                     confirmButtonColor: "#6edc8c",
                     confirmButtonText: "Cerrar",
                 });
+            } catch (error) {
+                console.error(error);
+                    swalEstilo.fire("Error", "No se pudo eliminar el horario.", "error");
             }
-        });
+        }
     };
     
     // Si el modo es "postAlta", lo trato como "consultar"

@@ -129,41 +129,37 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
             confirmButtonColor: '#d33',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
-        }); //.then((result) => {
-            
-            // <-- correr esta parte (tabular)
-            if (result.isConfirmed) {
-                // Acá se agregan las instrucciones para eliminar la actividad desde la base o el estado
-            
-                try {
-                // 🔥 Llamada al backend DELETE
-                    const response = await fetch(`http://localhost:3000/actividades/${actividad.actividad_id}`, {
-                        method: 'DELETE',
-                    });
+        });
+     
+        if (result.isConfirmed) {
+            try {
+            // 🔥 Llamada al backend DELETE
+                const response = await fetch(`http://localhost:3000/actividades/${actividad.actividad_id}`, {
+                    method: 'DELETE',
+                });
 
-                    if (!response.ok) {
-                        throw new Error("Error al eliminar la actividad");
-                    }
-
-                    // Actualizo la tabla local sin recargar
-                    setActividadesBD(prev =>
-                        prev.filter(a => a.actividad_id !== actividad.actividad_id)
-                    );
-
-                    
-                    swalEstilo.fire({
-                        title: "Eliminada",
-                        text: "La actividad ha sido eliminada.",
-                        icon: "success",
-                        confirmButtonColor: "#6edc8c",
-                        confirmButtonText: "Cerrar",
-                    });
-                } catch (error) {
-                    console.error(error);
-                    swalEstilo.fire("Error", "No se pudo eliminar la actividad.", "error");
+                if (!response.ok) {
+                    throw new Error("Error al eliminar la actividad");
                 }
+
+                // Actualizo la tabla local sin recargar
+                setActividadesBD(prev =>
+                    prev.filter(a => a.actividad_id !== actividad.actividad_id)
+                );
+
+                
+                swalEstilo.fire({
+                    title: "Eliminada",
+                    text: "La actividad ha sido eliminada.",
+                    icon: "success",
+                    confirmButtonColor: "#6edc8c",
+                    confirmButtonText: "Cerrar",
+                });
+            } catch (error) {
+                console.error(error);
+                swalEstilo.fire("Error", "No se pudo eliminar la actividad.", "error");
             }
-        //});
+        }
     };
    
 

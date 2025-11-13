@@ -53,9 +53,13 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
 
                 setHoras((horaRes || []).filter(h => h.activa));
 
-                // si no hay actividad seleccionada, usar la primera activa por defecto
+                // si no hay actividad seleccionada, usar la primera activa por defecto (ordenada por nombre)
                 if (!actividadID && acts.length > 0) {
-                    setActividadID(acts[0].actividad_id);
+                    const actividadesOrdenadas = [...acts]
+                        .filter(a => a.activa)
+                        .sort((a, b) => a.nombre.localCompare(b.nombre));
+
+                    setActividadID(actividadesOrdenadas[0].actividad_id);
                 }
                 
             } catch (error) {

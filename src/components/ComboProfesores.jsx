@@ -56,6 +56,11 @@ export default function ComboProfesores({
         {/* 👇 Lista de profesores activos (desde BD) */}
         {opciones
           .filter((p) => p.activo)       // muestro solo activos
+          .sort((a, b) => {
+            const nombreA = `${a.nombre} ${a.apellido}`.toLowerCase();    // de esta manera ordeno por nombre y apellido
+            const nombreB = `${b.nombre} ${b.apellido}`.toLowerCase();
+            return nombreA.localeCompare(nombreB);
+          })
           .map((p) => (
             <option key={p.profesor_id} value={p.profesor_id}>
               {`${p.nombre}, ${p.apellido}`}

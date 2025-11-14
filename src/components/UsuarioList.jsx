@@ -22,7 +22,13 @@ export default function UsuarioList({ modo, onEditar }) {
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await fetch("http://localhost:3000/usuarios");
+        const headers = {};
+        try {
+          const token = localStorage.getItem("token");
+          if (token) headers["Authorization"] = `Bearer ${token}`;
+        } catch {}
+
+        const response = await fetch("http://localhost:3000/usuarios", { headers });
         if (!response.ok) throw new Error("Error al obtener los usuarios");
         const data = await response.json();
         setUsuarios(data);
@@ -73,9 +79,15 @@ export default function UsuarioList({ modo, onEditar }) {
 
     if (confirm.isConfirmed) {
       try {
+        const headers = {};
+        try {
+          const token = localStorage.getItem("token");
+          if (token) headers["Authorization"] = `Bearer ${token}`;
+        } catch {}
+
         const response = await fetch(
           `http://localhost:3000/usuarios/${usuario.usuario_id}`,
-          { method: "DELETE" }
+          { method: "DELETE", headers }
         );
 
         if (!response.ok) throw new Error("Error al eliminar el usuario");

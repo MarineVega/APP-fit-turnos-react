@@ -230,7 +230,7 @@ export default function ProfesorForm({ guardar, profesores = [], datoInicial = n
                     error={errores.titulo}
                 />
                 
-                <label className="advertencia">* Campos obligatorios</label>                
+                <p className="advertencia">* Campos obligatorios</p>                
             </form>
 
             <FormBotones                    

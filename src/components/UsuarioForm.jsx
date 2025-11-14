@@ -129,31 +129,61 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     setErrores(nuevosErrores);
     if (!esValido) return;
 
-    // Estructura compatible 
-    const usuarioFormateado = {
-      usuario_id: usuario_id || usuarios.length + 1,
-      usuario: usuario.usuario,
-      email: usuario.email,
-      password: usuario.contrasenia,
-      activo: usuario.activo,
-      persona: {
-        persona_id: usuario_id || usuarios.length + 1,
-        nombre: usuario.nombre,
-        apellido: usuario.apellido,
-        documento: "",
-        telefono: "",
-        domicilio: "",
-        fecha_nac: "",
-        tipoPersona_id: parseInt(usuario.tipoPersona_id),
-        activo: true,
-      },
-    };
+    // Preparar datos para el backend
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const token = localStorage.getItem("token");
 
-    try {
-      await registerUser(usuarioFormateado); // ✅ Llama al backend real
-    } catch (error) {
-      Swal.fire("Error", error.message || "No se pudo registrar el usuario", "error");
-      return; // 🔹 evita que siga si hubo error
+    // Si estamos en modo edición, llamamos PUT a /usuarios/:id
+    if (modo === "editar" && usuario_id) {
+      const body = {
+        usuario: usuario.usuario,
+        email: usuario.email,
+        password: usuario.contrasenia,
+        activo: usuario.activo,
+        persona: {
+          nombre: usuario.nombre,
+          apellido: usuario.apellido,
+          documento: "",
+          telefono: "",
+          domicilio: "",
+          fecha_nac: "",
+          tipoPersona_id: parseInt(usuario.tipoPersona_id),
+          activo: true,
+        },
+      };
+
+      try {
+        const res = await fetch(`${API_URL}/usuarios/${usuario_id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || "Error al actualizar usuario");
+        }
+      } catch (error) {
+        Swal.fire("Error", error.message || "No se pudo actualizar el usuario", "error");
+        return;
+      }
+    } else {
+      // Modo crear: usar registerUser con los campos que espera
+      try {
+        await registerUser({
+          nombre: usuario.nombre,
+          apellido: usuario.apellido,
+          email: usuario.email,
+          password: usuario.contrasenia,
+          tipoPersona_id: parseInt(usuario.tipoPersona_id),
+        });
+      } catch (error) {
+        Swal.fire("Error", error.message || "No se pudo registrar el usuario", "error");
+        return;
+      }
     }
 
     const mensaje =
@@ -276,8 +306,9 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
         />
 
         {/* 🔹 Selector de Tipo de Usuario */}
-        <label className="labelGeneral">Tipo de Usuario *</label>
+        <label className="labelGeneral" htmlFor="tipoPersona_id">Tipo de Usuario *</label>
         <select
+          id="tipoPersona_id"
           name="tipoPersona_id"
           value={usuario.tipoPersona_id}
           onChange={handleChange}
@@ -303,7 +334,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           Activo
         </label>
 
-        <label className="advertencia">* Campos obligatorios</label>
+        <p className="advertencia">* Campos obligatorios</p>
       </form>
      
       {/* ✅ Botones */}

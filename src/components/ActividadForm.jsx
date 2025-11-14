@@ -215,7 +215,7 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
                     warning={"Coloque la imagen en la carpeta <b>src/assets/img</b> antes de seleccionarla."}
                 />
                 
-                <label className="advertencia">* Campos obligatorios</label>                
+                <p className="advertencia">* Campos obligatorios</p>                
             </form>
 
             <FormBotones                    

@@ -30,7 +30,7 @@ const FormCampos = ({               // desestructuro las props
     return (
         <div>
             {/* <label>{label}</label> */}
-            <label htmlFor={inputId} name={name}>{label}</label>
+            <label htmlFor={inputId}>{label}</label>
 
             {isFile ? (
             <>
@@ -54,6 +54,7 @@ const FormCampos = ({               // desestructuro las props
                     onChange={onChange}
                     onFocus={onFocus}
                     name={name}
+                    id={inputId}
                 />
             ) : (
                 <input
@@ -64,12 +65,13 @@ const FormCampos = ({               // desestructuro las props
                     onChange={onChange}                    
                     onFocus={onFocus}
                     name={name}
+                    id={inputId}
                 />
             )}
             {error && <div className="mensaje-error">{error}</div>}
 
             {warning && (
-                <label className="advertencia" dangerouslySetInnerHTML={{ __html: warning }} />
+                <p className="advertencia" dangerouslySetInnerHTML={{ __html: warning }} />
             )}
 
         </div>

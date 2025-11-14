@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
+import { registerUser } from "../services/api";
 import "../styles/style.css";
 import exito from "../assets/img/exito.png";
 import TituloConFlecha from "./TituloConFlecha.jsx";
@@ -51,33 +52,15 @@ export default function RegistrarForm({ onSwitch }) {
 
     // 🧩 Estructura de usuario que espera el backend
     const nuevoUsuario = {
-      usuario: username,
+      nombre: username,
+      apellido: "",
       email,
       password,
-      activo: true,
-      persona: {
-        nombre: username,
-        apellido: "",
-        documento: "",
-        telefono: "",
-        domicilio: "",
-        fecha_nac: "",
-        tipoPersona_id: 3, // Cliente
-        activo: true,
-      },
+      tipoPersona_id: 3, // Cliente
     };
 
     try {
-      const response = await fetch("http://localhost:3000/usuarios", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevoUsuario),
-      });
-
-      if (!response.ok) {
-        const msg = await response.text();
-        throw new Error(msg || "Error al crear usuario");
-      }
+      await registerUser(nuevoUsuario);
 
       await swalEstilo.fire({
         title: "¡Cuenta creada con éxito!",
@@ -86,7 +69,7 @@ export default function RegistrarForm({ onSwitch }) {
         imageHeight: 100,
         imageAlt: "Éxito",
         icon: "success",
-        confirmButtonText: "Ir al inicio",
+        confirmButtonText: "Iniciar Sesión",
       });
 
       onSwitch("login");

@@ -152,6 +152,39 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
         }
     };
     
+    // Creo función de ordenamiento
+    const ordenarHorarios = (lista) => {
+        return [...lista].sort((a, b) => {
+
+            // 1️. Ordeno por Actividad
+            const actA = a.actividad.nombre.toLowerCase();
+            const actB = b.actividad.nombre.toLowerCase();
+            if (actA < actB) return -1;
+            if (actA > actB) return 1;
+
+            // 2. Ordeno por Profesor (nombre + apellido)
+            const profA = `${a.profesor.nombre} ${a.profesor.apellido}`.toLowerCase();
+            const profB = `${b.profesor.nombre} ${b.profesor.apellido}`.toLowerCase();
+            if (profA < profB) return -1;
+            if (profA > profB) return 1;
+
+            // 3️. Ordeno por Días (string)
+            const diaA = a.dias.toLowerCase();
+            const diaB = b.dias.toLowerCase();
+            if (diaA < diaB) return -1;
+            if (diaA > diaB) return 1;
+
+            // 4. Ordeno por horaInicio
+            const horaA = a.hora.horaInicio;
+            const horaB = b.hora.horaInicio;
+            if (horaA < horaB) return -1;
+            if (horaA > horaB) return 1;
+
+            return 0; // iguales
+        });
+    };
+
+
     // Si el modo es "postAlta", lo trato como "consultar"
     const modoEfectivo = modo === "postAlta" ? "consultar" : modo;
     
@@ -174,11 +207,11 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
 
                     <tbody>
                         {horariosBD.length > 0 ? (                           
-                            horariosBD.map((horario) => {                                
+                           ordenarHorarios(horariosBD).map((horario) => {                                
                                 return (
                                     <tr key={horario.horario_id}>
                                         <td>{horario.actividad.nombre}</td>
-                                        <td>{horario.profesor.nombre} {horario.profesor_apellido}</td>
+                                        <td>{horario.profesor.nombre} {horario.profesor.apellido}</td>
                                         <td id="cupo">{horario.cupoMaximo ?? ""}</td>
                                         <td>{formatearDias(horario.dias)}</td>
                                         <td>{horario.hora?.horaInicio?.slice(0, 5)} a {horario.hora?.horaFin?.slice(0, 5)}</td>

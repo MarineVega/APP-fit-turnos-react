@@ -179,6 +179,19 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
         }
     };
 
+    // Creo función de ordenamiento
+    const ordenarActividades = (lista) => {
+        return [...lista].sort((a, b) => {
+            // 1️. Ordeno por Actividad
+            const actA = a.nombre.toLowerCase();
+            const actB = b.nombre.toLowerCase();
+            if (actA < actB) return -1;
+            if (actA > actB) return 1;
+
+            return 0; // iguales
+        });
+    };
+
     // Si el modo es "postAlta", lo trato como "consultar"
     const modoEfectivo = modo === "postAlta" ? "consultar" : modo;
     
@@ -198,7 +211,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
 
                     <tbody>
                         {actividadesBD.length > 0 ? (                           
-                            actividadesBD.map((actividad) => {
+                            ordenarActividades(actividadesBD).map((actividad) => {
                                 const imagenSrc =
                                     actividad.imagen instanceof File
                                         ? URL.createObjectURL(actividad.imagen)

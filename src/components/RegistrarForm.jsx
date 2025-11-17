@@ -32,7 +32,7 @@ export default function RegistrarForm({ onSwitch }) {
     e.preventDefault();
     setError("");
 
-    // ✅ Validaciones básicas
+    //  Validaciones básicas
     if (!username || !email || !password || !password2)
       return setError("Completá todos los campos.");
 
@@ -50,7 +50,7 @@ export default function RegistrarForm({ onSwitch }) {
 
     setLoading(true);
 
-    // 🧩 Estructura de usuario que espera el backend
+    //  Estructura de usuario que espera el backend
     const nuevoUsuario = {
       nombre: username,
       apellido: "",

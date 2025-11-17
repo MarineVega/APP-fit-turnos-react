@@ -23,7 +23,7 @@ export default function RecuperarForm({ onSwitch }) {
     setLoading(true);
 
     try {
-      // 1️⃣ Buscar usuario en el backend
+      // 1 Buscar usuario en el backend
       const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
       const response = await fetch(`${API_URL}/usuarios`);
       
@@ -50,12 +50,12 @@ export default function RecuperarForm({ onSwitch }) {
         return;
       }
 
-      // 2️⃣ Generar y guardar código de recuperación
+      //  2 Generar y guardar código de recuperación
       const codigo = generarCodigo();
       localStorage.setItem("codigoRecuperacion", codigo);
       localStorage.setItem("emailRecuperacion", email);
 
-      // 3️⃣ Enviar código por email
+      // 3 Enviar código por email
       await emailjs.send(
         "service_vq2s3hg", // Tu ID de servicio
         "template_tth5c7f", // Tu ID de plantilla

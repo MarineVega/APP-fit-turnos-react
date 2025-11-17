@@ -14,7 +14,7 @@ function Navbar() {
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   // ============================
-  // 🔄 Cargar usuario logueado
+  //  Cargar usuario logueado
   // ============================
   useEffect(() => {
     const actualizarUsuario = async () => {
@@ -55,7 +55,7 @@ function Navbar() {
   }, []);
 
   // ============================
-  // 🚪 Cerrar sesión
+  //  Cerrar sesión
   // ============================
   const cerrarSesion = () => {
     Swal.fire({
@@ -83,7 +83,7 @@ function Navbar() {
   };
 
   // -----------------------------------
-  // 🧾 Rol visible
+  //  Rol visible
   // -----------------------------------
   const obtenerRol = () => {
     const tipo = usuarioActivo?.persona?.tipoPersona_id;
@@ -96,7 +96,7 @@ function Navbar() {
   const esAdmin = usuarioActivo?.persona?.tipoPersona_id === 1;
 
   // -----------------------------------
-  // 👤 Nombre visible (con prioridad)
+  //  Nombre visible (con prioridad)
   // -----------------------------------
   const nombreVisible =
     usuarioActivo?.persona?.nombre?.trim()
@@ -108,7 +108,7 @@ function Navbar() {
   const toggleMenu = () => setMenuAbierto((prev) => !prev);
 
   // ============================
-  // 📱 Menú Mobile
+  //  Menú Mobile
   // ============================
   const MobileMenu = () => (
     <div className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}>
@@ -152,7 +152,7 @@ function Navbar() {
   );
 
   // ============================
-  // 🧭 Render principal
+  //  Render principal
   // ============================
   return (
     <header className="header">

@@ -38,7 +38,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
 
   const [errores, setErrores] = useState({});
 
-  // ✅ Si está en modo edición, repetirContrasenia toma el valor de contrasenia
+  // Si está en modo edición, repetirContrasenia toma el valor de contrasenia
   useEffect(() => {
     if (modo === "editar" && usuario.contrasenia && !usuario.repetirContrasenia) {
       setUsuario((prev) => ({
@@ -68,7 +68,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     const nuevosErrores = {};
     let esValido = true;
 
-    // 🔹 Validaciones básicas
+    //  Validaciones básicas
     if (!usuario.nombre.trim()) {
       nuevosErrores.nombre = "El nombre es obligatorio.";
       esValido = false;
@@ -337,7 +337,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
         <p className="advertencia">* Campos obligatorios</p>
       </form>
      
-      {/* ✅ Botones */}
+      {/*  Botones */}
       <FormBotones
         
         boton1={{

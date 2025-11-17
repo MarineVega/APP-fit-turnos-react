@@ -62,7 +62,8 @@ export default function Profesor() {
           setProfesores((prev) => [...prev, data]);
         }
 
-        setParams({ modo: "postAlta" }); // redirige según flujo del front
+      setParams({ modo: "consultar" }); // redirige al listado actualizado
+
       })
       .catch((err) => console.error("Error al guardar profesor:", err));
   };

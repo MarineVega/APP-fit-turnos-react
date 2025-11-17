@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import FormBotones from "./FormBotones";
-
 import Swal from "sweetalert2";
-import reservasData from "../data/reservas.json";       // 👈 Importa las reservas
 
 
 // configuro estilos para sweetalert
@@ -39,11 +37,6 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
     // Declaro el estado reservas
     const [reservas, setReservas] = useState([]);
 
-    // Cargo las reservas (desde JSON por ahora)
-    useEffect(() => { 
-        setReservas(reservasData);
-    }, []);
-  
     // ✅ Verifico si el hoario tiene reservas activas
     const tieneReservasActivas = (horarioId) => {
         const resultado = reservas.some(

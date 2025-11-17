@@ -29,7 +29,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
     const id = datoInicial?.horario_id || null;
     //const horario_id = datoInicial?.horario_id || null;
 
-     // Estados para los combos
+    // Estados para los combos
     const [profesores, setProfesores] = useState([]);
     const [actividades, setActividades] = useState([]);
     const [horas, setHoras] = useState([]);
@@ -38,27 +38,24 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
     useEffect(() => {
         const fetchDatos = async () => {
             try {
-                const [profRes, actRes, horaRes] = await Promise.all([
-                    Promise.resolve([]), // OJO!!!!!! dejo vacío por ahora hasta tener el BE de profesores y horas
-                    //fetch("http://localhost:3000/profesores").then(r => r.json()),
+                const [profRes, actRes, horaRes] = await Promise.all([                  
+                    fetch("http://localhost:3000/profesores").then(r => r.json()),
                     fetch("http://localhost:3000/actividades").then(r => r.json()),
                     fetch("http://localhost:3000/horas").then(r => r.json()),
                 ]);
 
-                setProfesores((profRes || []).filter(p => p.activo));
-                
+                setProfesores((profRes || []).filter(p => p.persona?.activo));                
                 //setActividades((actRes || []).filter(a => a.activa));
                 const acts = (actRes || []).filter((a) => a.activa);
                 setActividades(acts);
 
                 setHoras((horaRes || []).filter(h => h.activa));
-
+                
                 // si no hay actividad seleccionada, usar la primera activa por defecto (ordenada por nombre)
                 if (!actividadID && acts.length > 0) {
                     const actividadesOrdenadas = [...acts]
                         .filter(a => a.activa)
                         .sort((a, b) => a.nombre.localeCompare(b.nombre))
-                    
                     setActividadID(actividadesOrdenadas[0].actividad_id);
                 }
                 

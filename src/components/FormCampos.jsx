@@ -15,6 +15,8 @@ const FormCampos = ({               // desestructuro las props
     preview = false,                // mostrar vista previa de imagen
     warning,                        // prop para advertencias
     id,
+    imagenActual,   // 👈 imagen actual que viene del form
+    previewUrl      // 👈 vista previa si el usuario cambió el archivo
 }) => {
     const inputId = id || name;
     const [filePreview, setFilePreview] = useState(null);
@@ -42,9 +44,39 @@ const FormCampos = ({               // desestructuro las props
                 onChange={handleFileChange}
                 onFocus={onFocus}
             />
+        {/*             
             {preview && filePreview && (
                 <img src={filePreview} alt="Vista previa" width="100" />
+            )} */}
+
+            {/* ✅ muestra la imagen correspondiente */}
+            {isFile && preview && (
+            <div className="previewImagen" style={{ marginTop: "8px" }}>
+                {previewUrl ? (
+                <img
+                    src={previewUrl}
+                    alt="Nueva imagen"
+                    width="120"
+                    style={{ borderRadius: "8px" }}
+                />
+                ) : imagenActual ? (
+                <img
+                    src={new URL(`../assets/img/${imagenActual}`, import.meta.url).href}
+                    alt="Imagen actual"
+                    width="120"
+                    style={{ borderRadius: "8px" }}
+                />
+                ) : filePreview ? (
+                <img
+                    src={filePreview}
+                    alt="Vista previa temporal"
+                    width="120"
+                    style={{ borderRadius: "8px" }}
+                />
+                ) : null}
+            </div>
             )}
+        
             </>
         ) : isTextArea ? (
                 <textarea

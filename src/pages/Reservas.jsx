@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import CarruselActividades from "../components/CarruselActividades";
-import CalendarioTurnos from "../components/CalendarioTurnos";
+import ReservasCarrusel from "../components/ReservasCarrusel";
+import ReservasCalendario from "../components/ReservasCalendario";
 import TituloConFlecha from "../components/TituloConFlecha";
 import actividadesData from "../data/actividades.json";
 
-export default function Turnos() {
+// antes Turnos ahora Reservas
+export default function Reservas() {
   const [actividadSeleccionada, setActividadSeleccionada] = useState(null);
 
   // Al cargar la página, selecciona la primera actividad activa
@@ -22,12 +23,12 @@ export default function Turnos() {
     <>
       {/* <div className="turnos-container"> */}
       <TituloConFlecha destino="/"> Reserva tu Turno </TituloConFlecha>
-        <CarruselActividades
+        <ReservasCarrusel
           seleccion={actividadSeleccionada}
           onSeleccion={(actividad) => setActividadSeleccionada(actividad)}
         />
 
-        <CalendarioTurnos actividadSeleccionada={actividadSeleccionada} />
+        <ReservasCalendario actividadSeleccionada={actividadSeleccionada} />
 
     </>
   );

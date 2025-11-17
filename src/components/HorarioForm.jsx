@@ -26,9 +26,49 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
     const [params] = useSearchParams();
     const modo = params.get("modo") || "agregar";       
 
-    //const id = datoInicial?.horario_id || null;
-    const horario_id = datoInicial?.horario_id || null;
+    const id = datoInicial?.horario_id || null;
+    //const horario_id = datoInicial?.horario_id || null;
 
+     // Estados para los combos
+    const [profesores, setProfesores] = useState([]);
+    const [actividades, setActividades] = useState([]);
+    const [horas, setHoras] = useState([]);
+
+    // Cargo los combos desde la base de datos
+    useEffect(() => {
+        const fetchDatos = async () => {
+            try {
+                const [profRes, actRes, horaRes] = await Promise.all([
+                    Promise.resolve([]), // OJO!!!!!! dejo vacío por ahora hasta tener el BE de profesores y horas
+                    //fetch("http://localhost:3000/profesores").then(r => r.json()),
+                    fetch("http://localhost:3000/actividades").then(r => r.json()),
+                    fetch("http://localhost:3000/horas").then(r => r.json()),
+                ]);
+
+                setProfesores((profRes || []).filter(p => p.activo));
+                
+                //setActividades((actRes || []).filter(a => a.activa));
+                const acts = (actRes || []).filter((a) => a.activa);
+                setActividades(acts);
+
+                setHoras((horaRes || []).filter(h => h.activa));
+
+                // si no hay actividad seleccionada, usar la primera activa por defecto (ordenada por nombre)
+                if (!actividadID && acts.length > 0) {
+                    const actividadesOrdenadas = [...acts]
+                        .filter(a => a.activa)
+                        .sort((a, b) => a.nombre.localeCompare(b.nombre))
+                    
+                    setActividadID(actividadesOrdenadas[0].actividad_id);
+                }
+                
+            } catch (error) {
+                console.error("Error cargando datos iniciales:", error);
+            }
+        };
+        fetchDatos();
+    }, []);
+    
     // Estados del formulario
     const [profesorID, setProfesorID] = useState("");
     const [actividadID, setActividadID] = useState("");
@@ -47,28 +87,60 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
 
     // Si estoy en modo editar, cargo los datos del horario
     useEffect(() => {        
+        
         if (modo === "editar" && datoInicial) {
+            
+            console.log("datoInicial completo: ", datoInicial)
+           // console.log("actividad?.actividad_id:", datoInicial.actividad?.actividad_id)
+            console.log("dias: ", datoInicial.dias)
+           
             setProfesorID(datoInicial.profesor_id || null);
-            setActividadID(datoInicial.actividad_id);
+            setActividadID(datoInicial.actividad?.actividad_id);
             setCupoMaximo(datoInicial.cupoMaximo || null);            
             setHoraID(datoInicial.hora_id);    
 
-            if (Array.isArray(datoInicial.dias_id)) {
-                setDiasSeleccionados(datoInicial.dias_id);
-            } else if (typeof datoInicial.dias_id === "string") {      // Si en la BD viene como string JSON, lo convierto a array; entonces, cuando se abre el formulario en modo editar, los checkboxes se marcan automáticamente ✅.        
+            // Detecto el formato de los días guardados en la BD
+            if (Array.isArray(datoInicial.dias)) {                
+                // Si ya viene como array
+                setDiasSeleccionados(datoInicial.dias);
+            }
+            else if (typeof datoInicial.dias === "string") {
             try {
-                setDiasSeleccionados(JSON.parse(datoInicial.dias_id));
-            } catch {
+                // caso 1: viene como JSON -> ["lunes","miércoles"]
+                if (datoInicial.dias.trim().startsWith("[")) {
+                setDiasSeleccionados(JSON.parse(datoInicial.dias));
+                } 
+                // caso 2: viene como texto separado por comas -> "lunes,martes,viernes"
+                else {
+                const diasArray = datoInicial.dias
+                    .split(",")
+                    .map((d) => d.trim().toLowerCase());
+                setDiasSeleccionados(diasArray);
+                }
+            } catch (error) {
+                console.warn("Error parseando días:", error);
                 setDiasSeleccionados([]);
             }
-            } else {
-                setDiasSeleccionados([]);
-            }            
+            } 
+            else {
+            setDiasSeleccionados([]);
+            }
         }
     }, [modo, datoInicial]);
 
+    useEffect(() => {
+        if (modo === "editar" && datoInicial) {
+            if (profesores.length > 0) setProfesorID(datoInicial.profesor_id || null);
+            if (actividades.length > 0) {
+                const idActividad = datoInicial.actividad?.actividad_id || datoInicial.actividad_id;
+                setActividadID(idActividad);
+            }
+            if (horas.length > 0) setHoraID(datoInicial.hora?.hora_id || datoInicial.hora_id);
+        }
+    }, [modo, datoInicial, profesores, actividades, horas]);
+
     // Validación y guardado
-    const validarGuardar = (e) => {
+    const validarGuardar = async (e) => {
         e.preventDefault();
 
         let nuevosErrores = { actividad: "", dias: "", hora: "" };
@@ -153,7 +225,15 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
         // Si hay errores SALGO
         if (!esValido) return;
 
+        console.log("Profesor: ", profesorID);
+        console.log("Actividad: ", actividadID);
+        console.log("Cupo: ", cupoMaximo);
+        console.log("Días : ", diasSeleccionados);
+        console.log("Días JSON: ", JSON.stringify(diasSeleccionados));
+        console.log("Hora: ", horaID);
+
         // Si pasa todas las validaciones, continua el guardado
+        /*
         guardar({ 
             profesor: profesorID || null, 
             actividad: actividadID, 
@@ -162,38 +242,68 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
             dias: JSON.stringify(diasSeleccionados),            // "dias": "[\"lunes\",\"miércoles\",\"viernes\"]", --> para recibirlo en SQL como texto "["lunes","miércoles","viernes"]".
             hora: horaID 
         });
+*/
+        const horarioData = { 
+           //horario_id: datoInicial?.horario_id,            // para el modificar
+            profesor_id: profesorID || null, 
+            actividad_id: actividadID, 
+            cupoMaximo, 
+            //dias: JSON.stringify(diasSeleccionados),            // "dias": "[\"lunes\",\"miércoles\",\"viernes\"]", --> para recibirlo en SQL como texto "["lunes","miercoles","viernes"]".
+            dias: diasSeleccionados.join(","),          // convierte ["lunes","jueves"] → "lunes,jueves"
+            hora_id: horaID ,
+            activo: true
+        }
 
-        console.log("Profesor: ", profesorID);
-        console.log("Actividad: ", actividadID);
-        console.log("Cupo: ", cupoMaximo);
-        console.log("Días : ", diasSeleccionados);
-        console.log("Hora: ", horaID);
+        try {
+            const url = 
+            modo === "editar" && id
+                ? `http://localhost:3000/horarios/${id}`
+                : "http://localhost:3000/horarios";
 
-        const mensaje = 
-            modo === "editar"
-                ? 'El horario ha sido actualizado.'
-                : 'El horario ha sido creado.';
+            const method = modo === "editar" ? "PUT" : "POST";
 
-        swalEstilo.fire({
-            title: '¡Operación Exitosa!',
-            text: mensaje ,
-            imageUrl: exitoImg ,
-            imageAlt: 'Éxito',
-            icon: 'success',
-            confirmButtonText: 'Volver',
-            customClass: {
-                confirmButton: 'btnAceptar' 
-            },
-            buttonsStyling: false
-        }).then(() => {
-            limpiarFormulario();
-            // Redirección según modo
-            if (modo === "editar") {
-                window.location.href = "/horario?modo=editar";
-            } else {
-                window.location.href = "/horario?modo=postAlta";      // para distinguirlo del consultar normal
-            }        
-        });        
+            console.log("Enviando a backend:", horarioData);
+            console.log("URL:", url);
+            console.log("Método:", method);
+
+            const response = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(horarioData),
+            });
+
+            if (!response.ok) throw new Error("Error al guardar en la base de datos");
+
+
+            const mensaje = 
+                modo === "editar"
+                    ? 'El horario ha sido actualizado.'
+                    : 'El horario ha sido creado.';
+
+            swalEstilo.fire({
+                title: '¡Operación Exitosa!',
+                text: mensaje ,
+                imageUrl: exitoImg ,
+                imageAlt: 'Éxito',
+                icon: 'success',
+                confirmButtonText: 'Volver',
+                customClass: {
+                    confirmButton: 'btnAceptar' 
+                },
+                buttonsStyling: false
+            }).then(() => {
+                limpiarFormulario();
+                // Redirección según modo
+                if (modo === "editar") {
+                    window.location.href = "/horario?modo=editar";
+                } else {
+                    window.location.href = "/horario?modo=postAlta";      // para distinguirlo del consultar normal
+                }        
+            });   
+        } catch (err) {
+            console.error(err);
+            swalEstilo.fire("Error", "No se pudo guardar el horario.", "error");
+        }     
     };
 
 
@@ -236,6 +346,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                         setProfesorID(e);
                         limpiarError("profesor");
                     }}
+                    opciones={profesores}
                     onFocus={() => limpiarError("profesor")}
                     className="inputHorario"
                     label="Profesor"
@@ -247,7 +358,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                         setActividadID(e);
                         limpiarError("actividad");
                     }}
-                    
+                    opciones={actividades} 
                     onFocus={() => limpiarError("actividad")}
                     incluirTodos={false}
                     className="inputHorario"
@@ -286,6 +397,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                         setHoraID(e);
                         limpiarError("hora");
                     }}
+                    opciones={horas}
                     onFocus={() => limpiarError("hora")}
                     incluirTodos={false}
                     className="inputHorario"

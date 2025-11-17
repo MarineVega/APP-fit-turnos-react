@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import profesoresData from "../data/profesores.json";       // 👈 Datos mock
+//import profesoresData from "../data/profesores.json";       // 👈 Datos mock
 
 export default function ComboProfesores({ 
     value, 
     onChange = () => {},
+    opciones = [],
     onFocus,
     incluirTodos = true,
     className="",
@@ -11,7 +12,7 @@ export default function ComboProfesores({
     error,
     }) {
   const [profesores, setProfesores] = useState([]);
-
+/*
   useEffect(() => {
     // simulo una carga asincrónica (como si viniera del backend)
     const cargarProfesores = async () => {
@@ -22,7 +23,7 @@ export default function ComboProfesores({
 
     cargarProfesores();
   }, []);
-
+*/
   return (
     <div className="campoFormulario">
       {/* <label htmlFor="profesor">Profesor *</label> */}
@@ -44,13 +45,29 @@ export default function ComboProfesores({
           <option value="">(Todos)</option>
         )}
 
-        {/* 👇 Lista de profesores activos */}
+        {/* 👇 Lista de profesores activos
         {/* <option value="">Profesor</option> */}
-        {profesores.map((p) => (
+        {/* {profesores.map((p) => (
           <option key={p.profesor_id} value={p.profesor_id}>
             {`${p.apellido}, ${p.nombre} (${p.titulo})`}
           </option>
-        ))}
+        ))} */}
+
+        {/* 👇 Lista de profesores activos (desde BD) */}
+        {opciones
+          .filter((p) => p.activo)       // muestro solo activos
+          .sort((a, b) => {
+            const nombreA = `${a.nombre} ${a.apellido}`.toLowerCase();    // de esta manera ordeno por nombre y apellido
+            const nombreB = `${b.nombre} ${b.apellido}`.toLowerCase();
+            return nombreA.localeCompare(nombreB);
+          })
+          .map((p) => (
+            <option key={p.profesor_id} value={p.profesor_id}>
+              {`${p.nombre}, ${p.apellido}`}
+            </option>
+          ))
+        }          
+
       </select>
       
       {/* 👇 Mostramos el mensaje de error, si existe */}

@@ -13,10 +13,35 @@ function Navbar() {
   const [usuarioActivo, setUsuarioActivo] = useState(null);
   const [menuAbierto, setMenuAbierto] = useState(false);
 
+  // ============================
+  //  Cargar usuario logueado
+  // ============================
   useEffect(() => {
-    const actualizarUsuario = () => {
-      const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-      setUsuarioActivo(usuario);
+    const actualizarUsuario = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        localStorage.removeItem("usuarioActivo");
+        setUsuarioActivo(null);
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:3000/auth/perfil", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) throw new Error("Token inválido o expirado");
+
+        const usuario = await res.json();
+        localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
+        setUsuarioActivo(usuario);
+
+      } catch {
+        localStorage.removeItem("token");
+        localStorage.removeItem("usuarioActivo");
+        setUsuarioActivo(null);
+      }
     };
 
     actualizarUsuario();
@@ -29,10 +54,10 @@ function Navbar() {
     };
   }, []);
 
-  const toggleMenu = () => setMenuAbierto((prev) => !prev);
-
-  const cerrarSesion = (e) => {
-    e?.preventDefault();
+  // ============================
+  //  Cerrar sesión
+  // ============================
+  const cerrarSesion = () => {
     Swal.fire({
       title: "¿Cerrar sesión?",
       text: "¿Querés salir de tu cuenta?",
@@ -48,6 +73,7 @@ function Navbar() {
     }).then((result) => {
       if (result.isConfirmed) {
         localStorage.removeItem("usuarioActivo");
+        localStorage.removeItem("token");
         setUsuarioActivo(null);
         setMenuAbierto(false);
         window.dispatchEvent(new Event("usuarioActualizado"));
@@ -56,7 +82,9 @@ function Navbar() {
     });
   };
 
-  // 🧭 Función auxiliar para identificar el rol
+  // -----------------------------------
+  //  Rol visible
+  // -----------------------------------
   const obtenerRol = () => {
     const tipo = usuarioActivo?.persona?.tipoPersona_id;
     if (tipo === 1) return "Administrador";
@@ -67,17 +95,33 @@ function Navbar() {
 
   const esAdmin = usuarioActivo?.persona?.tipoPersona_id === 1;
 
-  // ===== Menú móvil desplegable =====
+  // -----------------------------------
+  //  Nombre visible (con prioridad)
+  // -----------------------------------
+  const nombreVisible =
+    usuarioActivo?.persona?.nombre?.trim()
+      ? `${usuarioActivo.persona.nombre} ${usuarioActivo.persona.apellido}`
+      : usuarioActivo?.usuario?.trim()
+      ? usuarioActivo.usuario
+      : usuarioActivo?.email;
+
+  const toggleMenu = () => setMenuAbierto((prev) => !prev);
+
+  // ============================
+  //  Menú Mobile
+  // ============================
   const MobileMenu = () => (
     <div className={`menu-desplegable ${menuAbierto ? "mostrar" : ""}`}>
       {usuarioActivo ? (
         <>
           <span
             className="menu-link nombre"
-            onClick={() => navigate("/perfil")}
-            style={{ cursor: "pointer" }}>
-            {usuarioActivo.nombre || usuarioActivo.usuario}{" "}
-            {obtenerRol() && `(${obtenerRol()})`}
+            onClick={() => {
+              navigate("/perfil");
+              setMenuAbierto(false);
+            }}
+          >
+            {nombreVisible} {obtenerRol() && `(${obtenerRol()})`}
           </span>
 
           <Link to="/reservas" onClick={() => setMenuAbierto(false)}>
@@ -107,23 +151,25 @@ function Navbar() {
     </div>
   );
 
+  // ============================
+  //  Render principal
+  // ============================
   return (
     <header className="header">
       <div className="navbar">
-        {/* === IZQUIERDA === */}
+        {/* IZQUIERDA */}
         <div className="nav-left">
-          {/* Logo siempre visible */}
           <Link to="/" className="logo">
-            <img src={Logo_Fit_Home} alt="Logo Fit Turnos" loading="lazy" />
+            <img src={Logo_Fit_Home} alt="Logo" loading="lazy" />
           </Link>
 
-          {/* Links Turnos y Administrar solo en escritorio */}
           <div className="desktop-only">
             {usuarioActivo && (
               <>
                 <Link className="menu-link" to="/reservas">
                   Turnos
                 </Link>
+
                 {esAdmin && (
                   <Link className="menu-link" to="/administrar">
                     Administrar
@@ -133,46 +179,43 @@ function Navbar() {
             )}
           </div>
 
-          {/* Botón menú hamburguesa solo en mobile */}
+          {/* Botón hamburguesa mobile */}
           <button
             id="btnMenu"
             className="icon btnMenu mobile-only"
             onClick={toggleMenu}
-            aria-label="Abrir menú"
           >
-            <img src={menuIcon} alt="Menú" loading="lazy" />
+            <img src={menuIcon} alt="Menú" />
           </button>
         </div>
 
-        {/* === DERECHA === */}
+        {/* DERECHA */}
         <div className="nav-right">
-          {/* Nombre y cerrar sesión solo si logueado (escritorio) */}
           {usuarioActivo && (
             <div className="desktop-only user-info">
               <span
                 className="menu-link nombre"
                 onClick={() => navigate("/perfil")}
-                style={{ cursor: "pointer" }}>
-                {usuarioActivo.nombre || usuarioActivo.usuario}{" "}
-                {obtenerRol() && `(${obtenerRol()})`}
+              >
+                {nombreVisible} {obtenerRol() && `(${obtenerRol()})`}
               </span>
+
               <span className="menu-link logout" onClick={cerrarSesion}>
                 Cerrar sesión
               </span>
             </div>
           )}
 
-          {/* Íconos siempre visibles */}
-          <a href="#" className="icon" aria-label="Buscar">
-            <img src={buscar} alt="Buscar" loading="lazy" />
+          {/* Iconos */}
+          <a href="#" className="icon">
+            <img src={buscar} alt="Buscar" />
           </a>
-          <a href="#" className="icon" aria-label="Notificaciones">
-            <img src={notif} alt="Notificaciones" loading="lazy" />
+          <a href="#" className="icon">
+            <img src={notif} alt="Notificaciones" />
           </a>
         </div>
       </div>
 
-      {/* Menú móvil */}
       <MobileMenu />
     </header>
   );

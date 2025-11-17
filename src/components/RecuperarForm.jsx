@@ -4,7 +4,6 @@ import emailjs from "@emailjs/browser";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import TituloConFlecha from "./TituloConFlecha.jsx";
-import usuariosData from "../data/usuarios.json"; // 👈 respaldo local opcional
 import "../styles/style.css";
 
 export default function RecuperarForm({ onSwitch }) {
@@ -23,23 +22,40 @@ export default function RecuperarForm({ onSwitch }) {
 
     setLoading(true);
 
-    // 1️⃣ Buscar usuario en localStorage o JSON
-    const usuariosLS = JSON.parse(localStorage.getItem("usuarios")) || [];
-    const usuarios = usuariosLS.length > 0 ? usuariosLS : usuariosData.usuarios;
-    const usuarioExiste = usuarios.find((u) => u.email === email);
-
-    if (!usuarioExiste) {
-      setError("No existe una cuenta con ese correo.");
-      setLoading(false);
-      return;
-    }
-
-    // 2️⃣ Generar y guardar código de recuperación
-    const codigo = generarCodigo();
-    localStorage.setItem("codigoRecuperacion", codigo);
-    localStorage.setItem("emailRecuperacion", email);
-
     try {
+      // 1 Buscar usuario en el backend
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      const response = await fetch(`${API_URL}/usuarios`);
+      
+      if (!response.ok) {
+        throw new Error("No se pudo obtener usuarios del backend");
+      }
+
+      let usuarios = await response.json();
+
+      // El backend podría devolver un array directo o un objeto con propiedad 'usuarios'
+      if (!Array.isArray(usuarios)) {
+        if (usuarios && Array.isArray(usuarios.usuarios)) {
+          usuarios = usuarios.usuarios;
+        } else {
+          throw new Error("Formato de respuesta inesperado del backend");
+        }
+      }
+
+      const usuarioExiste = usuarios.find((u) => u.email === email);
+
+      if (!usuarioExiste) {
+        setError("No existe una cuenta con ese correo.");
+        setLoading(false);
+        return;
+      }
+
+      //  2 Generar y guardar código de recuperación
+      const codigo = generarCodigo();
+      localStorage.setItem("codigoRecuperacion", codigo);
+      localStorage.setItem("emailRecuperacion", email);
+
+      // 3 Enviar código por email
       await emailjs.send(
         "service_vq2s3hg", // Tu ID de servicio
         "template_tth5c7f", // Tu ID de plantilla
@@ -58,7 +74,7 @@ export default function RecuperarForm({ onSwitch }) {
       });
     } catch (err) {
       console.error("Error:", err);
-      setError("No se pudo enviar el correo. Intentalo más tarde.");
+      setError(err.message || "No se pudo procesar la recuperación. Intentalo más tarde.");
       setLoading(false);
     }
   };

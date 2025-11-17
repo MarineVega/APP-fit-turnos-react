@@ -7,8 +7,8 @@ import { useSearchParams } from "react-router-dom";
 
 // configuro estilos para sweetalert
 const swalEstilo = Swal.mixin({
-    imageWidth: 200,       // ancho en píxeles
-    imageHeight: 200,      // alto en píxeles 
+    imageWidth: 200,
+    imageHeight: 200,
     background: '#bababa',
     confirmButtonColor: '#6edc8c',
     customClass: {
@@ -17,19 +17,19 @@ const swalEstilo = Swal.mixin({
     }
 });
 
-export default function ProfesorForm({ guardar, profesores = [], datoInicial = null}) {  
+export default function ProfesorForm({ guardar, profesores = [], datoInicial = null }) {
     const [params] = useSearchParams();
     const modo = params.get("modo") || "agregar";
     
     const profesor_id = datoInicial?.profesor_id || null;
-    
-    // Estados del formulario
-    const [nombre, setNombre] = useState(datoInicial?.nombre || "");
-    const [apellido, setApellido] = useState(datoInicial?.apellido || "");
-    const [documento, setDocumento] = useState(datoInicial?.documento || "");
-    const [titulo, setTitulo] = useState(datoInicial?.titulo || "");
 
-    // Estados de errores
+    // Estados del formulario (🟢 acceso ajustado para el backend)
+    const [nombre, setNombre] = useState(datoInicial?.persona?.nombre || "");
+    const [apellido, setApellido] = useState(datoInicial?.persona?.apellido || "");
+    const [documento, setDocumento] = useState(datoInicial?.persona?.documento || "");
+    const [titulo, setTitulo] = useState(datoInicial?.titulo || "");
+    const [activo, setActivo] = useState(datoInicial?.persona?.activo ?? true); // Nuevo campo
+
     const [errores, setErrores] = useState({
         nombre: "",
         apellido: "",
@@ -38,28 +38,15 @@ export default function ProfesorForm({ guardar, profesores = [], datoInicial = n
     });
 
     // Si estoy en modo editar, cargo los datos del profesor
-    useEffect(() =>{
+    useEffect(() => {
         if (modo === "editar" && datoInicial) {
-            setNombre(datoInicial.nombre);
-            setApellido(datoInicial.apellido);
-            setDocumento(datoInicial.documento);
+            setNombre(datoInicial.persona?.nombre || "");
+            setApellido(datoInicial.persona?.apellido || "");
+            setDocumento(datoInicial.persona?.documento || "");
             setTitulo(datoInicial.titulo);
+            setActivo(datoInicial.persona?.activo ?? true);
         }
-    }, [modo, datoInicial]);      
-
-    // Valido el campo documento
-    const validarDocumento = (valor) => {
-        // Solo permite números, sin puntos, comas ni guiones
-        const soloNumeros = /^[0-9]+$/.test(valor);
-        if (!soloNumeros) return "El documento solo debe contener números (sin puntos ni guiones).";
-
-        // Debe tener 8 o 11 dígitos
-        if (!(valor.length === 8 || valor.length === 11)) {
-            return "El documento debe tener 8 dígitos (DNI) o 11 dígitos (CUIL/CUIT).";
-        }
-
-        return "";      // válido
-    };
+    }, [modo, datoInicial]);
 
     // Validación y guardado
     const validarGuardar = (e) => {
@@ -82,164 +69,94 @@ export default function ProfesorForm({ guardar, profesores = [], datoInicial = n
             nuevosErrores.documento = "Por favor ingrese el documento.";
             esValido = false;
         } else {
-            const errorDoc = validarDocumento(documento.trim());
-            if (errorDoc) {
-                nuevosErrores.documento = errorDoc;
+            const soloNumeros = /^[0-9]+$/.test(documento);
+            if (!soloNumeros) {
+                nuevosErrores.documento = "El documento solo debe contener números.";
                 esValido = false;
             }
         }
 
-        // Verifico si ya existe otro profesor con el mismo documento
-        const documentoDuplicado = profesores.some(
-            (prof) =>
-                prof.documento === documento.trim() &&
-                Number(prof.profesor_id) !== Number(profesor_id)
-        );
-
-        if (documentoDuplicado) {
-            nuevosErrores.documento = "Ya existe un profesor con ese documento.";
-            esValido = false;
-        }
-
-       
         if (!titulo.trim()) {
             nuevosErrores.titulo = "Por favor ingrese el título habilitante.";
             esValido = false;
         }
 
         setErrores(nuevosErrores);
-
-        // Si hay errores SALGO
         if (!esValido) return;
 
-        guardar({ nombre, apellido, documento, titulo });
+        // 🟢 Cambiado: incluye activo, título y datos de persona
+        guardar({ nombre, apellido, documento, titulo, activo });
 
-        console.log("Nombre: ", nombre);
-        console.log("Apellido: ", apellido);
-        console.log("Documento: ", documento);
-        console.log("Título: ", titulo);
-
-        const mensaje = 
+        const mensaje =
             modo === "editar"
                 ? 'El profesor ha sido actualizado.'
                 : 'El profesor ha sido creado.';
 
         swalEstilo.fire({
             title: '¡Operación Exitosa!',
-            text: mensaje ,
-            imageUrl: exitoImg ,
+            text: mensaje,
+            imageUrl: exitoImg,
             imageAlt: 'Éxito',
             icon: 'success',
             confirmButtonText: 'Volver',
-            customClass: {
-                confirmButton: 'btnAceptar' 
-            },
+            customClass: { confirmButton: 'btnAceptar' },
             buttonsStyling: false
         }).then(() => {
-            limpiarFormulario();
-            // Redirección según modo
             if (modo === "editar") {
                 window.location.href = "/profesor?modo=editar";
             } else {
-                window.location.href = "/profesor?modo=postAlta";      // para distinguirlo del consultar normal
-            }        
+                window.location.href = "/profesor?modo=postAlta";
+            }
         });
     };
 
-    function cancelar () {
-        limpiarFormulario();
-        if (modo === "agregar") {
-            window.location.href = "/administrar";
-         } else if (modo === "editar") {
-            window.location.href = "/profesor?modo=editar";
-        } else {
-            window.location.href = "/profesor?modo=consultar";
-        }        
-    }
-
-    // Limpio campos
-    function limpiarFormulario() {
-        setNombre("");
-        setApellido("");
-        setDocumento("");
-        setTitulo("");
-        setErrores({ nombre: "", apellido: "", documento: "", titulo: "" });
-    }
-
-    // Limpia el mensaje de error al hacer foco o modificar el campo
-    const limpiarError = (campo) => {
-        setErrores((prev) => ({ ...prev, [campo]: "" }));           // se actualiza así -> setErrores(prev => ({ ...prev, nombre: "" }));
-    };
-
-
     return (
-        <section className="seccionProfesor">        
+        <section className="seccionProfesor">
             <form onSubmit={validarGuardar} className="formProfesor">
                 <FormCampos
                     label="Nombre *"
-                    name="nombre"
-                    placeholder="Nombre"
                     value={nombre}
-                    onChange={(e) => {
-                        setNombre(e.target.value);
-                        limpiarError("nombre");
-                    }}
-                    onFocus={() => limpiarError("nombre")}
-                    className="inputProfesor"
+                    onChange={(e) => setNombre(e.target.value)}
                     error={errores.nombre}
                 />
-
                 <FormCampos
                     label="Apellido *"
-                    name="apellido"
-                    placeholder="Apellido"
                     value={apellido}
-                    onChange={(e) => {
-                        setApellido(e.target.value);
-                        limpiarError("apellido");
-                    }}
-                    onFocus={() => limpiarError("apellido")}
-                    className="inputProfesor"
+                    onChange={(e) => setApellido(e.target.value)}
                     error={errores.apellido}
                 />
                 <FormCampos
-                    label="DNI/CUIT/CUIL *"
-                    name="documento"
-                    placeholder="Ingrese solo números"
+                    label="Documento *"
                     value={documento}
-                    onChange={(e) => {
-                        setDocumento(e.target.value);
-                        limpiarError("documento");
-                    }}
-                    onFocus={() => limpiarError("documento")}
-                    className="inputProfesor"
+                    onChange={(e) => setDocumento(e.target.value)}
                     error={errores.documento}
                 />
-
                 <FormCampos
                     label="Título habilitante *"
-                    name="titulo"
-                    placeholder="Título"
                     value={titulo}
-                    onChange={(e) => {
-                        setTitulo(e.target.value);
-                        limpiarError("titulo");
-                    }}
-                    onFocus={() => limpiarError("titulo")}
-                    className="inputProfesor"
+                    onChange={(e) => setTitulo(e.target.value)}
                     error={errores.titulo}
                 />
-                
-                <label className="advertencia">* Campos obligatorios</label>                
+
+                {/* 🟢 Checkbox Activo */}
+                <div className="form-check">
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={activo}
+                            onChange={(e) => setActivo(e.target.checked)}
+                        />
+                        Activo
+                    </label>
+                </div>
+
+                <p className="advertencia">* Campos obligatorios</p>
             </form>
 
-            <FormBotones                    
-                boton1={{ id: "agregar", label: modo === "editar" ? "GUARDAR" : "AGREGAR", className: "btnAceptar", onClick: validarGuardar }}
-                boton2={{ id: "cancelar", label: "CANCELAR", className: "btnCancelar", onClick: cancelar }}
-                contenedorClass="contenedorBotones"
-            />                
+            <FormBotones
+                boton1={{ label: modo === "editar" ? "GUARDAR" : "AGREGAR", onClick: validarGuardar }}
+                boton2={{ label: "CANCELAR", onClick: () => window.location.href = "/profesor" }}
+            />
         </section>
     );
-
 }
-

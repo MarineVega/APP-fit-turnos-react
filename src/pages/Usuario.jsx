@@ -10,44 +10,22 @@ import UsuarioList from "../components/UsuarioList";
 import ImagenLateral from "../components/ImagenLateral";
 import TituloConFlecha from "../components/TituloConFlecha";
 
-import usuariosData from "../data/usuarios.json";
-
 export default function Usuario() {
   const [params, setParams] = useSearchParams();
   const modo = params.get("modo") || "consultar";
   const usuario_id = parseInt(params.get("id"));
-  const [usuarios, setUsuarios] = useState(
-    JSON.parse(localStorage.getItem("usuarios")) || usuariosData.usuarios
-  );
+  const [usuarios, setUsuarios] = useState([]);
   const [datoInicial, setDatoInicial] = useState(null);
 
-  // 🔹 Asegurar compatibilidad: si los usuarios antiguos no tienen estructura "persona"
+  // 🔹 Cargar usuarios desde el backend
   useEffect(() => {
-    const actualizados = usuarios.map((u) => {
-      if (!u.persona) {
-        return {
-          ...u,
-          persona: {
-            persona_id: u.usuario_id,
-            nombre: u.nombre || u.usuario || "",
-            apellido: "",
-            documento: "",
-            telefono: "",
-            domicilio: "",
-            fecha_nac: "",
-            tipoPersona_id: u.esAdmin ? 1 : 3, // 1=Admin, 3=Cliente (por compatibilidad)
-            activo: true,
-          },
-        };
-      }
-      return u;
-    });
-
-    if (JSON.stringify(actualizados) !== JSON.stringify(usuarios)) {
-      setUsuarios(actualizados);
-      localStorage.setItem("usuarios", JSON.stringify(actualizados));
-    }
-  }, []); // se ejecuta solo una vez al cargar
+    fetch("http://localhost:3000/usuarios")
+      .then((res) => res.json())
+      .then((data) => {
+        setUsuarios(data);
+      })
+      .catch((err) => console.error("Error al cargar usuarios:", err));
+  }, []);
 
   // 🔹 Detectar si hay usuario seleccionado para editar
   useEffect(() => {
@@ -59,33 +37,32 @@ export default function Usuario() {
     }
   }, [modo, usuario_id, usuarios]);
 
-  // 🔹 Guardar usuario nuevo o editado
-  const guardarUsuario = (usuario) => {
-    if (modo === "editar" && datoInicial) {
-      const actualizados = usuarios.map((u) =>
-        u.usuario_id === datoInicial.usuario_id ? { ...u, ...usuario } : u
-      );
-      setUsuarios(actualizados);
-      localStorage.setItem("usuarios", JSON.stringify(actualizados));
-    } else {
-      const nuevo = {
-        ...usuario,
-        usuario_id: usuarios.length + 1,
-        persona: usuario.persona || {
-          persona_id: usuarios.length + 1,
-          nombre: usuario.nombre || usuario.usuario || "",
-          apellido: "",
-          documento: "",
-          telefono: "",
-          domicilio: "",
-          fecha_nac: "",
-          tipoPersona_id: 3, // por defecto Cliente
-          activo: true,
-        },
-      };
-      const actualizados = [...usuarios, nuevo];
-      setUsuarios(actualizados);
-      localStorage.setItem("usuarios", JSON.stringify(actualizados));
+  // 🔹 Guardar usuario nuevo o editado (llamando al backend)
+  const guardarUsuario = async (usuario) => {
+    try {
+      if (modo === "editar" && datoInicial) {
+        // PUT: actualizar usuario existente
+        const res = await fetch(`http://localhost:3000/usuarios/${datoInicial.usuario_id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(usuario),
+        });
+        if (!res.ok) throw new Error("Error al actualizar usuario");
+      } else {
+        // POST: crear nuevo usuario
+        const res = await fetch("http://localhost:3000/usuarios", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(usuario),
+        });
+        if (!res.ok) throw new Error("Error al crear usuario");
+      }
+
+      // ✅ Volver a cargar la lista
+      const nuevos = await fetch("http://localhost:3000/usuarios").then((r) => r.json());
+      setUsuarios(nuevos);
+    } catch (error) {
+      console.error("Error guardando usuario:", error);
     }
   };
 
@@ -146,12 +123,13 @@ export default function Usuario() {
           <UsuarioList usuarios={usuarios} modo="consultar" />
         </>
       )}
+
       {modo === "postAlta" && (
         <>
-          <TituloConFlecha> Listado de Usuarios </TituloConFlecha>
-          <UsuarioList usuarios={usuarios} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
+          <TituloConFlecha>Listado de Usuarios</TituloConFlecha>
+          <UsuarioList usuarios={usuarios} modo="postAlta" />
         </>
-    )}
+      )}
     </main>
   );
 }

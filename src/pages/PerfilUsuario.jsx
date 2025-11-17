@@ -11,22 +11,21 @@ export default function PerfilUsuario() {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [editando, setEditando] = useState(false);
+
   const [actual, setActual] = useState("");
   const [nueva, setNueva] = useState("");
   const [confirmar, setConfirmar] = useState("");
 
-  // 🔹 Cargar usuario activo desde localStorage
   useEffect(() => {
     const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
-    if (usuarioActivo) {
-      setUsuario(usuarioActivo);
-    } else {
+    if (!usuarioActivo) {
       Swal.fire("Atención", "No hay usuario activo", "warning");
-      navigate("/login");
+      navigate("/cuenta");
+      return;
     }
+    setUsuario(usuarioActivo);
   }, [navigate]);
 
-  // 🧭 Función para obtener el rol a partir de tipoPersona_id
   const obtenerRol = () => {
     const tipo = usuario?.persona?.tipoPersona_id;
     if (tipo === 1) return "Administrador";
@@ -35,8 +34,7 @@ export default function PerfilUsuario() {
     return "Usuario";
   };
 
-  // 🔹 Cambiar contraseña
-  const handleCambiarPassword = (e) => {
+  const handleCambiarPassword = async (e) => {
     e.preventDefault();
 
     if (nueva !== confirmar) {
@@ -44,46 +42,54 @@ export default function PerfilUsuario() {
         title: "Las contraseñas no coinciden",
         imageUrl: error,
         imageHeight: 100,
-        imageAlt: "Error",
         icon: "error",
-        confirmButtonText: "Cerrar",
       });
       return;
     }
 
-    if (actual !== usuario.password) {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`${API_URL}/auth/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: actual,
+          newPassword: nueva,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Error al actualizar contraseña");
+      }
+
       Swal.fire({
-        title: "La contraseña actual no es correcta",
+        title: "Contraseña actualizada",
+        text: "Se cambió correctamente",
+        imageUrl: checkmark,
+        imageHeight: 100,
+        icon: "success",
+      });
+
+      setActual("");
+      setNueva("");
+      setConfirmar("");
+      setEditando(false);
+    } catch (err) {
+      Swal.fire({
+        title: "Error",
+        text: err.message,
         imageUrl: error,
         imageHeight: 100,
-        imageAlt: "Error",
         icon: "error",
-        confirmButtonText: "Cerrar",
       });
-      return;
     }
-
-    const usuarioActualizado = { ...usuario, password: nueva };
-    localStorage.setItem("usuarioActivo", JSON.stringify(usuarioActualizado));
-
-    // Actualizar también el listado general
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-    const actualizados = usuarios.map((u) =>
-      u.email === usuario.email ? usuarioActualizado : u
-    );
-    localStorage.setItem("usuarios", JSON.stringify(actualizados));
-
-    setUsuario(usuarioActualizado);
-    setEditando(false);
-
-    Swal.fire({
-      title: "La contraseña se cambió correctamente",
-      imageUrl: checkmark,
-      imageHeight: 100,
-      imageAlt: "Checkmark",
-      icon: "success",
-      confirmButtonText: "Cerrar",
-    });
   };
 
   if (!usuario) return null;
@@ -96,7 +102,7 @@ export default function PerfilUsuario() {
         <section className="perfilDatos">
           <p>
             <strong>Nombre:</strong>{" "}
-            <span>{usuario?.persona?.nombre || usuario.nombre || "-"}</span>
+            <span>{usuario?.persona?.nombre || "-"}</span>
           </p>
           <p>
             <strong>Email:</strong> <span>{usuario.email}</span>
@@ -106,7 +112,6 @@ export default function PerfilUsuario() {
           </p>
         </section>
 
-        {/* 🔹 línea separadora */}
         <hr className="lineaPerfil" />
 
         {!editando ? (
@@ -148,7 +153,6 @@ export default function PerfilUsuario() {
               />
             </label>
 
-            {/* ✅  FormBotones */}
             <FormBotones
               boton1={{
                 label: "Guardar",

@@ -405,7 +405,7 @@ export default function HorarioForm({ guardar, horarios = [], datoInicial = null
                     error={errores.hora}
                 />
 
-                <label className="advertencia">* Campos obligatorios</label>
+                <p className="advertencia">* Campos obligatorios</p>
             </form>
 
             <FormBotones                    

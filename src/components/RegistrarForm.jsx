@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
+import { registerUser } from "../services/api";
 import "../styles/style.css";
 import exito from "../assets/img/exito.png";
 import TituloConFlecha from "./TituloConFlecha.jsx";
@@ -31,7 +32,7 @@ export default function RegistrarForm({ onSwitch }) {
     e.preventDefault();
     setError("");
 
-    // Validaciones básicas
+    //  Validaciones básicas
     if (!username || !email || !password || !password2)
       return setError("Completá todos los campos.");
 
@@ -47,44 +48,20 @@ export default function RegistrarForm({ onSwitch }) {
     if (password !== password2)
       return setError("Las contraseñas no coinciden.");
 
-    // Recuperar usuarios existentes
-    const usuariosGuardados = JSON.parse(localStorage.getItem("usuarios")) || [];
-    const existe = usuariosGuardados.some(
-      (u) => u.email === email || u.usuario === username
-    );
+    setLoading(true);
 
-    if (existe)
-      return setError(
-        "Ya existe una cuenta registrada con ese email o nombre de usuario."
-      );
-
-    // 🧩 Crear nuevo usuario coherente con el modelo (tipoPersona_id)
+    //  Estructura de usuario que espera el backend
     const nuevoUsuario = {
-      usuario_id: usuariosGuardados.length + 1,
-      usuario: username,
+      nombre: username,
+      apellido: "",
       email,
       password,
-      activo: true,
-
-      // Estructura similar a la de base de datos:
-      persona: {
-        persona_id: usuariosGuardados.length + 1,
-        nombre: username,
-        apellido: "",
-        documento: "",
-        telefono: "",
-        domicilio: "",
-        fecha_nac: "",
-        tipoPersona_id: 3, // 3 = Cliente
-        activo: true,
-      },
+      tipoPersona_id: 3, // Cliente
     };
 
-    usuariosGuardados.push(nuevoUsuario);
-    localStorage.setItem("usuarios", JSON.stringify(usuariosGuardados));
-
-    setLoading(true);
     try {
+      await registerUser(nuevoUsuario);
+
       await swalEstilo.fire({
         title: "¡Cuenta creada con éxito!",
         text: "Bienvenid@ a Fit Turnos. Ya podés iniciar sesión.",
@@ -92,12 +69,13 @@ export default function RegistrarForm({ onSwitch }) {
         imageHeight: 100,
         imageAlt: "Éxito",
         icon: "success",
-        confirmButtonText: "Ir al inicio",
+        confirmButtonText: "Iniciar Sesión",
       });
+
       onSwitch("login");
     } catch (err) {
-      setError("Error al registrar el usuario");
       console.error(err);
+      setError("Error al registrar el usuario. " + err.message);
     } finally {
       setLoading(false);
     }

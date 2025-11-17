@@ -6,10 +6,12 @@ import interactionPlugin from "@fullcalendar/interaction";
 import Swal from "sweetalert2";
 
 //import actividadesData from "../data/actividades.json";
+/*
 import profesoresData from "../data/profesores.json";
 import horasData from "../data/horas.json";
 import horariosData from "../data/horarios.json";
 import reservasData from "../data/reservas.json";
+*/
 
 import imgPensando from "../assets/img/pensando.png";
 import error from "../assets/img/error.png";
@@ -67,14 +69,63 @@ function normalizeHora(h) {
   if (typeof h === "number") return `${String(h).padStart(2, "0")}:00`; // si viene "8.00" o "8.0" o "8" => convertir a "08:00"
   return null;
 }
-
-export default function CalendarioTurnos({ actividadSeleccionada }) {
+// antes CalendarioTurnos ahora ReservasCalendario
+export default function ReservasCalendario ({ actividadSeleccionada }) {
   const [eventos, setEventos] = useState([]);
-  const [reservas, setReservas] = useState(reservasData);
+  //const [reservas, setReservas] = useState(reservasData);
+
+  // creo estados para cada colección
+  const [profesoresData, setProfesoresData] = useState([]);
+  const [horasData, setHorasData] = useState([]);
+  const [horariosData, setHorariosData] = useState([]);
+  const [reservas, setReservas] = useState([]);
+  const [actividadesData, setActividadesData] = useState([]);
+
 
   // Levanto usuario activo
   //const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
   const usuario = { usuario_id: 2, nombre: "Mariné" };
+
+  // INICIO Nuevo 
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [profesoresRes, horasRes, horariosRes, reservasRes, actividadesRes] =
+          await Promise.all([
+            fetch("http://localhost:3000/profesores"),
+            fetch("http://localhost:3000/horas"),
+            fetch("http://localhost:3000/horarios"),
+            fetch("http://localhost:3000/reservas"),
+            fetch("http://localhost:3000/actividades"),
+          ]);
+
+        const profesoresJson = await profesoresRes.json();
+        const horasJson = await horasRes.json();
+        const horariosJson = await horariosRes.json();
+        const reservasJson = await reservasRes.json();
+        const actividadesJson = await actividadesRes.json();
+
+        setProfesoresData(profesoresJson);
+        setHorasData(horasJson);
+        setHorariosData(horariosJson);
+        setReservas(reservasJson);
+        setActividadesData(actividadesJson);
+
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+// FIN NUEVO 
+
+
+
+
+
 
   // Generar eventos según actividad
   useEffect(() => {
@@ -83,6 +134,12 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
       setEventos([]);
       return;
     }
+
+    if (
+      horariosData.length === 0 ||
+      profesoresData.length === 0 ||
+      horasData.length === 0
+    ) return;
 
     const eventosGenerados = [];
     const hoy = new Date();
@@ -95,11 +152,6 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
     const finRango = new Date(hoy);
     finRango.setMonth(hoy.getMonth() + 2);
     finRango.setDate(30);
-
-    /*
-    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-    const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
-    */
 
     // Recorro horarios y genero eventos solamente para la actividad seleccionada
     horariosData.forEach((horario) => {
@@ -126,10 +178,16 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
 
       dias.forEach((dia) => {
         for (
+          let d = new Date(inicioRango.getTime()); 
+          d <= finRango; 
+          d.setDate(d.getDate() + 1)
+        ) {
+          /*
+        for (
           let d = new Date(inicioRango);
           d <= finRango;
           d.setDate(d.getDate() + 1)
-        ) {
+        ) {*/
           const nombreDia = Object.keys(diasSemana).find(
             (key) => diasSemana[key] === d.getDay()
           );
@@ -204,7 +262,7 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
           
          // console.log(horaInicio)
          // console.log(eventoPasado)
-        
+        /*
           eventosGenerados.push({
             // ... (resto de las propiedades del evento)
             extendedProps: {
@@ -215,11 +273,12 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
               eventoPasado,       // propiedad para el bloqueo en el click
               reservas,           // borrarlo es para control
             },
-          });
+            
+          }); */
 
 
           //const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}/${horario.cupoMaximo}`;
-          const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}`;
+          const titulo = `Cupo: ${cuposDisponibles}  \n${profesor ? profesor.nombre + " " + profesor.apellido : ""}`;
 
           // asigno colores según el estado de las reservas
           // const colorEvento = yaReservado
@@ -263,7 +322,13 @@ export default function CalendarioTurnos({ actividadSeleccionada }) {
     });
 
     setEventos(eventosGenerados);
-  }, [actividadSeleccionada, reservas]);
+  }, [
+    actividadSeleccionada, 
+    reservas,
+    horariosData,
+    horasData,
+    profesoresData
+  ]);
 
   // Manejador de clics
   const manejarClick = (info) => {

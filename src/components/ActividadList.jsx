@@ -182,7 +182,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
     // Creo función de ordenamiento
     const ordenarActividades = (lista) => {
         return [...lista].sort((a, b) => {
-            // 1️. Ordeno por Actividad
+            // 1️. Ordeno por nombre
             const actA = a.nombre.toLowerCase();
             const actB = b.nombre.toLowerCase();
             if (actA < actB) return -1;

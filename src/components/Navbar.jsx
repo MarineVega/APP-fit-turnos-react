@@ -80,7 +80,7 @@ function Navbar() {
             {obtenerRol() && `(${obtenerRol()})`}
           </span>
 
-          <Link to="/turnos" onClick={() => setMenuAbierto(false)}>
+          <Link to="/reservas" onClick={() => setMenuAbierto(false)}>
             Turnos
           </Link>
 
@@ -121,7 +121,7 @@ function Navbar() {
           <div className="desktop-only">
             {usuarioActivo && (
               <>
-                <Link className="menu-link" to="/turnos">
+                <Link className="menu-link" to="/reservas">
                   Turnos
                 </Link>
                 {esAdmin && (

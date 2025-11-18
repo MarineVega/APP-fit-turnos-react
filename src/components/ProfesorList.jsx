@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import FormBotones from "./FormBotones";
 import Swal from "sweetalert2";
-import reservasData from "../data/reservas.json"; // 👈 Importa las reservas
-import horariosData from "../data/horarios.json";
+//import reservasData from "../data/reservas.json"; // 👈 Importa las reservas
+//import horariosData from "../data/horarios.json";
 import { API_BASE_URL } from "../utils/apiConfig";
 
 // configuro estilos para sweetalert

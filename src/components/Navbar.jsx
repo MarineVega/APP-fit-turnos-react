@@ -125,7 +125,7 @@ function Navbar() {
           </span>
 
           <Link to="/reservas" onClick={() => setMenuAbierto(false)}>
-            Turnos
+            Reservas
           </Link>
 
           {esAdmin && (
@@ -167,7 +167,7 @@ function Navbar() {
             {usuarioActivo && (
               <>
                 <Link className="menu-link" to="/reservas">
-                  Turnos
+                  Reservas
                 </Link>
 
                 {esAdmin && (

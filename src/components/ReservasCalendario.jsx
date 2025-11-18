@@ -5,14 +5,6 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Swal from "sweetalert2";
 
-//import actividadesData from "../data/actividades.json";
-/*
-import profesoresData from "../data/profesores.json";
-import horasData from "../data/horas.json";
-import horariosData from "../data/horarios.json";
-import reservasData from "../data/reservas.json";
-*/
-
 import imgPensando from "../assets/img/pensando.png";
 import error from "../assets/img/error.png";
 import chica_ok from "../assets/img/chica_ok.png";
@@ -62,13 +54,30 @@ function parseDias(diasCampo) {
 }
 
 // Convierte horas a formato HH:mm
-function normalizeHora(h) {
-  // acepta formatos distintos: "08:00", "8.00", numbers 8 or "8" o objetos con horaInicio/hora_inicio
+function normalizeHora(h) {  
+  // acepta formatos distintos: "08:00", "8.00", numbers 8 o "8", "08:00:00" o "8:00:00"
   if (!h) return null;
-  if (typeof h === "string" && /^\d{1,2}:\d{2}$/.test(h)) return h; // si viene "08:00" lo devolvemos tal cual
-  if (typeof h === "number") return `${String(h).padStart(2, "0")}:00`; // si viene "8.00" o "8.0" o "8" => convertir a "08:00"
+
+  /*
+  if (typeof h === "string") {
+    if (/^\d{1,2}:\d{2}:\d{2}$/.test(h)) {
+      return h.slice(0, 5);
+    }
+  }
+  */
+
+  // si viene con segundos, "08:00:00" -> "08:00" 
+  if (typeof h === "string" && /^\d{1,2}:\d{2}:\d{2}$/.test(h)) return h.slice(0, 5);
+
+  // si viene "08:00" lo devolvemos tal cual
+  if (typeof h === "string" && /^\d{1,2}:\d{2}$/.test(h)) return h; 
+  
+  // si viene "8.00" o "8.0" o "8" => convertir a "08:00"
+  if (typeof h === "number") return `${String(h).padStart(2, "0")}:00`; 
+  
   return null;
 }
+
 // antes CalendarioTurnos ahora ReservasCalendario
 export default function ReservasCalendario ({ actividadSeleccionada }) {
   const [eventos, setEventos] = useState([]);
@@ -83,11 +92,11 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
 
   // Levanto usuario activo
-  //const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-  const usuario = { usuario_id: 2, nombre: "Mariné" };
+  const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));  
 
-  // INICIO Nuevo 
+  console.log('usuario activo', usuario)
 
+  // INICIO Nuevo
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -118,11 +127,20 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
     };
 
     fetchData();
+
+
   }, []);
 
 // FIN NUEVO 
 
+  // DEPURACIÓN: revisar que los horarios se cargaron correctamente
+  useEffect(() => {
+    console.log("Horarios cargados:", horariosData);
+  }, [horariosData]);
 
+
+//console.log('Actividades ', actividadesJson)
+//console.log('Horarios ', horariosJson)
 
 
 
@@ -155,25 +173,61 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
     // Recorro horarios y genero eventos solamente para la actividad seleccionada
     horariosData.forEach((horario) => {
+      /*
+      console.log("Procesando horario:", horario);
+      console.log("Comparando actividad:", horario.actividad.actividad_id, 
+        "vs", actividadSeleccionada.actividad_id);
+
+      console.log("Horas disponibles:", horasData);
+      console.log("Hora del horario:", horario.hora);
+*/
+      
+
+
+
       if (
-        Number(horario.actividad_id) !==
+        Number(horario.actividad.actividad_id) !==
         Number(actividadSeleccionada.actividad_id)
-      )
+      ) {
+//        console.log("Horario descartado por actividad:", horario.actividad.actividad_id);
         return;
-      if (!horario.activo) return;
+      }
+
+      if (!horario.activo) {
+  //      console.log("Horario descartado por estar inactivo");
+        return;
+      }
+
+          console.log("Procesando horario:", horario);
+      console.log("Comparando actividad:", horario.actividad.actividad_id, 
+        "vs", actividadSeleccionada.actividad_id);
+
+      console.log("Horas disponibles:", horasData);
+      console.log("Hora del horario:", horario.hora);
+
+      console.log('horasData' ,horasData)
 
       const horaObj =
-        horasData.find((h) => Number(h.hora_id) === Number(horario.hora_id)) ||
+        horasData.find((h) => Number(h.hora_id) === Number(horario.hora.hora_id)) ||
         {};
-      const horaInicio = normalizeHora(
-        horaObj.horaInicio || horaObj.hora_inicio
-      );
+
+      console.log('horaObj' ,horaObj)
+
+
+      const horaInicio = normalizeHora(horaObj.horaInicio || horaObj.hora_inicio);
       const horaFin = normalizeHora(horaObj.horaFin || horaObj.hora_fin);
+      
+      console.log('horaInicio ', horaInicio)
+      console.log('horaFin ', horaFin)
+
       if (!horaInicio || !horaFin) return;
 
       const profesor = profesoresData.find(
-        (p) => Number(p.profesor_id) === Number(horario.profesor_id)
+        (p) => 
+          horario.profesor &&                     // verificamos que horario.profesor exista ya que profesor puede ser null
+          Number(p.profesor_id) === Number(horario.profesor.profesor_id)
       );
+
       const dias = parseDias(horario.dias_id || horario.dias);
 
       dias.forEach((dia) => {
@@ -278,7 +332,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
 
           //const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}/${horario.cupoMaximo}`;
-          const titulo = `Cupo: ${cuposDisponibles}  \n${profesor ? profesor.nombre + " " + profesor.apellido : ""}`;
+          const titulo = `Cupo: ${cuposDisponibles}  \n${profesor ? profesor.persona.nombre + " " + profesor.persona.apellido : ""}`;
 
           // asigno colores según el estado de las reservas
           // const colorEvento = yaReservado

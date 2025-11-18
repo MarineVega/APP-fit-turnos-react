@@ -17,11 +17,12 @@ export default function ComboProfesores({
         <select
           id="profesor"
           name="profesor"
-          value={value ?? ""} // si value es null/undefined mostramos ""
+          //value={value ?? ""}         // si value es null/undefined mostramos ""
+          value={value != null ? Number(value) : ""}         // si value es null/undefined mostramos ""
           onChange={(e) => {
             const val = e.target.value;
             // convierto "" a null para que el padre reciba null si selecciona "(Todos)"
-            onChange(val === "" ? null : val);
+            onChange(val === "" ? null : Number(val));
           }}
           onFocus={onFocus}       
           className={className}
@@ -37,16 +38,12 @@ export default function ComboProfesores({
             .sort((a, b) => {
               const nombreA = `${a.persona?.nombre ?? ""} ${a.persona?.apellido ?? ""}`.toLowerCase();
               const nombreB = `${b.persona?.nombre ?? ""} ${b.persona?.apellido ?? ""}`.toLowerCase();
-              /*
-              const nombreA = `${a.persona.nombre} ${a.persona.apellido}`.toLowerCase();    // de esta manera ordeno por nombre y apellido
-              const nombreB = `${b.persona.nombre} ${b.persona.apellido}`.toLowerCase();
-              */
+              
               return nombreA.localeCompare(nombreB);
             })
             .map((p) => (
               <option key={p.profesor_id} value={p.profesor_id}>
                 {`${p.persona?.nombre ?? ""} ${p.persona?.apellido ?? ""}`}
-                {/* {`${p.persona.nombre}, ${p.persona.apellido}`} */}
               </option>
             ))
           }          

@@ -86,11 +86,14 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
     // ✅ Manejo de modificación con validación   
     const editarHorario = (horario) => {
         
+        const nombreProfesor = horario.profesor?.persona?.nombre || "";
+        const apellidoProfesor = horario.profesor?.persona?.apellido || "";
+
         if (tieneReservasActivas(horario.horario_id)) {
             swalEstilo.fire({
                 icon: "warning",
                 title: "No se puede modificar",
-                text: `El horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} (${horario.profesor.persona.nombre} ${horario.profesor.persona.apellido}), tiene reservas activas.`,
+                text: `El horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} ${nombreProfesor} ${apellidoProfesor}, tiene reservas activas.`,
                 confirmButtonText: "Cerrar",
             });
         
@@ -104,11 +107,14 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
     const eliminarHorario = async (horario) => {
         console.log('horario.horario_id ', horario.horario_id )
 
+        const nombreProfesor = horario.profesor?.persona?.nombre || "";
+        const apellidoProfesor = horario.profesor?.persona?.apellido || "";
+
         if (tieneReservasActivas(horario.horario_id )) {
             swalEstilo.fire({
                 icon: "warning",
                 title: "No se puede eliminar",
-                text: `El horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} (${horario.profesor.persona.nombre} ${horario.profesor.persona.apellido}), tiene reservas activas.`,
+                text: `El horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} ${nombreProfesor} ${apellidoProfesor}, tiene reservas activas.`,
                 confirmButtonText: "Cerrar",
             });
             return;
@@ -117,7 +123,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
        // swalEstilo.fire({
         const result = await swalEstilo.fire({
             title: "¿Eliminar horario?",
-            text: `Esta acción eliminará el horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} (${horario.profesor.nombre} ${horario.profesor.apellido}) permanentemente.`,            
+            text: `Esta acción eliminará el horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} ${nombreProfesor} ${apellidoProfesor} permanentemente.`,            
             icon: "warning",
             showCancelButton: true,
             cancelButtonColor: '#6edc8c',                        

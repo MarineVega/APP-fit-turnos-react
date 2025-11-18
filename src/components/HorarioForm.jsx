@@ -91,7 +91,7 @@ export default function HorarioForm({
       console.log("dias: ", datoInicial.dias);
 
       setProfesorID(
-        datoInicial.profesor.profesor_id != null
+        datoInicial.profesor != null
           ? Number(datoInicial.profesor.profesor_id)
           : null
       );
@@ -302,7 +302,7 @@ export default function HorarioForm({
     const horarioData = {
       profesor_id: profesorID !== "" ? Number(profesorID) : null,
       actividad_id: Number(actividadID),
-      cupoMaximo,
+      cupoMaximo: Number(cupoMaximo),
       dias: diasSeleccionados.join(","), // convierte ["lunes","jueves"] → "lunes,jueves"
       hora_id: Number(horaID),
       activo: true,

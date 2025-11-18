@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import FormBotones from "./FormBotones";
 import Swal from "sweetalert2";
-//import reservasData from "../data/reservas.json"; // 👈 Importa las reservas
-//import horariosData from "../data/horarios.json";
 import { API_BASE_URL } from "../utils/apiConfig";
 
 // configuro estilos para sweetalert
@@ -21,10 +19,19 @@ export default function ProfesorList({ profesores = [], modo, onEditar, setProfe
   const [reservas, setReservas] = useState([]);
   const [horarios, setHorarios] = useState([]);
 
-  // Cargo datos dummy de reservas y horarios (simulación)
-  useEffect(() => {
-    setReservas(reservasData);
-    setHorarios(horariosData);
+   // Cargar reservas y horarios desde la base de datos
+   useEffect(() => {
+    // Cargar reservas
+    fetch(`${API_BASE_URL}/reservas`)
+      .then((res) => res.json())
+      .then((data) => setReservas(data))
+      .catch((err) => console.error("Error al cargar reservas:", err));
+
+    // Cargar horarios
+    fetch(`${API_BASE_URL}/horarios`)
+      .then((res) => res.json())
+      .then((data) => setHorarios(data))
+      .catch((err) => console.error("Error al cargar horarios:", err));
   }, []);
 
   const tieneReservasActivas = (profesorId) => {

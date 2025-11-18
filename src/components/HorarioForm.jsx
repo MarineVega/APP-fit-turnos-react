@@ -302,7 +302,8 @@ export default function HorarioForm({
     const horarioData = {
       profesor_id: profesorID !== "" ? Number(profesorID) : null,
       actividad_id: Number(actividadID),
-      cupoMaximo: Number(cupoMaximo),
+      //cupoMaximo: Number(cupoMaximo),
+      cupoMaximo: cupoMaximo === null || cupoMaximo === "" ? null : Number(cupoMaximo), // si tiene null, que mande null, sino mandaba 0
       dias: diasSeleccionados.join(","), // convierte ["lunes","jueves"] → "lunes,jueves"
       hora_id: Number(horaID),
       activo: true,

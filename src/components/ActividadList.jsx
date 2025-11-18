@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import FormBotones from "./FormBotones";
 import Swal from "sweetalert2";
 
-import reservasData from "../data/reservas.json";       // 👈 Importa las reservas
+//import reservasData from "../data/reservas.json";       // 👈 Importa las reservas
 
 
 // configuro estilos para sweetalert

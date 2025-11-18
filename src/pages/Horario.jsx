@@ -10,8 +10,6 @@ import TituloConFlecha from "../components/TituloConFlecha";
 import imgIzquierda from "../assets/img/horario1.png";
 import imgDerecha from "../assets/img/horario2.png";
 
-//import horariosData from "../data/horarios.json";         // 👈 importo el JSON local (provisorio hasta que levante los datos
-
 export default function Horario() {
   //horario → se mostrará "consultar"
   //horario?modo=agregar → mostrará el formulario para agregar
@@ -64,8 +62,6 @@ export default function Horario() {
     setDatoInicial(horario);
     setParams({ modo: "editar", id: horario.id }); 
   };
-
-  console.log(horarios)
 
   return (   
     <main className="mainHorario">

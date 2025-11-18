@@ -15,8 +15,8 @@ const FormCampos = ({               // desestructuro las props
     preview = false,                // mostrar vista previa de imagen
     warning,                        // prop para advertencias
     id,
-    imagenActual,   // 👈 imagen actual que viene del form
-    previewUrl      // 👈 vista previa si el usuario cambió el archivo
+    imagenActual,                   // 👈 imagen actual que viene del form
+    previewUrl                      // 👈 vista previa si el usuario cambió el archivo
 }) => {
     const inputId = id || name;
     const [filePreview, setFilePreview] = useState(null);

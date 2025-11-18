@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-//import profesoresData from "../data/profesores.json";       // 👈 Datos mock
 
 export default function ComboProfesores({ 
     value, 
@@ -11,68 +10,49 @@ export default function ComboProfesores({
     label,
     error,
     }) {
-  const [profesores, setProfesores] = useState([]);
-/*
-  useEffect(() => {
-    // simulo una carga asincrónica (como si viniera del backend)
-    const cargarProfesores = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300));             // pequeño delay
-      const activos = profesoresData.filter((p) => p.activo);
-      setProfesores(activos);
-    };
 
-    cargarProfesores();
-  }, []);
-*/
-  return (
-    <div className="campoFormulario">
-      {/* <label htmlFor="profesor">Profesor *</label> */}
-      <label htmlFor="profesor"> {label} </label>
-      <select
-        id="profesor"
-        name="profesor"
-        value={value ?? ""} // si value es null/undefined mostramos ""
-        onChange={(e) => {
-          const val = e.target.value;
-          // convierto "" a null para que el padre reciba null si selecciona "(Todos)"
-          onChange(val === "" ? null : val);
-        }}
-        onFocus={onFocus}       
-        className={className}
-      >
-        {/* 👇 Opción por defecto */}
-        {incluirTodos && (
-          <option value="">(Todos)</option>
-        )}
+    return (
+      <div className="campoFormulario">
+        <label htmlFor="profesor"> {label} </label>
+        <select
+          id="profesor"
+          name="profesor"
+          //value={value ?? ""}         // si value es null/undefined mostramos ""
+          value={value != null ? Number(value) : ""}         // si value es null/undefined mostramos ""
+          onChange={(e) => {
+            const val = e.target.value;
+            // convierto "" a null para que el padre reciba null si selecciona "(Todos)"
+            onChange(val === "" ? null : Number(val));
+          }}
+          onFocus={onFocus}       
+          className={className}
+        >
+          {/* 👇 Opción por defecto */}
+          {incluirTodos && (
+            <option value="">(Todos)</option>
+          )}
 
-        {/* 👇 Lista de profesores activos
-        {/* <option value="">Profesor</option> */}
-        {/* {profesores.map((p) => (
-          <option key={p.profesor_id} value={p.profesor_id}>
-            {`${p.apellido}, ${p.nombre} (${p.titulo})`}
-          </option>
-        ))} */}
+          {/* 👇 Lista de profesores activos (desde BD) */}
+          {opciones
+            .filter((p) => p.persona?.activo)       // muestro solo activos
+            .sort((a, b) => {
+              const nombreA = `${a.persona?.nombre ?? ""} ${a.persona?.apellido ?? ""}`.toLowerCase();
+              const nombreB = `${b.persona?.nombre ?? ""} ${b.persona?.apellido ?? ""}`.toLowerCase();
+              
+              return nombreA.localeCompare(nombreB);
+            })
+            .map((p) => (
+              <option key={p.profesor_id} value={p.profesor_id}>
+                {`${p.persona?.nombre ?? ""} ${p.persona?.apellido ?? ""}`}
+              </option>
+            ))
+          }          
 
-        {/* 👇 Lista de profesores activos (desde BD) */}
-        {opciones
-          .filter((p) => p.activo)       // muestro solo activos
-          .sort((a, b) => {
-            const nombreA = `${a.nombre} ${a.apellido}`.toLowerCase();    // de esta manera ordeno por nombre y apellido
-            const nombreB = `${b.nombre} ${b.apellido}`.toLowerCase();
-            return nombreA.localeCompare(nombreB);
-          })
-          .map((p) => (
-            <option key={p.profesor_id} value={p.profesor_id}>
-              {`${p.nombre}, ${p.apellido}`}
-            </option>
-          ))
-        }          
+        </select>
+        
+        {/* 👇 Mostramos el mensaje de error, si existe */}
+        {error && <div className="mensaje-error">{error}</div>}
 
-      </select>
-      
-      {/* 👇 Mostramos el mensaje de error, si existe */}
-      {error && <div className="mensaje-error">{error}</div>}
-
-    </div>
-  );
+      </div>
+    );
 }

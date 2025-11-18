@@ -5,14 +5,6 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Swal from "sweetalert2";
 
-//import actividadesData from "../data/actividades.json";
-/*
-import profesoresData from "../data/profesores.json";
-import horasData from "../data/horas.json";
-import horariosData from "../data/horarios.json";
-import reservasData from "../data/reservas.json";
-*/
-
 import imgPensando from "../assets/img/pensando.png";
 import error from "../assets/img/error.png";
 import chica_ok from "../assets/img/chica_ok.png";
@@ -62,18 +54,26 @@ function parseDias(diasCampo) {
 }
 
 // Convierte horas a formato HH:mm
-function normalizeHora(h) {
-  // acepta formatos distintos: "08:00", "8.00", numbers 8 or "8" o objetos con horaInicio/hora_inicio
+function normalizeHora(h) {  
+  // acepta formatos distintos: "08:00", "8.00", numbers 8 o "8", "08:00:00" o "8:00:00"
   if (!h) return null;
-  if (typeof h === "string" && /^\d{1,2}:\d{2}$/.test(h)) return h; // si viene "08:00" lo devolvemos tal cual
-  if (typeof h === "number") return `${String(h).padStart(2, "0")}:00`; // si viene "8.00" o "8.0" o "8" => convertir a "08:00"
+
+  // si viene con segundos, "08:00:00" -> "08:00" 
+  if (typeof h === "string" && /^\d{1,2}:\d{2}:\d{2}$/.test(h)) return h.slice(0, 5);
+
+  // si viene "08:00" lo devolvemos tal cual
+  if (typeof h === "string" && /^\d{1,2}:\d{2}$/.test(h)) return h; 
+  
+  // si viene "8.00" o "8.0" o "8" => convertir a "08:00"
+  if (typeof h === "number") return `${String(h).padStart(2, "0")}:00`; 
+  
   return null;
 }
+
 // antes CalendarioTurnos ahora ReservasCalendario
 export default function ReservasCalendario ({ actividadSeleccionada }) {
   const [eventos, setEventos] = useState([]);
-  //const [reservas, setReservas] = useState(reservasData);
-
+  
   // creo estados para cada colección
   const [profesoresData, setProfesoresData] = useState([]);
   const [horasData, setHorasData] = useState([]);
@@ -81,12 +81,8 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
   const [reservas, setReservas] = useState([]);
   const [actividadesData, setActividadesData] = useState([]);
 
-
   // Levanto usuario activo
-  //const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-  const usuario = { usuario_id: 2, nombre: "Mariné" };
-
-  // INICIO Nuevo 
+  const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -118,14 +114,15 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
     };
 
     fetchData();
+
   }, []);
 
-// FIN NUEVO 
-
-
-
-
-
+/*
+  // DEPURACIÓN: revisar que los horarios se cargaron correctamente
+  useEffect(() => {
+    console.log("Horarios cargados:", horariosData);
+  }, [horariosData]);
+*/
 
   // Generar eventos según actividad
   useEffect(() => {
@@ -155,25 +152,35 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
     // Recorro horarios y genero eventos solamente para la actividad seleccionada
     horariosData.forEach((horario) => {
-      if (
-        Number(horario.actividad_id) !==
-        Number(actividadSeleccionada.actividad_id)
-      )
-        return;
-      if (!horario.activo) return;
+     
+      // Descarto horario por actividad -> actividad seleccionada es <> a la actividad del horario
+      if (Number(horario.actividad.actividad_id) !== Number(actividadSeleccionada.actividad_id)) return;
 
+      // Descarto horario por estar desactivado
+      if (!horario.activo) return;
+/*
+      console.log("Procesando horario:", horario);
+      console.log("Comparando actividad:", horario.actividad.actividad_id, 
+        "vs", actividadSeleccionada.actividad_id);
+      console.log("Horas disponibles:", horasData);
+      console.log("Hora del horario:", horario.hora);
+      console.log('horasData' ,horasData)
+*/
       const horaObj =
-        horasData.find((h) => Number(h.hora_id) === Number(horario.hora_id)) ||
+        horasData.find((h) => Number(h.hora_id) === Number(horario.hora.hora_id)) ||
         {};
-      const horaInicio = normalizeHora(
-        horaObj.horaInicio || horaObj.hora_inicio
-      );
+
+      const horaInicio = normalizeHora(horaObj.horaInicio || horaObj.hora_inicio);
       const horaFin = normalizeHora(horaObj.horaFin || horaObj.hora_fin);
+      
       if (!horaInicio || !horaFin) return;
 
       const profesor = profesoresData.find(
-        (p) => Number(p.profesor_id) === Number(horario.profesor_id)
+        (p) => 
+          horario.profesor &&                     // verificamos que horario.profesor exista ya que profesor puede ser null
+          Number(p.profesor_id) === Number(horario.profesor.profesor_id)
       );
+
       const dias = parseDias(horario.dias_id || horario.dias);
 
       dias.forEach((dia) => {
@@ -182,12 +189,6 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           d <= finRango; 
           d.setDate(d.getDate() + 1)
         ) {
-          /*
-        for (
-          let d = new Date(inicioRango);
-          d <= finRango;
-          d.setDate(d.getDate() + 1)
-        ) {*/
           const nombreDia = Object.keys(diasSemana).find(
             (key) => diasSemana[key] === d.getDay()
           );
@@ -205,50 +206,33 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           const start = `${fechaISO}T${horaInicio}`;
           const horaFinEvento = `${fechaISO}T${horaFin}`; 
 
+        //  console.log("Reservas cargadas desde backend:", reservas);
+
+
           const reservasHorario = reservas.filter(
             (r) =>
-              Number(r.horario_id) === Number(horario.horario_id) && 
+              Number(r.horario_id ?? r.horario?.horario_id) === Number(horario.horario_id) &&
               r.fecha.substring(0, 10) === fechaISO &&
               r.activo
           );
 
-          const cuposDisponibles = Math.max(
-            horario.cupoMaximo - reservasHorario.length,
-            0
-          );
-/*
-          const yaReservado = reservas.some(
-            (r) =>
-              r.usuario_id === usuario.usuario_id &&
-              Number(r.horario_id) === Number(horario.horario_id) &&
-              r.fecha === fechaISO &&
-              r.activo
-          );
-*/
+          // Cupo base: si el horario tiene cupoMaximo, usar ese. Si NO tiene, usar el cupo de la actividad.
+          const cupoBase = 
+            horario.cupoMaximo != null
+              ? Number(horario.cupoMaximo)
+              : Number(horario.actividad.cupoMaximo);
+
+          // Aseguro un número válido
+          const cuposDisponibles = Math.max(cupoBase - reservasHorario.length, 0);
 
           const yaReservado = reservas.some((r) => {
             // Definimos la fecha de la reserva extrayendo los primeros 10 caracteres (YYYY-MM-DD)
             const fechaReservaNorm = r.fecha.substring(0, 10);
-          /*
-            if (r.usuario_id === usuario.usuario_id && Number(r.horario_id) === Number(horario.horario_id) && fechaISO === "2025-10-31") {
-              console.log(`--- DEBUG RESERVA EXISTENTE --- Usuario ${usuario.usuario_id}`);
-              console.log(`Evento (fechaISO): ${fechaISO}`);
-              //console.log(`Reserva (r.fecha): ${r.fecha}`);
-              console.log(`Reserva (r.fecha): ${fechaReservaNorm}`);
-              //console.log(`Reserva (r.fecha str): ${r.fecha.toString().split("T")[0]}`);
-              console.log(`Horario ID: ${r.horario_id}`);
-              //console.log(`¿Coinciden fechas?: ${r.fecha.toString().split("T")[0] === fechaISO}`);
-              console.log(`¿Coinciden fechas?: ${fechaReservaNorm === fechaISO}`);
-
-              console.log(`¿Reserva Activa?: ${r.activo}`);
-              console.log("Tipo de r.activo:", typeof r.activo);
-              console.log("-------------------------------");
-            }                        
-            */
-
+          
             return (
-              r.usuario_id === usuario.usuario_id &&
-              Number(r.horario_id) === Number(horario.horario_id) &&
+              //r.usuario_id === usuario.usuario_id &&
+              Number(r.cliente_id ?? r.cliente?.cliente_id) === Number(usuario.usuario_id) &&
+              Number(r.horario_id ?? r.horario?.horario_id) === Number(horario.horario_id) &&
               fechaReservaNorm === fechaISO &&
               r.activo
             );
@@ -259,26 +243,8 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           const fechaYHoraEvento = new Date(horaFinEvento);   // uso la hora de fin para considerar que el evento terminó
           
           const eventoPasado = fechaYHoraEvento <= ahora;     // TRUE si el evento ya pasó
-          
-         // console.log(horaInicio)
-         // console.log(eventoPasado)
-        /*
-          eventosGenerados.push({
-            // ... (resto de las propiedades del evento)
-            extendedProps: {
-              // ... (otras extendedProps existentes)
-              yaReservado,
-              horaInicio,
-              horaFin,
-              eventoPasado,       // propiedad para el bloqueo en el click
-              reservas,           // borrarlo es para control
-            },
-            
-          }); */
-
-
-          //const titulo = `${profesor ? profesor.nombre + " " + profesor.apellido : ""} \nCupo: ${cuposDisponibles}/${horario.cupoMaximo}`;
-          const titulo = `Cupo: ${cuposDisponibles}  \n${profesor ? profesor.nombre + " " + profesor.apellido : ""}`;
+                    
+          const titulo = `Cupo: ${cuposDisponibles}  \n${profesor ? profesor.persona.nombre + " " + profesor.persona.apellido : ""}`;
 
           // asigno colores según el estado de las reservas
           // const colorEvento = yaReservado
@@ -308,12 +274,16 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
               fecha: fechaISO,
               cuposDisponibles,
               profesor: profesor
-                ? `${profesor.nombre} ${profesor.apellido}`
+                ? `${profesor.persona.nombre} ${profesor.persona.apellido}`
                 : "Sin profesor",
               yaReservado,
               horaInicio,
               horaFin,
               eventoPasado,
+              actividad_id: Number(horario.actividad.actividad_id),
+              profesor_id: profesor
+                ? Number(`${profesor.profesor_id}`)
+                : null,
               reservas,           // borrarlo es para control
             },
           });
@@ -335,7 +305,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
     const evento = info.event.extendedProps;
     
     console.log(info.event.extendedProps)
-    console.log(evento)
+    console.log('evento 1',evento)
     
     // bloqueo si si el evento ya pasó
     if (evento.eventoPasado) {
@@ -352,6 +322,8 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
       return;
     }
 
+    //console.log("evento", evento)
+
     const {
       horario_id,
       fecha,
@@ -359,7 +331,8 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
       cuposDisponibles,
       horaInicio,
       profesor,
-      //reserva_id,         //borrar es solo para control
+      profesor_id,
+      actividad_id ,
     } = evento;
 
     if (yaReservado) {
@@ -382,26 +355,98 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
             cancelButton: "btnAceptar",
           },
         })
-        .then((result) => {
-          if (result.isConfirmed) {
-            setReservas((prev) =>
-              prev.map((r) =>
-                r.usuario_id === usuario.usuario_id &&
-                r.horario_id === horario_id &&
-                r.fecha.substring(0, 10) === fecha &&                
-                r.activo
-                  ? { ...r, activo: false }
-                  : r                  
-              )
+        .then(async (result) => {
+          if (result.isConfirmed) {           
+            /*
+            // ---- DEBUG: inspeccionar objetos clave ----
+            console.log(">>> DEBUG cancelar - evento.extendedProps:", info.event.extendedProps);
+            console.log(">>> DEBUG reservas array (len):", reservas.length);
+            console.log(">>> DEBUG reservas (primeros 10):", reservas.slice(0, 10));
+            console.log(">>> DEBUG horario_id buscado:", horario_id);
+            console.log(">>> DEBUG fecha buscada:", fecha);
+            console.log(">>> DEBUG usuario:", usuario);
+            
+            // Opcional: mostrar cada reserva resumida
+            console.table(
+              reservas.map(r => ({
+                reserva_id: r.reserva_id,
+                horario_id: r.horario_id ?? r.horario?.horario_id,
+                cliente_id: r.cliente_id ?? r.cliente?.cliente_id ?? r.usuario_id ?? r.usuario?.usuario_id,
+                fecha: r.fecha,
+                activo: r.activo
+              }))
             );
-            swalEstilo.fire({
-              title: "Reserva cancelada",
-              icon: "success",
-              confirmButtonColor: "#6edc8c",
-              customClass: {
-                confirmButton: "btnAceptar",
-              },
-            });
+            */
+
+            // Busco la reserva a eliminar
+            const reserva = reservas.find(
+              (r) =>
+                // r.usuario_id === usuario.usuario_id &&
+                // r.cliente.cliente_id === usuario.usuario_id &&
+                Number(
+                  r.cliente_id ??
+                  r.cliente?.cliente_id ??
+                  r.usuario_id ??
+                  r.usuario?.usuario_id
+                ) === Number(usuario.usuario_id) &&                
+                Number(r.horario_id ?? r.horario?.horario_id) === Number(horario_id) &&
+                r.fecha.substring(0, 10) === fecha &&
+                r.activo
+            );
+
+            if (!reserva) {
+              return swalEstilo.fire({
+                title: "Error",
+                text: "No se encontró la reserva.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "Cerrar",
+                customClass: {
+                  confirmButton: "",   
+                }
+              });
+            }
+
+            try {
+              const url = `http://localhost:3000/reservas/${reserva.reserva_id}`;
+              
+              console.log("URL:", url);
+
+
+              const response = await fetch(url, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" }
+              });
+
+              if (!response.ok) {
+                throw new Error("Error al eliminar la reserva en el backend");
+              }
+
+              // Actualizar estado en el frontend
+              setReservas((prev) => prev.filter(r => r.reserva_id !== reserva.reserva_id));
+
+              swalEstilo.fire({
+                title: "Reserva cancelada",
+                icon: "success",
+                confirmButtonColor: "#6edc8c",
+                customClass: {
+                  confirmButton: "btnAceptar",
+                },
+              });
+
+            } catch (error) {
+              console.error(error);
+              swalEstilo.fire({
+                 title: "Error",
+                text: "No se pudo cancelar la reserva.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "Cerrar",
+                customClass: {
+                  confirmButton: "",   
+                }
+              });
+            }            
           }
         });
       return;
@@ -430,8 +475,6 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
       showCancelButton: true,
       confirmButtonText: "Sí, reservar",
       cancelButtonText: "Cancelar",
-      // confirmButtonColor: "#6edc8c",
-
       // cambio dinámicamente el color del texto del botón Cancelar; tengo que agregar el bloque didRender dentro del swalEstilo... porque es una función que se ejecuta cuando se muestra el alerta, y el mixin solo define una configuración base.
       didRender: () => {
         const cancelButton = Swal.getCancelButton();
@@ -447,7 +490,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
         }
       },
     })
-    .then((result) => {
+    .then(async (result) => {
       // Verifico si el usuario ya tiene una reserva en ese horario
       const conflicto = reservas.find(
         (r) =>
@@ -455,15 +498,6 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           r.fecha.substring(0, 10) === fecha &&
           r.activo &&
           r.horaInicio === horaInicio
-          //r.horario_id !== horario_id // que no sea el mismo horario
-        /*
-          eventos.some(
-            (e) =>
-              e.extendedProps.horaInicio === horaInicio &&
-              e.extendedProps.fecha === r.fecha
-              )
-              /*/
-              
       );
 
       console.log(fecha)
@@ -472,9 +506,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
         
       if (result.isConfirmed) {
         if (conflicto) {
-
-          swalEstilo.fire({
-            // icon: 'error',
+          swalEstilo.fire({            
             title: "Conflicto de horario",
             imageUrl: error,
             html: `
@@ -483,27 +515,62 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
             confirmButtonColor: "#d33",
             confirmButtonText: "Cerrar",
             customClass: {
-              confirmButton: "", // elimino la clase
+              confirmButton: "",      // elimino la clase
             },
           });
           return;
         }
       
         const nuevaReserva = {
-          reserva_id: reservas.length + 1,
+          actividad_id,          
+          profesor_id,
+          cliente_id: usuario.usuario_id,
           horario_id,
-          usuario_id: usuario.usuario_id,
-          activo: true,
-          horaInicio: horaInicio,
           fecha,
+          activo: true,
         };
-        setReservas((prev) => [...prev, nuevaReserva]);
-        swalEstilo.fire({
-          title: "¡Reserva confirmada!",
-          text: "",
-          icon: "success",
-          imageUrl: chica_ok,
-        });
+
+        try {
+          const url = `http://localhost:3000/reservas`
+    
+          console.log("Enviando a backend:", nuevaReserva);
+          console.log("URL:", url);
+        
+    
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(nuevaReserva),
+          });
+    
+          if (!response.ok) throw new Error("Error al guardar en la base de datos");
+    
+          const data = await response.json();   // recupero reserva_id real
+
+          // guardo la reserva EXACTA que viene del backend
+          setReservas((prev) => [...prev, data]);
+          
+          //setReservas((prev) => [...prev, nuevaReserva]);
+          swalEstilo.fire({
+            title: "¡Reserva confirmada!",
+            text: "",
+            icon: "success",
+            imageUrl: chica_ok,
+          });
+
+        } catch (err) {
+          console.error("Error al reservar", err);
+          swalEstilo.fire({            
+            title: "Error",
+            html: `No se pudo generar la reserva.`,
+            icon: "error",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "Cerrar",
+            customClass: {
+              confirmButton: "",      // elimino la clase
+            },
+          });
+        }
       }
     });
   };
@@ -525,7 +592,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="timeGridWeek"
-            //  initialDate={new Date()}    // centra el calendario en el día actual
+            //initialDate={new Date()}    // centra el calendario en el día actual
             headerToolbar={{
               left: "prev,next today",
               center: "title",

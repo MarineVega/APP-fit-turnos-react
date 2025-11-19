@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
-import emailjs from "@emailjs/browser";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import TituloConFlecha from "./TituloConFlecha.jsx";
@@ -23,22 +22,21 @@ export default function RecuperarForm({ onSwitch }) {
     setLoading(true);
 
     try {
-      // 1 Buscar usuario en el backend
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+      const API_URL = import.meta.env.VITE_API_URL;
+
+      // 1. Buscar usuarios en backend
       const response = await fetch(`${API_URL}/usuarios`);
-      
       if (!response.ok) {
         throw new Error("No se pudo obtener usuarios del backend");
       }
 
       let usuarios = await response.json();
 
-      // El backend podría devolver un array directo o un objeto con propiedad 'usuarios'
       if (!Array.isArray(usuarios)) {
         if (usuarios && Array.isArray(usuarios.usuarios)) {
           usuarios = usuarios.usuarios;
         } else {
-          throw new Error("Formato de respuesta inesperado del backend");
+          throw new Error("Formato inesperado del backend");
         }
       }
 
@@ -50,18 +48,21 @@ export default function RecuperarForm({ onSwitch }) {
         return;
       }
 
-      //  2 Generar y guardar código de recuperación
+      // 2. Generar código
       const codigo = generarCodigo();
       localStorage.setItem("codigoRecuperacion", codigo);
       localStorage.setItem("emailRecuperacion", email);
 
-      // 3 Enviar código por email
-      await emailjs.send(
-        "service_vq2s3hg", // Tu ID de servicio
-        "template_tth5c7f", // Tu ID de plantilla
-        { email, codigo },
-        "K_tWHwFkHy42ZpWnU" // Tu clave pública
-      );
+      // 3. Enviar código al backend (Nodemailer)
+      const mailRes = await fetch(`${API_URL}/auth/send-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, codigo }),
+      });
+
+      if (!mailRes.ok) {
+        throw new Error("No se pudo enviar el código por email");
+      }
 
       Swal.fire({
         title: "Código enviado ✉️",
@@ -70,11 +71,11 @@ export default function RecuperarForm({ onSwitch }) {
         confirmButtonColor: "#6edc8c",
       }).then(() => {
         setLoading(false);
-        onSwitch("recuperar2"); // pasa al siguiente paso
+        onSwitch("recuperar2");
       });
     } catch (err) {
       console.error("Error:", err);
-      setError(err.message || "No se pudo procesar la recuperación. Intentalo más tarde.");
+      setError(err.message || "No se pudo procesar la recuperación.");
       setLoading(false);
     }
   };
@@ -95,7 +96,6 @@ export default function RecuperarForm({ onSwitch }) {
           className="inputCuenta"
         />
 
-        {/* Error debajo del campo */}
         {error && (
           <div className="contenedorError">
             <p className="adventencia">{error}</p>

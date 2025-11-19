@@ -15,27 +15,26 @@ export default function LoginForm({ onSwitch }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Si ya hay token guardado, validar usuario activo
+  // --------------------------------------------
+  // VALIDAR token, pero SIN autologin
+  // Solo limpia tokens inválidos
+  // --------------------------------------------
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      fetch("http://localhost:3000/auth/perfil", {
-        headers: { Authorization: `Bearer ${token}` },
+    if (!token) return;
+
+    fetch("http://localhost:3000/auth/perfil", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Token inválido");
+        return res.json();
       })
-        .then((res) => {
-          if (!res.ok) throw new Error("Token inválido");
-          return res.json();
-        })
-        .then((user) => {
-          localStorage.setItem("usuarioActivo", JSON.stringify(user));
-          navigate("/");
-        })
-        .catch(() => {
-          localStorage.removeItem("token");
-          localStorage.removeItem("usuarioActivo");
-        });
-    }
-  }, [navigate]);
+      .catch(() => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("usuarioActivo");
+      });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,28 +48,27 @@ export default function LoginForm({ onSwitch }) {
     setLoading(true);
 
     try {
-      // Intentamos login con la función centralizada en services/api.js
       const usuarioBackend = await loginUser({ email, password });
 
       if (usuarioBackend) {
-        // Si el backend devuelve estructura con token, guardarla
         if (usuarioBackend.access_token) {
           localStorage.setItem("token", usuarioBackend.access_token);
           localStorage.setItem(
             "usuarioActivo",
             JSON.stringify(usuarioBackend.usuario || usuarioBackend)
           );
-          // Disparar evento para que Navbar se actualice
+
           window.dispatchEvent(new Event("usuarioActualizado"));
+
           await mostrarBienvenida(usuarioBackend.usuario || usuarioBackend);
           setTimeout(() => navigate("/"), 100);
           return;
         }
 
-        // Caso común: loginUser devolvió el usuario (sin token)
+        // Login sin token (fallback)
         localStorage.setItem("usuarioActivo", JSON.stringify(usuarioBackend));
-        // Disparar evento para que Navbar se actualice
         window.dispatchEvent(new Event("usuarioActualizado"));
+
         await mostrarBienvenida(usuarioBackend);
         setTimeout(() => navigate("/"), 100);
         return;
@@ -86,38 +84,48 @@ export default function LoginForm({ onSwitch }) {
   };
 
   const mostrarBienvenida = async (usuario) => {
-  const nombreUsuario = usuario?.usuario?.trim();
-  const tipo = usuario?.persona?.tipoPersona_id;
+    const nombreUsuario = usuario?.usuario?.trim();
+    const tipo = usuario?.persona?.tipoPersona_id;
 
-  let rol = "";
-  if (tipo === 1) rol = "Administrador";
-  else if (tipo === 2) rol = "Profesor";
-  else if (tipo === 3) rol = "Cliente";
+    let rol = "";
+    if (tipo === 1) rol = "Administrador";
+    else if (tipo === 2) rol = "Profesor";
+    else if (tipo === 3) rol = "Cliente";
 
-      // ▶ Lógica del título
-      let titulo = "¡Bienvenid@!";
+    let titulo = "¡Bienvenid@!";
 
-      if (nombreUsuario) {
-        titulo = `¡Bienvenid@ ${nombreUsuario}!`;
-      } else if (rol) {
-        titulo = `¡Bienvenid@ ${rol}!`;
-      }
+    if (nombreUsuario) {
+      titulo = `¡Bienvenid@ ${nombreUsuario}!`;
+    } else if (rol) {
+      titulo = `¡Bienvenid@ ${rol}!`;
+    }
 
-      return Swal.fire({
-        title: titulo,
-        imageUrl: checkmark,
-        imageHeight: 100,
-        imageAlt: "Checkmark",
-        icon: "success",
-        confirmButtonText: "Cerrar",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-      });
-    };
+    return Swal.fire({
+      title: titulo,
+      imageUrl: checkmark,
+      imageHeight: 100,
+      imageAlt: "Checkmark",
+      icon: "success",
+      confirmButtonText: "Cerrar",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+  };
+
+  // --------------------------
+  // BOTÓN CANCELAR ARREGLADO
+  // --------------------------
+  const cancelar = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuarioActivo");
+    window.dispatchEvent(new Event("usuarioActualizado"));
+    navigate("/");
+  };
 
   return (
     <>
       <TituloConFlecha>Iniciar Sesión</TituloConFlecha>
+
       <form onSubmit={handleSubmit} className="formCuenta">
         <FormCampos
           label="Email"
@@ -161,7 +169,7 @@ export default function LoginForm({ onSwitch }) {
               id: "btnCancelar",
               label: "CANCELAR",
               className: "btnCancelar",
-              onClick: () => navigate("/"),
+              onClick: cancelar, // ← FIX DEFINITIVO
             }}
             contenedorClass="contenedorBotones"
           />
@@ -169,6 +177,7 @@ export default function LoginForm({ onSwitch }) {
           <p className="link" onClick={() => onSwitch("registrar")}>
             Crear cuenta
           </p>
+
           <p className="link" onClick={() => onSwitch("recuperar1")}>
             Olvidé mi contraseña
           </p>

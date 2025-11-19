@@ -14,7 +14,7 @@ function Navbar() {
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   // ============================
-  //  Cargar usuario logueado
+  //  Cargar usuario logueado (CON FIX)
   // ============================
   useEffect(() => {
     const actualizarUsuario = async () => {
@@ -44,7 +44,14 @@ function Navbar() {
       }
     };
 
-    actualizarUsuario();
+    // ⭐ EVITAR AUTOLOGIN cuando estás en /cuenta
+    const esPantallaCuenta = window.location.pathname.includes("cuenta");
+
+    if (!esPantallaCuenta) {
+      actualizarUsuario();
+    }
+
+    // Eventos para actualizar usuario
     window.addEventListener("storage", actualizarUsuario);
     window.addEventListener("usuarioActualizado", actualizarUsuario);
 
@@ -96,7 +103,7 @@ function Navbar() {
   const esAdmin = usuarioActivo?.persona?.tipoPersona_id === 1;
 
   // -----------------------------------
-  //  Nombre visible (con prioridad)
+  //  Nombre visible
   // -----------------------------------
   const nombreVisible =
     usuarioActivo?.persona?.nombre?.trim()

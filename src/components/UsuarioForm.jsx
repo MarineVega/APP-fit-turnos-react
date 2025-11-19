@@ -324,7 +324,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
             value="2"
             disabled={modo === "agregar" || usuario.tipoPersona_id !== "2"}
           >
-            Profesor (solo desde CRUD de Profesores)
+            Profesor (proximamente)
           </option>
 
           <option value="3">Cliente</option>

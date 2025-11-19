@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+
 import Swal from "sweetalert2";
 
 import imgPensando from "../assets/img/pensando.png";
@@ -80,20 +81,22 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
   const [horariosData, setHorariosData] = useState([]);
   const [reservas, setReservas] = useState([]);
   const [actividadesData, setActividadesData] = useState([]);
+  const [clientesData, setClientesData] = useState([]);
 
   // Levanto usuario activo
   const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));  
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profesoresRes, horasRes, horariosRes, reservasRes, actividadesRes] =
+        const [profesoresRes, horasRes, horariosRes, reservasRes, actividadesRes, clientesRes] =
           await Promise.all([
             fetch("http://localhost:3000/profesores"),
             fetch("http://localhost:3000/horas"),
             fetch("http://localhost:3000/horarios"),
             fetch("http://localhost:3000/reservas"),
             fetch("http://localhost:3000/actividades"),
+            fetch("http://localhost:3000/clientes"),
           ]);
 
         const profesoresJson = await profesoresRes.json();
@@ -101,12 +104,15 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
         const horariosJson = await horariosRes.json();
         const reservasJson = await reservasRes.json();
         const actividadesJson = await actividadesRes.json();
+        const clientesJson = await clientesRes.json();
+
 
         setProfesoresData(profesoresJson);
         setHorasData(horasJson);
         setHorariosData(horariosJson);
         setReservas(reservasJson);
         setActividadesData(actividadesJson);
+        setClientesData(clientesJson);
 
       } catch (error) {
         console.error("Error cargando datos:", error);
@@ -117,6 +123,46 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
   }, []);
 
+  const [clienteActual, setClienteActual] = useState(null);  
+  
+  // Obtengo el ID de persona que corresponde al usuario, para después obtener el ID de cliente
+  useEffect(() => {
+    
+    if (clientesData.length > 0 && usuario) {      
+      const cliente = clientesData.find(
+        (c) => Number(c.persona.persona_id) === Number(usuario.persona.persona_id)
+      );
+
+      setClienteActual(cliente);
+    }
+  }, [clientesData, usuario]);
+ 
+  console.log('clienteActual',clienteActual)
+  console.log('clienteActual.cliente_id',clienteActual?.cliente_id)
+
+
+  //const cliente_id = 1//clienteActual.cliente_id;
+  
+  // Si el usuario no es un cliente, asigno -1 para que solo pueda ver las reservas sin editar
+  const cliente_id = clienteActual?.cliente_id ?? -1;
+
+  console.log("cliente obtenido!", cliente_id)
+
+/*  
+ // if (!clienteActual) {
+  if (!cliente_id || cliente_id === -1) {
+    swalEstilo.fire({
+      title: "Error",
+      text: "El usuario logueado no tiene permisos editar las reservas.",
+      icon: "error",
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Cerrar",
+      customClass: {
+        confirmButton: "",   
+      }
+    });
+  };
+*/
 /*
   // DEPURACIÓN: revisar que los horarios se cargaron correctamente
   useEffect(() => {
@@ -230,8 +276,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
             const fechaReservaNorm = r.fecha.substring(0, 10);
           
             return (
-              //r.usuario_id === usuario.usuario_id &&
-              Number(r.cliente_id ?? r.cliente?.cliente_id) === Number(usuario.usuario_id) &&
+              Number(r.cliente_id ?? r.cliente?.cliente_id) === Number(cliente_id) &&
               Number(r.horario_id ?? r.horario?.horario_id) === Number(horario.horario_id) &&
               fechaReservaNorm === fechaISO &&
               r.activo
@@ -251,7 +296,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           const colorEvento = eventoPasado
             ? "#7fa8d1ff"       // grisáceo : Si el evento ya pasó
             : yaReservado 
-            ? "#5cb85c"       // verde si está reservado por el usuario logueado
+            ? "#5cb85c"       // verde si está reservado por el cliente logueado
             : cuposDisponibles > 0
             ? "#3788d8"
             : "#d9534f";
@@ -302,6 +347,22 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
   // Manejador de clics
   const manejarClick = (info) => {
+  
+    // 🚫 Si no es cliente → no permito interactuar
+    if (!cliente_id || cliente_id === -1) {
+      swalEstilo.fire({
+        title: "Solo lectura",
+        text: "Tu usuario no está habilitado para reservar.",
+        imageUrl: error,
+        confirmButtonText: "Cerrar",
+        confirmButtonColor: "#d33",
+        customClass: {
+        confirmButton: "",   
+      }
+      });
+      return;
+    } 
+
     const evento = info.event.extendedProps;
     
     console.log(info.event.extendedProps)
@@ -364,14 +425,14 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
             console.log(">>> DEBUG reservas (primeros 10):", reservas.slice(0, 10));
             console.log(">>> DEBUG horario_id buscado:", horario_id);
             console.log(">>> DEBUG fecha buscada:", fecha);
-            console.log(">>> DEBUG usuario:", usuario);
+            
             
             // Opcional: mostrar cada reserva resumida
             console.table(
               reservas.map(r => ({
                 reserva_id: r.reserva_id,
                 horario_id: r.horario_id ?? r.horario?.horario_id,
-                cliente_id: r.cliente_id ?? r.cliente?.cliente_id ?? r.usuario_id ?? r.usuario?.usuario_id,
+                cliente_id: r.cliente_id ?? r.cliente?.cliente_id ?? ,
                 fecha: r.fecha,
                 activo: r.activo
               }))
@@ -381,14 +442,10 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
             // Busco la reserva a eliminar
             const reserva = reservas.find(
               (r) =>
-                // r.usuario_id === usuario.usuario_id &&
-                // r.cliente.cliente_id === usuario.usuario_id &&
                 Number(
                   r.cliente_id ??
-                  r.cliente?.cliente_id ??
-                  r.usuario_id ??
-                  r.usuario?.usuario_id
-                ) === Number(usuario.usuario_id) &&                
+                  r.cliente?.cliente_id
+                ) === Number(cliente_id) &&                
                 Number(r.horario_id ?? r.horario?.horario_id) === Number(horario_id) &&
                 r.fecha.substring(0, 10) === fecha &&
                 r.activo
@@ -491,10 +548,10 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
       },
     })
     .then(async (result) => {
-      // Verifico si el usuario ya tiene una reserva en ese horario
+      // Verifico si el cliente ya tiene una reserva en ese horario
       const conflicto = reservas.find(
         (r) =>
-          r.usuario_id === usuario.usuario_id &&
+          r.cliente_id === cliente_id &&
           r.fecha.substring(0, 10) === fecha &&
           r.activo &&
           r.horaInicio === horaInicio
@@ -524,7 +581,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
         const nuevaReserva = {
           actividad_id,          
           profesor_id,
-          cliente_id: usuario.usuario_id,
+          cliente_id,
           horario_id,
           fecha,
           activo: true,

@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react";
 import FormBotones from "./FormBotones";
 import Swal from "sweetalert2";
 
-//import reservasData from "../data/reservas.json";       // 👈 Importa las reservas
-
-
 // configuro estilos para sweetalert
 const swalEstilo = Swal.mixin({
     imageWidth: 200,       // ancho en píxeles
@@ -17,8 +14,6 @@ const swalEstilo = Swal.mixin({
     }
 });
 
-
-//import actividadesData from "../data/actividades.json";     // 👈 importa el JSON local (provisorio hasta que levante los datos de la BD)
 
 export default function ActividadList({ actividades = [], modo, onEditar }) {
 
@@ -48,36 +43,40 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
         fetchActividades();
     }, []);
     
-/*
-    useEffect(() => {        
-        setActividades(actividadesData);        // Carga inicial de los datos mockeados
-    }, []);
-*/
     // Declaro el estado reservas
     const [reservas, setReservas] = useState([]);
 
-    // Cargo las reservas (desde JSON por ahora)
-    useEffect(() => { 
-        setReservas(reservasData);
+    useEffect(() => {
+        const fetchReservas = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/reservas"); // el backend
+            const data = await response.json();
+            setReservas(data);
+        } catch (error) {
+            console.error("Error cargando reservas:", error);
+        }
+        };
+        fetchReservas();
     }, []);
-
+    
+    console.log("reservas", reservas)
 
     // ✅ Verifico si la actividad tiene reservas activas
     const tieneReservasActivas = (actividadId) => {
-  /*
+  
         console.log("Buscando reservas activas para actividadId:", actividadId);
 
         reservas.forEach(r => {
             console.log(`→ reserva_id=${r.reserva_id}, actividad_id=${r.actividad_id}, activo=${r.activo}`);
         });
-        
+        /*
 
         return reservas.some(
         (r) => r.actividad_id === actividadId && r.activo === true
         );
 */
         const resultado = reservas.some(
-            (r) => Number(r.actividad_id) === Number(actividadId) && r.activo === true
+            (r) => Number(r.actividad.actividad_id) === Number(actividadId) && r.activo === true
         );
 
         console.log(`¿La actividad ${actividadId} tiene reservas activas? →`, resultado);

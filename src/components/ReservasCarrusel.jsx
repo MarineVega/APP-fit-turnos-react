@@ -1,23 +1,55 @@
 import React, { useState, useEffect } from "react";
-import actividadesData from "../data/actividades.json";
+//import actividadesData from "../data/actividades.json";
 
 /* Reemplaza el <div id="carruselActividades">.
 Muestra las actividades de a 3, con desplazamiento circular.
 Notifica al padre qué actividad está seleccionada.
 */
-
-export default function CarruselActividades({ seleccion, onSeleccion }) {
+// antes CarruselActividades ahora ReservasCarrusel
+export default function ReservasCarrusel({ seleccion, onSeleccion }) {
     // 1. TODOS los HOOKS deben ir primero
     const [actividades, setActividades] = useState([]);         // Hook 1
     const [indiceInicio, setIndiceInicio] = useState(0);        // Hook 2
     const visible = 3;      // cantidad de actividades visibles por vez
 
     // 2. Hook de carga de datos
+  /*
     // Cargo actividades activas
     useEffect (() => {                  // Hook 3
         const activas = actividadesData.filter((a) => a.activa);
         setActividades(activas);
     }, []);
+*/
+    // Cargo actividades desde la BD
+    useEffect(() => {
+        const fetchActividades = async () => {
+            try {
+                const response = await fetch("http://localhost:3000/actividades");
+                const data = await response.json();
+
+                // Filtro solo las activas
+                const activas = data.filter(a => a.activa === true);
+
+                 // Ordeno por nombre
+                const ordenadas = activas.sort((a, b) => {
+                    const nomA = a.nombre.toLowerCase();
+                    const nomB = b.nombre.toLowerCase();
+
+                    if (nomA < nomB) return -1;
+                    if (nomA > nomB) return 1;
+                    return 0;
+                });
+                
+                setActividades(ordenadas);
+
+            } catch (error) {
+                console.error("Error cargando actividades:", error);
+            }
+        };
+
+        fetchActividades();
+    }, []); 
+
 
     // 3. Hook de selección 
     // Lo movemos aquí porque tiene que ejecutarse en CADA render para que React lo registre.

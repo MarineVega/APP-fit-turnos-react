@@ -13,7 +13,7 @@ export default function RecuperarStep3({ onSwitch }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleReset = (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -29,36 +29,46 @@ export default function RecuperarStep3({ onSwitch }) {
 
     setLoading(true);
 
-    // Recuperar usuarios y correo en recuperación
     const email = localStorage.getItem("emailRecuperacion");
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-
-    const usuarioIndex = usuarios.findIndex((u) => u.email === email);
-
-    if (usuarioIndex === -1) {
-      setError("No se encontró el usuario asociado al correo.");
+    if (!email) {
+      setError("No se encontró el email para recuperación.");
       setLoading(false);
       return;
     }
 
-    // Actualizar contraseña
-    usuarios[usuarioIndex].password = password;
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+   });
+   
 
-    // Limpiar datos temporales
-    localStorage.removeItem("codigoRecuperacion");
-    localStorage.removeItem("emailRecuperacion");
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.message || "Error al actualizar la contraseña.");
+        setLoading(false);
+        return;
+      }
 
-    Swal.fire({
-      title: "Contraseña actualizada",
-      text: "Tu nueva contraseña fue guardada con éxito.",
-      icon: "success",
-      confirmButtonColor: "#6edc8c",
-      confirmButtonText: "Iniciar sesión",
-    }).then(() => {
-      onSwitch("login");
+      // Limpiar
+      localStorage.removeItem("codigoRecuperacion");
+      localStorage.removeItem("emailRecuperacion");
+
+      Swal.fire({
+        title: "Contraseña actualizada",
+        text: "Tu nueva contraseña fue guardada con éxito.",
+        icon: "success",
+        confirmButtonColor: "#6edc8c",
+        confirmButtonText: "Iniciar sesión",
+      }).then(() => {
+        onSwitch("login");
+        setLoading(false);
+      });
+    } catch (err) {
+      setError("Error al conectar con el servidor.");
       setLoading(false);
-    });
+    }
   };
 
   return (
@@ -84,7 +94,6 @@ export default function RecuperarStep3({ onSwitch }) {
           className="inputCuenta"
         />
 
-        {/* Error en rojo debajo del campo */}
         {error && (
           <div className="contenedorError">
             <p className="adventencia">{error}</p>
@@ -107,7 +116,6 @@ export default function RecuperarStep3({ onSwitch }) {
             }}
           />
 
-          {/* 🔗 Link */}
           <p className="link" onClick={() => onSwitch("login")}>
             Volver al login
           </p>

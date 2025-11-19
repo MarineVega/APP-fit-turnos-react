@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react";
 import FormBotones from "./FormBotones";
 import Swal from "sweetalert2";
 
-import reservasData from "../data/reservas.json";       // 👈 Importa las reservas
-
-
 // configuro estilos para sweetalert
 const swalEstilo = Swal.mixin({
     imageWidth: 200,       // ancho en píxeles
@@ -18,17 +15,26 @@ const swalEstilo = Swal.mixin({
 });
 
 
-//import actividadesData from "../data/actividades.json";     // 👈 importa el JSON local (provisorio hasta que levante los datos de la BD)
-
 export default function ActividadList({ actividades = [], modo, onEditar }) {
-    // const [actividades, setActividades] = useState([]);       // Cuando levante los datos de la BD
+
+    const [actividadesBD, setActividadesBD] = useState([]);          // Levanta los datos de la BD
+    
     /*
+    useEffect(() => {
+        fetch("http://localhost:3000/actividades")
+        .then((res) => res.json())
+        .then((data) => setActividades(data))
+        .catch((err) => console.error("Error:", err));
+    }, []);
+
+    */
+    
     useEffect(() => {
         const fetchActividades = async () => {
         try {
-            const response = await fetch("http://localhost:3000/api/actividades"); // el backend
+            const response = await fetch("http://localhost:3000/actividades"); // el backend
             const data = await response.json();
-            setActividades(data);
+            setActividadesBD(data);
         } catch (error) {
             console.error("Error cargando actividades:", error);
         }
@@ -36,37 +42,41 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
 
         fetchActividades();
     }, []);
-    */
-/*
-    useEffect(() => {        
-        setActividades(actividadesData);        // Carga inicial de los datos mockeados
-    }, []);
-*/
+    
     // Declaro el estado reservas
     const [reservas, setReservas] = useState([]);
 
-    // Cargo las reservas (desde JSON por ahora)
-    useEffect(() => { 
-        setReservas(reservasData);
+    useEffect(() => {
+        const fetchReservas = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/reservas"); // el backend
+            const data = await response.json();
+            setReservas(data);
+        } catch (error) {
+            console.error("Error cargando reservas:", error);
+        }
+        };
+        fetchReservas();
     }, []);
-
+    
+    console.log("reservas", reservas)
 
     // ✅ Verifico si la actividad tiene reservas activas
     const tieneReservasActivas = (actividadId) => {
-  /*
+  
         console.log("Buscando reservas activas para actividadId:", actividadId);
 
         reservas.forEach(r => {
             console.log(`→ reserva_id=${r.reserva_id}, actividad_id=${r.actividad_id}, activo=${r.activo}`);
         });
-        
+        /*
 
         return reservas.some(
         (r) => r.actividad_id === actividadId && r.activo === true
         );
 */
         const resultado = reservas.some(
-            (r) => Number(r.actividad_id) === Number(actividadId) && r.activo === true
+            (r) => Number(r.actividad.actividad_id) === Number(actividadId) && r.activo === true
         );
 
         console.log(`¿La actividad ${actividadId} tiene reservas activas? →`, resultado);
@@ -91,7 +101,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
     };
 
     // ✅ Manejo de eliminación con validación    
-    const eliminarActividad = (actividad) => {
+    const eliminarActividad = async (actividad) => {
         console.log('actividad.actividad_id ', actividad.actividad_id)
 
         if (tieneReservasActivas(actividad.actividad_id)) {
@@ -105,7 +115,8 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
 
         }
             
-        swalEstilo.fire({
+        //swalEstilo.fire({
+        const result = await swalEstilo.fire({
             title: "¿Eliminar actividad?",
             text: `Esta acción eliminará la actividad "${actividad.nombre}" permanentemente.`,
             icon: "warning",
@@ -117,10 +128,25 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
             confirmButtonColor: '#d33',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Acá se agregan las instrucciones para eliminar la actividad desde la base o el estado
-            
+        });
+     
+        if (result.isConfirmed) {
+            try {
+            // 🔥 Llamada al backend DELETE
+                const response = await fetch(`http://localhost:3000/actividades/${actividad.actividad_id}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error al eliminar la actividad");
+                }
+
+                // Actualizo la tabla local sin recargar
+                setActividadesBD(prev =>
+                    prev.filter(a => a.actividad_id !== actividad.actividad_id)
+                );
+
+                
                 swalEstilo.fire({
                     title: "Eliminada",
                     text: "La actividad ha sido eliminada.",
@@ -128,8 +154,11 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                     confirmButtonColor: "#6edc8c",
                     confirmButtonText: "Cerrar",
                 });
+            } catch (error) {
+                console.error(error);
+                swalEstilo.fire("Error", "No se pudo eliminar la actividad.", "error");
             }
-        });
+        }
     };
    
 
@@ -147,6 +176,19 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
         console.warn(`No se encontró la imagen: ${nombreArchivo}`);
         return null;
         }
+    };
+
+    // Creo función de ordenamiento
+    const ordenarActividades = (lista) => {
+        return [...lista].sort((a, b) => {
+            // 1️. Ordeno por nombre
+            const actA = a.nombre.toLowerCase();
+            const actB = b.nombre.toLowerCase();
+            if (actA < actB) return -1;
+            if (actA > actB) return 1;
+
+            return 0; // iguales
+        });
     };
 
     // Si el modo es "postAlta", lo trato como "consultar"
@@ -167,8 +209,8 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                     </thead>
 
                     <tbody>
-                        {actividades.length > 0 ? (                           
-                            actividades.map((actividad) => {
+                        {actividadesBD.length > 0 ? (                           
+                            ordenarActividades(actividadesBD).map((actividad) => {
                                 const imagenSrc =
                                     actividad.imagen instanceof File
                                         ? URL.createObjectURL(actividad.imagen)

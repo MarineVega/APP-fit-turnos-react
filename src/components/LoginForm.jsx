@@ -5,7 +5,7 @@ import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import TituloConFlecha from "./TituloConFlecha.jsx";
 import checkmark from "../assets/img/exito.png";
-import usuariosData from "../data/usuarios.json"; // 👈 respaldo inicial
+import { loginUser } from "../services/api";
 import "../styles/style.css";
 
 export default function LoginForm({ onSwitch }) {
@@ -15,13 +15,28 @@ export default function LoginForm({ onSwitch }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Si ya hay usuario logueado, redirige a la página principal
+  // --------------------------------------------
+  // VALIDAR token, pero SIN autologin
+  // Solo limpia tokens inválidos
+  // --------------------------------------------
   useEffect(() => {
-    const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
-    if (usuarioActivo) navigate("/");
-  }, [navigate]);
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  const handleSubmit = (e) => {
+    fetch("http://localhost:3000/auth/perfil", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Token inválido");
+        return res.json();
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("usuarioActivo");
+      });
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -32,60 +47,85 @@ export default function LoginForm({ onSwitch }) {
 
     setLoading(true);
 
-    setTimeout(() => {
-      // 1️⃣ Trae usuarios desde localStorage o desde el JSON local
-      const usuariosLS = JSON.parse(localStorage.getItem("usuarios")) || [];
-      const usuarios = usuariosLS.length > 0 ? usuariosLS : usuariosData.usuarios;
+    try {
+      const usuarioBackend = await loginUser({ email, password });
 
-      // 2️⃣ Busca el usuario por email y contraseña
-      const usuario = usuarios.find(
-        (u) => u.email === email && u.password === password
-      );
+      if (usuarioBackend) {
+        if (usuarioBackend.access_token) {
+          localStorage.setItem("token", usuarioBackend.access_token);
+          localStorage.setItem(
+            "usuarioActivo",
+            JSON.stringify(usuarioBackend.usuario || usuarioBackend)
+          );
 
-      //  Si no existe el usuario
-      if (!usuario) {
-        setError("Usuario o contraseña incorrecta.");
-        setLoading(false);
+          window.dispatchEvent(new Event("usuarioActualizado"));
+
+          await mostrarBienvenida(usuarioBackend.usuario || usuarioBackend);
+          setTimeout(() => navigate("/"), 100);
+          return;
+        }
+
+        // Login sin token (fallback)
+        localStorage.setItem("usuarioActivo", JSON.stringify(usuarioBackend));
+        window.dispatchEvent(new Event("usuarioActualizado"));
+
+        await mostrarBienvenida(usuarioBackend);
+        setTimeout(() => navigate("/"), 100);
         return;
       }
 
-      //  Si el usuario está inactivo, no permitir login
-      if (!usuario.activo) {
-        setError("Tu cuenta está inactiva. Contactá con el administrador.");
-        setLoading(false);
-        return;
-      }
-
-      // 3️ Guarda el usuario logueado
-      localStorage.setItem("usuarioActivo", JSON.stringify(usuario));
-
-      // Notificar a otros componentes
-      window.dispatchEvent(new Event("usuarioActualizado"));
-
-      //  Determinar el tipo de persona
-      const tipo = usuario?.persona?.tipoPersona_id;
-
-      let rol = "";
-      if (tipo === 1) rol = "Administrador";
-      else if (tipo === 2) rol = "Profesor";
-      else if (tipo === 3) rol = "Cliente";
-
-      Swal.fire({
-        title: `¡Bienvenido${rol ? ", " + rol : ""}!`,
-        imageUrl: checkmark,
-        imageHeight: 100,
-        imageAlt: "Checkmark",
-        icon: "success",
-        confirmButtonText: "Cerrar",
-      }).then(() => navigate("/"));
-
+      throw new Error("Usuario o contraseña incorrecta");
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Error al iniciar sesión.");
+    } finally {
       setLoading(false);
-    }, 300);
+    }
+  };
+
+  const mostrarBienvenida = async (usuario) => {
+    const nombreUsuario = usuario?.usuario?.trim();
+    const tipo = usuario?.persona?.tipoPersona_id;
+
+    let rol = "";
+    if (tipo === 1) rol = "Administrador";
+    else if (tipo === 2) rol = "Profesor";
+    else if (tipo === 3) rol = "Cliente";
+
+    let titulo = "¡Bienvenid@!";
+
+    if (nombreUsuario) {
+      titulo = `¡Bienvenid@ ${nombreUsuario}!`;
+    } else if (rol) {
+      titulo = `¡Bienvenid@ ${rol}!`;
+    }
+
+    return Swal.fire({
+      title: titulo,
+      imageUrl: checkmark,
+      imageHeight: 100,
+      imageAlt: "Checkmark",
+      icon: "success",
+      confirmButtonText: "Cerrar",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+  };
+
+  // --------------------------
+  // BOTÓN CANCELAR ARREGLADO
+  // --------------------------
+  const cancelar = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuarioActivo");
+    window.dispatchEvent(new Event("usuarioActualizado"));
+    navigate("/");
   };
 
   return (
     <>
       <TituloConFlecha>Iniciar Sesión</TituloConFlecha>
+
       <form onSubmit={handleSubmit} className="formCuenta">
         <FormCampos
           label="Email"
@@ -129,7 +169,7 @@ export default function LoginForm({ onSwitch }) {
               id: "btnCancelar",
               label: "CANCELAR",
               className: "btnCancelar",
-              onClick: () => navigate("/"),
+              onClick: cancelar, // ← FIX DEFINITIVO
             }}
             contenedorClass="contenedorBotones"
           />
@@ -137,6 +177,7 @@ export default function LoginForm({ onSwitch }) {
           <p className="link" onClick={() => onSwitch("registrar")}>
             Crear cuenta
           </p>
+
           <p className="link" onClick={() => onSwitch("recuperar1")}>
             Olvidé mi contraseña
           </p>

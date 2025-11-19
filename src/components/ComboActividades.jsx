@@ -1,27 +1,15 @@
 import React, { useEffect, useState } from "react";
-import actividadesData from "../data/actividades.json";       // 👈 Datos mock
 
 export default function ComboActividades({  
     value, 
     onChange = () => {},
+    opciones = [],
     onFocus,
     incluirTodos = true, 
     className="",
     label,
     error,
 }) {
-  const [actividades, setActividades] = useState([]);
-
-  useEffect(() => {
-    // simulo una carga asincrónica (como si viniera del backend)
-    const cargarActividades = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300));             // pequeño delay
-      const activas = actividadesData.filter((a) => a.activa);
-      setActividades(activas);
-    };
-
-    cargarActividades();
-  }, []);
 
   return (
     <div className="campoFormulario">
@@ -42,14 +30,18 @@ export default function ComboActividades({
         {incluirTodos && (
           <option value="">(Todas)</option>
         )}
-
-        {/* 👇 Lista de actividades activas */}
-        <option value="">Elegir una actividad</option>
-        {actividades.map((a) => (
-          <option key={a.actividad_id} value={a.actividad_id}>
-            {`${a.nombre}`}
-          </option>
-        ))}
+       
+        {/* 👇 Lista de actividades activas (desde BD) */}
+        {opciones
+          .filter((a) => a.activa)         // muestro solo activas
+          .sort((a, b) => a.nombre.localeCompare(b.nombre))   // ordeno por nombre (localeCompare -> respeta acentos y orden textual correcto en español)
+          .map((a) => (
+            <option key={a.actividad_id} value={a.actividad_id}>
+              {`${a.nombre}`}
+            </option>
+          ))
+        }    
+          
       </select>
 
       {/* 👇 Mostramos el mensaje de error, si existe */}

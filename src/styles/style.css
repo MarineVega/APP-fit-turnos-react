@@ -1170,7 +1170,7 @@ h2#fc-dom-1 {
 }
 
 .mainPrincipal, .mainActividad, .mainHorario, .mainTurno, .mainCuenta, .mainProfesor, .mainAdministrar {
-  margin-top: 100px; /* deja espacio para el header */
+  margin-top: 10px; /* deja espacio para el header */
 }
 
 /* para que el footer siempre quede abajo, incluso si el contenido no ocupa toda la altura de la pantalla*/

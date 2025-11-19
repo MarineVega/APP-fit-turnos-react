@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect} from "react";
 
 import Card from "../components/Card";
 import "../styles/style.css";
@@ -13,6 +13,15 @@ import TituloConFlecha from "../components/TituloConFlecha";
 
 export default function Administrar() {
   
+  // Restauro scroll al volver
+  useEffect(() => {
+    const scrollY = sessionStorage.getItem("scrollY_admin");
+    if (scrollY) {
+      window.scrollTo({ top: parseInt(scrollY, 10), behavior: "smooth" });
+      sessionStorage.removeItem("scrollY_admin");     // limpio para evitar que quede
+    }
+  }, []);
+
   const secciones = [
    
     {

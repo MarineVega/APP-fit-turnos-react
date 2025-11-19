@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
-import emailjs from "@emailjs/browser";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import TituloConFlecha from "./TituloConFlecha.jsx";
@@ -18,6 +17,7 @@ export default function RecuperarStep2({ onSwitch }) {
     if (!code) return setError("Ingresá el código recibido.");
 
     const codigoGuardado = localStorage.getItem("codigoRecuperacion");
+
     if (code === codigoGuardado) {
       Swal.fire({
         title: "Código verificado ✅",
@@ -30,21 +30,27 @@ export default function RecuperarStep2({ onSwitch }) {
     }
   };
 
+  // 🔥 Reemplaza EmailJS → ahora lo envía tu backend
   const handleResend = async () => {
-    const email = localStorage.getItem("emailRecuperacion"); // 👈 lo guardamos en Step1
+    const email = localStorage.getItem("emailRecuperacion");
     if (!email) return;
 
     const nuevoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
     localStorage.setItem("codigoRecuperacion", nuevoCodigo);
 
     setLoading(true);
+
     try {
-      await emailjs.send(
-        "service_vq2s3hg", // tu ID de servicio
-        "template_tth5c7f", // tu plantilla
-        { email, codigo: nuevoCodigo },
-        "K_tWHwFkHy42ZpWnU" // tu clave pública
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/send-code`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, codigo: nuevoCodigo }),
+        }
       );
+
+      if (!response.ok) throw new Error("Error enviando el código");
 
       Swal.fire({
         title: "Código reenviado ✉️",
@@ -53,7 +59,7 @@ export default function RecuperarStep2({ onSwitch }) {
         confirmButtonColor: "#6edc8c",
       });
     } catch (err) {
-      console.error("Error al reenviar:", err);
+      console.error(err);
       setError("No se pudo reenviar el código. Intentalo más tarde.");
     } finally {
       setLoading(false);
@@ -76,7 +82,6 @@ export default function RecuperarStep2({ onSwitch }) {
           className="inputCuenta"
         />
 
-        {/* Error en rojo debajo del campo */}
         {error && (
           <div className="contenedorError">
             <p className="adventencia">{error}</p>
@@ -99,7 +104,6 @@ export default function RecuperarStep2({ onSwitch }) {
             }}
           />
 
-          {/* Reenviar código */}
           <p className="link" onClick={handleResend}>
             Reenviar código
           </p>

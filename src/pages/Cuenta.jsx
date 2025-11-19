@@ -15,6 +15,16 @@ export default function Cuenta() {
   const [form, setForm] = useState("login");
   const [searchParams] = useSearchParams();
 
+  // --------------------------------------------
+  // Borrar token al entrar a /cuenta
+  // --------------------------------------------
+  useEffect(() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuarioActivo");
+    window.dispatchEvent(new Event("usuarioActualizado"));
+  }, []);
+
+  // Mantener compatibilidad con /cuenta?form=crear
   useEffect(() => {
     if (searchParams.get("form") === "crear") setForm("registrar");
   }, [searchParams]);
@@ -29,6 +39,7 @@ export default function Cuenta() {
         altIzq="Cuenta izquierda"
         altDer="Cuenta derecha"
       />
+
       <section className="seccionCuenta">
         {form === "login" && <LoginForm onSwitch={handleSwitch} />}
         {form === "registrar" && <RegistrarForm onSwitch={handleSwitch} />}

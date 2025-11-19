@@ -7,11 +7,23 @@ const FormBotones = ({
 }) => {
     return (
         <div className={contenedorClass}>
-            <button id={boton1.id} className={boton1.className} onClick={boton1.onClick}>
+            {/* BOTÓN 1 = SUBMIT */}
+            <button
+                id={boton1.id}
+                className={boton1.className}
+                onClick={boton1.onClick}
+                type="submit"
+            >
                 {boton1.label}
             </button>
 
-            <button id={boton2.id} className={boton2.className} onClick={boton2.onClick}>
+            {/* BOTÓN 2 = BUTTON (NO SUBMIT) */}
+            <button
+                id={boton2.id}
+                className={boton2.className}
+                onClick={boton2.onClick}
+                type="button"
+            >
                 {boton2.label}
             </button>
         </div>

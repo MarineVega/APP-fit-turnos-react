@@ -89,11 +89,16 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
         const nombreProfesor = horario.profesor?.persona?.nombre || "";
         const apellidoProfesor = horario.profesor?.persona?.apellido || "";
 
+        const textoProfesor = nombreProfesor && apellidoProfesor 
+            ? ` (${nombreProfesor} ${apellidoProfesor}),`
+            : "";
+
+
         if (tieneReservasActivas(horario.horario_id)) {
             swalEstilo.fire({
                 icon: "warning",
                 title: "No se puede modificar",
-                text: `El horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} ${nombreProfesor} ${apellidoProfesor}, tiene reservas activas.`,
+                text: `El horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} ${textoProfesor} tiene reservas activas.`,
                 confirmButtonText: "Cerrar",
             });
         
@@ -110,11 +115,15 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
         const nombreProfesor = horario.profesor?.persona?.nombre || "";
         const apellidoProfesor = horario.profesor?.persona?.apellido || "";
 
+        const textoProfesor = nombreProfesor && apellidoProfesor 
+            ? ` (${nombreProfesor} ${apellidoProfesor}),`
+            : "";
+
         if (tieneReservasActivas(horario.horario_id )) {
             swalEstilo.fire({
                 icon: "warning",
                 title: "No se puede eliminar",
-                text: `El horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} ${nombreProfesor} ${apellidoProfesor}, tiene reservas activas.`,
+                text: `El horario de ${horario.hora.horaInicio.slice(0, 5)} a  ${horario.hora.horaFin.slice(0, 5)} de ${horario.actividad.nombre} ${textoProfesor} tiene reservas activas.`,
                 confirmButtonText: "Cerrar",
             });
             return;

@@ -53,7 +53,7 @@ export async function registerUser({
 }
 
 // --------------------------------------------
-// LOGIN REAL → SOLO /auth/login
+// LOGIN
 // --------------------------------------------
 export async function loginUser({ email, password }) {
   const res = await fetch(`${API_URL}/auth/login`, {
@@ -63,11 +63,11 @@ export async function loginUser({ email, password }) {
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Credenciales inválidas");
+    const err = await res.json();
+    throw new Error(err.message || "Error en el login");
   }
 
-  return await res.json(); // { access_token, usuario }
+  return await res.json();
 }
 
 // --------------------------------------------
@@ -98,4 +98,22 @@ export async function updatePassword(email, newPassword) {
   if (!res.ok) throw new Error("No se pudo actualizar la contraseña");
 
   return true;
+}
+
+// --------------------------------------------
+// REENVIAR EMAIL DE VERIFICACIÓN
+// --------------------------------------------
+export async function resendVerificationEmail(email) {
+  const res = await fetch(`${API_URL}/auth/resend-verification`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Error enviando verificación");
+  }
+
+  return await res.json();
 }

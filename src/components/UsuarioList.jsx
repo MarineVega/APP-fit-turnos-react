@@ -144,7 +144,8 @@ export default function UsuarioList({ modo, onEditar }) {
                     <td>{u.persona?.nombre || "—"}</td>
                     <td>{u.persona?.apellido || "—"}</td>
                     <td>{obtenerTipo(u)}</td>
-                    <td>{u.activo ? "Sí" : "No"}</td>
+                    <td>{u.persona?.activo ? "Sí" : "No"}</td>
+
 
                     {modo !== "consultar" && (
                       <td>

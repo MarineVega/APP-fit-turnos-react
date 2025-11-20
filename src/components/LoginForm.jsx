@@ -5,7 +5,7 @@ import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
 import TituloConFlecha from "./TituloConFlecha.jsx";
 import checkmark from "../assets/img/exito.png";
-import { loginUser } from "../services/api";
+import { loginUser, resendVerificationEmail } from "../services/api";
 import "../styles/style.css";
 
 export default function LoginForm({ onSwitch }) {
@@ -75,9 +75,52 @@ export default function LoginForm({ onSwitch }) {
       }
 
       throw new Error("Usuario o contraseña incorrecta");
+
     } catch (err) {
       console.error(err);
-      setError(err.message || "Error al iniciar sesión.");
+
+      const backendMsg = err.response?.data?.message || err.message;
+
+      // ⚠️ Cuenta no verificada
+      if (backendMsg?.includes("no está verificada")) {
+        Swal.fire({
+          title: "Cuenta no verificada",
+          text: "Tu cuenta aún no está activada. Revisá tu correo o reenviá el email.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#6edc8c",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Reenviar correo",
+          cancelButtonText: "Cerrar",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              await resendVerificationEmail(email);
+
+              Swal.fire({
+                title: "Correo reenviado ✉️",
+                text: "Revisá tu bandeja de entrada.",
+                icon: "success",
+                confirmButtonColor: "#6edc8c",
+              });
+            } catch (error) {
+              Swal.fire({
+                title: "Error",
+                text: error.message || "No se pudo reenviar el correo.",
+                icon: "error",
+                confirmButtonColor: "#6edc8c",
+              });
+            }
+          }
+        });
+
+        setLoading(false);
+        return;
+      }
+
+      // ❌ Otros errores
+      setError(backendMsg || "Error al iniciar sesión.");
+
     } finally {
       setLoading(false);
     }
@@ -169,7 +212,7 @@ export default function LoginForm({ onSwitch }) {
               id: "btnCancelar",
               label: "CANCELAR",
               className: "btnCancelar",
-              onClick: cancelar, // ← FIX DEFINITIVO
+              onClick: cancelar,
             }}
             contenedorClass="contenedorBotones"
           />

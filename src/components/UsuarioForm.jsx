@@ -305,7 +305,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           error={errores.repetirContrasenia}
         />
 
-        {/* 🔹 Selector de Tipo de Usuario */}
+        {/* Selector de Tipo de Usuario */}
         <label className="labelGeneral" htmlFor="tipoPersona_id">Tipo de Usuario *</label>
         <select
           id="tipoPersona_id"
@@ -314,12 +314,23 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           onChange={handleChange}
           className="inputProfesor"
           required
+          disabled={usuario.tipoPersona_id === "2"} // si es profesor, bloquea todo el select
         >
           <option value="">Seleccione...</option>
+
           <option value="1">Administrador</option>
-          <option value="2">Profesor</option>
+
+          <option
+            value="2"
+            disabled={modo === "agregar" || usuario.tipoPersona_id !== "2"}
+          >
+            Profesor (proximamente)
+          </option>
+
           <option value="3">Cliente</option>
         </select>
+
+
         {errores.tipoPersona_id && (
           <p className="adventencia">{errores.tipoPersona_id}</p>
         )}

@@ -23,7 +23,7 @@ export default function ProfesorForm({ guardar, profesores = [], datoInicial = n
     
     const profesor_id = datoInicial?.profesor_id || null;
 
-    // Estados del formulario (🟢 acceso ajustado para el backend)
+    // Estados del formulario (acceso ajustado para el backend)
     const [nombre, setNombre] = useState(datoInicial?.persona?.nombre || "");
     const [apellido, setApellido] = useState(datoInicial?.persona?.apellido || "");
     const [documento, setDocumento] = useState(datoInicial?.persona?.documento || "");
@@ -84,7 +84,7 @@ export default function ProfesorForm({ guardar, profesores = [], datoInicial = n
         setErrores(nuevosErrores);
         if (!esValido) return;
 
-        // 🟢 Cambiado: incluye activo, título y datos de persona
+        //  incluye activo, título y datos de persona
         guardar({ nombre, apellido, documento, titulo, activo });
 
         const mensaje =
@@ -138,7 +138,7 @@ export default function ProfesorForm({ guardar, profesores = [], datoInicial = n
                     error={errores.titulo}
                 />
 
-                {/* 🟢 Checkbox Activo */}
+                {/* Checkbox Activo */}
                 <div className="form-check">
                     <label>
                         <input

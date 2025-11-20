@@ -17,7 +17,7 @@ export default function Usuario() {
   const [usuarios, setUsuarios] = useState([]);
   const [datoInicial, setDatoInicial] = useState(null);
 
-  // 🔹 Cargar usuarios desde el backend
+  //  Cargar usuarios desde el backend
   useEffect(() => {
     fetch("http://localhost:3000/usuarios")
       .then((res) => res.json())
@@ -27,7 +27,7 @@ export default function Usuario() {
       .catch((err) => console.error("Error al cargar usuarios:", err));
   }, []);
 
-  // 🔹 Detectar si hay usuario seleccionado para editar
+  //  Detectar si hay usuario seleccionado para editar
   useEffect(() => {
     if (modo === "editar" && usuario_id) {
       const usuario = usuarios.find((u) => u.usuario_id === usuario_id);
@@ -37,7 +37,7 @@ export default function Usuario() {
     }
   }, [modo, usuario_id, usuarios]);
 
-  // 🔹 Guardar usuario nuevo o editado (llamando al backend)
+  // Guardar usuario nuevo o editado (llamando al backend)
   const guardarUsuario = async (usuario) => {
     try {
       if (modo === "editar" && datoInicial) {
@@ -58,7 +58,7 @@ export default function Usuario() {
         if (!res.ok) throw new Error("Error al crear usuario");
       }
 
-      // ✅ Volver a cargar la lista
+      //  Volver a cargar la lista
       const nuevos = await fetch("http://localhost:3000/usuarios").then((r) => r.json());
       setUsuarios(nuevos);
     } catch (error) {

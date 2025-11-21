@@ -47,7 +47,12 @@ export default function RecuperarForm({ onSwitch }) {
         setLoading(false);
         return;
       }
-
+      // Chequear si está verificado
+      if (!usuarioExiste.verificado) {
+        setError("Tu cuenta aún no está verificada. Revisá tu correo para activarla.");
+        setLoading(false);
+        return;
+} 
       // 2. Generar código
       const codigo = generarCodigo();
       localStorage.setItem("codigoRecuperacion", codigo);

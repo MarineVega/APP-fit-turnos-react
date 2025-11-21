@@ -18,7 +18,7 @@ export default function UsuarioList({ modo, onEditar }) {
   const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
   const [usuarios, setUsuarios] = useState([]);
 
-  // ✅ Traer usuarios desde el backend
+  //  Traer usuarios desde el backend
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
@@ -53,7 +53,7 @@ export default function UsuarioList({ modo, onEditar }) {
     return "—";
   };
 
-  // ✅ Eliminar usuario desde el backend
+  //  Eliminar usuario desde el backend
   const handleEliminar = async (usuario) => {
     if (usuarioActivo && usuario.usuario_id === usuarioActivo.usuario_id) {
       swalEstilo.fire({
@@ -125,7 +125,9 @@ export default function UsuarioList({ modo, onEditar }) {
               <th>Nombre</th>
               <th>Apellido</th>
               <th>Tipo</th>
+              <th>Verificado</th>
               <th>Activo</th>
+
               {modo !== "consultar" && <th>Acciones</th>}
             </tr>
           </thead>
@@ -144,7 +146,9 @@ export default function UsuarioList({ modo, onEditar }) {
                     <td>{u.persona?.nombre || "—"}</td>
                     <td>{u.persona?.apellido || "—"}</td>
                     <td>{obtenerTipo(u)}</td>
-                    <td>{u.activo ? "Sí" : "No"}</td>
+                    <td>{u.verificado ? "Sí" : "No"}</td>
+                    <td>{u.persona?.activo ? "Sí" : "No"}</td>
+
 
                     {modo !== "consultar" && (
                       <td>

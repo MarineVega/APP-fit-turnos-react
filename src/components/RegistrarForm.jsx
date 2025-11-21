@@ -54,6 +54,7 @@ export default function RegistrarForm({ onSwitch }) {
       password,
       persona: {
         tipoPersona_id: 3, // Cliente
+        activo:false, 
       },
     };
 

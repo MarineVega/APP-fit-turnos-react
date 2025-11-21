@@ -13,7 +13,7 @@ export default function LayoutPublic() {
   }, []);
 
   return (
-    <div className="layout-public">
+    <div className="App">
       <Header />
       <main className="contenido">
         <Outlet />

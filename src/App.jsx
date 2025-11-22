@@ -20,7 +20,7 @@ import CuentaVerificada from "./pages/cuentaverificada.jsx";
 import VerificarCuenta from "./pages/VerificarCuenta";  // <-- IMPORTANTE
 
 function App() {
-  return (
+  return (    
     <Routes>
 
       {/* Layout público */}

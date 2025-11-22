@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -73,8 +73,8 @@ function normalizeHora(h) {
 
 // antes CalendarioTurnos ahora ReservasCalendario
 export default function ReservasCalendario ({ actividadSeleccionada }) {
-  const [eventos, setEventos] = useState([]);
-  
+  const [eventos, setEventos] = useState([]);  
+
   // creo estados para cada colección
   const [profesoresData, setProfesoresData] = useState([]);
   const [horasData, setHorasData] = useState([]);
@@ -130,7 +130,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
     
     if (clientesData.length > 0 && usuario) {      
       const cliente = clientesData.find(
-        (c) => Number(c.persona.persona_id) === Number(usuario.persona.persona_id)
+        (c) => Number(c.persona.persona_id) === Number(usuario.persona.persona_id) && usuario.persona.activo
       );
 
       setClienteActual(cliente);
@@ -649,7 +649,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="timeGridWeek"
-            //initialDate={new Date()}    // centra el calendario en el día actual
+            initialDate={new Date()}    // centra el calendario en el día actual
             headerToolbar={{
               left: "prev,next today",
               center: "title",

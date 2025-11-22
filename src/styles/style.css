@@ -51,6 +51,48 @@
   --color-contraste-oscuro: #222222;
 }
 
+/*  INICIO Agregado 21-11-2025 */
+/* === Asegurar que el footer quede al fondo === */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#root, .App {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 100vh;
+}
+
+/* El contenido principal debe crecer para empujar el footer */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Para las páginas específicas que usan clases main específicas */
+.mainPrincipal, 
+.mainActividad, 
+.mainHorario, 
+.mainTurno, 
+.mainCuenta, 
+.mainProfesor, 
+.mainAdministrar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* FIN Agregado 21-11-2025 */
 
 .header {
   nav {        
@@ -615,6 +657,7 @@ a.btnAceptar:hover {
 
 
 /* footer */
+/*             inicio 21-11-2025 
 .footer {
   background-color: var(--color-primario);
   color: var(--color-cuarto);
@@ -625,6 +668,7 @@ a.btnAceptar:hover {
   bottom: 0;
   left: 0;  
 }
+  fin 21-11-2025 */
 
 
 /* 
@@ -1174,6 +1218,7 @@ h2#fc-dom-1 {
 }
 
 /* para que el footer siempre quede abajo, incluso si el contenido no ocupa toda la altura de la pantalla*/
+/*             inicio 21-11-2025 
 html, body {
   height: 100%;
   display: flex;
@@ -1183,7 +1228,7 @@ html, body {
 main {
   flex: 1;
 }
-
+   fin 21-11-2025 */
 
 /* ===== Imágenes laterales solo en escritorio (>=1024 px) ===== */
 /* Por defecto, oculto en todos los tamaños */
@@ -1236,9 +1281,10 @@ main {
 
 
 
-
+/*             inicio 21-11-2025 */
 
 /* --- Layout general --- */
+/*
 html, body {
   height: 100%;
   margin: 0;
@@ -1248,23 +1294,94 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;  /* ocupa toda la pantalla */
-}
-
+/*}
+*/
 /* El contenido principal debe crecer para empujar el footer */
+/*
 main {
   flex: 1;
 }
-
+*/
 /* --- Footer --- */
+/*
 footer {
   background-color: #333;
   color: #fff;
   text-align: center;
   padding: 10px;
-  margin-top: auto;  /* empuja el footer hacia abajo */
+  margin-top: auto;  
 }
+            fin 21-11-2025 */
 
 /* === Estructura general para mantener el footer abajo === */
+/*             inicio 21-11-2025 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#root, .App {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 100vh;
+}
+*/
+/* El contenido principal crece y empuja el footer hacia abajo */
+/*
+main, .mainProfesor, .mainActividad, .seccionHorario {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === Footer fijo al fondo === */
+/*
+footer, .footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 10px 0;
+  width: 100%;
+}
+*/
+/* === Ajuste especial para pantallas pequeñas === */
+/*
+@media (max-width: 480px) {
+  html, body, #root, .App {
+    min-height: 100vh;
+  }
+
+  footer, .footer {
+    position: relative;
+    bottom: 0;
+    left: 0;
+  }
+}
+             fin 21-11-2025 */
+
+
+/* INICIO Nuevo 21-11-2025 */
+
+/* === FOOTER FIJO AL FONDO === */
+.footer {
+  background-color: var(--color-primario);
+  color: var(--color-cuarto);
+  padding: 8px 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: auto; /* Esto es clave - empuja el footer hacia abajo */
+  flex-shrink: 0; /* Evita que el footer se encoja */
+}
+
+/* === ESTRUCTURA PRINCIPAL PARA FOOTER AL FONDO === */
 html, body {
   height: 100%;
   margin: 0;
@@ -1284,30 +1401,36 @@ body {
   min-height: 100vh;
 }
 
-/* El contenido principal crece y empuja el footer hacia abajo */
-main, .mainProfesor, .mainActividad, .seccionHorario {
+/* El contenido principal debe crecer para empujar el footer */
+main {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-/* === Footer fijo al fondo === */
-footer, .footer {
-  margin-top: auto;
-  text-align: center;
-  padding: 10px 0;
+/* Para las páginas específicas que usan clases main específicas */
+.mainPrincipal, 
+.mainActividad, 
+.mainHorario, 
+.mainTurno, 
+.mainCuenta, 
+.mainProfesor, 
+.mainAdministrar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === FOOTER FIJO AL FONDO === */
+.footer {
+  background-color: var(--color-primario);
+  color: var(--color-cuarto);
+  padding: 8px 10px;
   width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
-/* === Ajuste especial para pantallas pequeñas === */
-@media (max-width: 480px) {
-  html, body, #root, .App {
-    min-height: 100vh;
-  }
-
-  footer, .footer {
-    position: relative;
-    bottom: 0;
-    left: 0;
-  }
-}
+/* FIN Nuevo 21-11-2025 */

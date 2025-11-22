@@ -50,6 +50,14 @@ export default function ReservasCarrusel({ seleccion, onSeleccion }) {
         fetchActividades();
     }, []); 
 
+    // 21-11-2025 -> para que la PRIMER actividad aparezca en el centro al cargar el carrusel.
+    useEffect(() => {
+    if (actividades.length > 0) {
+        // para que la PRIMER actividad quede en el centro
+        setIndiceInicio(actividades.length - 1);
+        }
+    }, [actividades]);
+
 
     // 3. Hook de selección 
     // Lo movemos aquí porque tiene que ejecutarse en CADA render para que React lo registre.

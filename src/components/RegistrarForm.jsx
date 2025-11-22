@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import FormCampos from "./FormCampos.jsx";
 import FormBotones from "./FormBotones.jsx";
-import { registerUser } from "../services/api";
 import "../styles/style.css";
-import exito from "../assets/img/exito.png";
 import TituloConFlecha from "./TituloConFlecha.jsx";
 
 export default function RegistrarForm({ onSwitch }) {
@@ -18,8 +16,7 @@ export default function RegistrarForm({ onSwitch }) {
   const [loading, setLoading] = useState(false);
 
   const swalEstilo = Swal.mixin({
-    imageWidth: 200,
-    imageHeight: 200,
+    imageWidth: 160,
     background: "#bababa",
     confirmButtonColor: "#6edc8c",
     customClass: {
@@ -32,7 +29,7 @@ export default function RegistrarForm({ onSwitch }) {
     e.preventDefault();
     setError("");
 
-    //  Validaciones básicas
+    // VALIDACIONES
     if (!username || !email || !password || !password2)
       return setError("Completá todos los campos.");
 
@@ -50,32 +47,45 @@ export default function RegistrarForm({ onSwitch }) {
 
     setLoading(true);
 
-    //  Estructura de usuario que espera el backend
+    // FORMATO EXACTO QUE ESPERA EL BACKEND
     const nuevoUsuario = {
-      nombre: username,
-      apellido: "",
+      usuario: username,
       email,
       password,
-      tipoPersona_id: 3, // Cliente
+      persona: {
+        tipoPersona_id: 3, // Cliente
+        activo:false, 
+      },
     };
 
     try {
-      await registerUser(nuevoUsuario);
+      const API_URL = import.meta.env.VITE_API_URL;
 
+      const res = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nuevoUsuario),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "No se pudo registrar el usuario.");
+      }
+
+      // MENSAJE DE VERIFICACIÓN
       await swalEstilo.fire({
-        title: "¡Cuenta creada con éxito!",
-        text: "Bienvenid@ a Fit Turnos. Ya podés iniciar sesión.",
-        imageUrl: exito,
-        imageHeight: 100,
-        imageAlt: "Éxito",
+        title: "¡Registración exitosa!",
+        text: "Te enviamos un correo para activar tu cuenta.",
         icon: "success",
-        confirmButtonText: "Iniciar Sesión",
+        confirmButtonText: "Ir al Login",
       });
 
       onSwitch("login");
+
     } catch (err) {
       console.error(err);
-      setError("Error al registrar el usuario. " + err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -134,7 +144,7 @@ export default function RegistrarForm({ onSwitch }) {
               id: "btnRegistrar",
               label: loading ? "Cargando..." : "REGISTRARSE",
               className: "btnCuentaLogin",
-              onClick: handleRegister,
+              type: "submit",
             }}
             boton2={{
               id: "btnCancelar",
@@ -142,7 +152,6 @@ export default function RegistrarForm({ onSwitch }) {
               className: "btnCancelar",
               onClick: () => navigate("/"),
             }}
-            contenedorClass="contenedorBotones"
           />
         </div>
 

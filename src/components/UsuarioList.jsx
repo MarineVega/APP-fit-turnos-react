@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import FormBotones from "./FormBotones";
@@ -18,20 +20,23 @@ export default function UsuarioList({ modo, onEditar }) {
   const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
   const [usuarios, setUsuarios] = useState([]);
 
-  //  Traer usuarios desde el backend
+  // ───────────────────────────────────────────────
+  //   Traer usuarios
+  // ───────────────────────────────────────────────
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
         const headers = {};
-        try {
-          const token = localStorage.getItem("token");
-          if (token) headers["Authorization"] = `Bearer ${token}`;
-        } catch {}
+        const token = localStorage.getItem("token");
+        if (token) headers["Authorization"] = `Bearer ${token}`;
 
         const response = await fetch("http://localhost:3000/usuarios", { headers });
+
         if (!response.ok) throw new Error("Error al obtener los usuarios");
+
         const data = await response.json();
         setUsuarios(data);
+
       } catch (error) {
         console.error("Error cargando usuarios:", error);
         Swal.fire({
@@ -53,66 +58,121 @@ export default function UsuarioList({ modo, onEditar }) {
     return "—";
   };
 
-  //  Eliminar usuario desde el backend
-  const handleEliminar = async (usuario) => {
-    if (usuarioActivo && usuario.usuario_id === usuarioActivo.usuario_id) {
-      swalEstilo.fire({
-        icon: "warning",
-        title: "No se puede eliminar",
-        text: "No puedes eliminar tu propio usuario mientras esté activo.",
-        confirmButtonText: "Cerrar",
+ // ───────────────────────────────────────────────
+//   ELIMINAR USUARIO
+// ───────────────────────────────────────────────
+const handleEliminar = async (usuario) => {
+
+  //  VALIDACIÓN: NO BORRAR AL USUARIO ACTIVO
+  if (usuarioActivo && usuario.usuario_id === usuarioActivo.usuario_id) {
+    swalEstilo.fire({
+      icon: "warning",
+      title: "No permitido",
+      text: "No puedes eliminar tu propio usuario.",
+    });
+    return;
+  }
+
+  //  NUEVO: Si es cliente, preguntar antes por reservas
+  const tipo = usuario?.persona?.tipoPersona_id;
+  if (tipo === 3) {
+    try {
+      const headers = {};
+      const token = localStorage.getItem("token");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const resp = await fetch(
+        `http://localhost:3000/reservas/usuario/${usuario.persona.persona_id}`,
+        { headers }
+      );
+
+      if (resp.ok) {
+        const { tieneReservas } = await resp.json();
+        if (tieneReservas) {
+          swalEstilo.fire({
+            icon: "warning",
+            title: "No se puede eliminar",
+            text: "Este cliente tiene reservas activas y no puede ser eliminado.",
+          });
+          return;
+        }
+      }
+
+    } catch (err) {
+      console.error("Error verificando reservas:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo verificar si el usuario tiene reservas.",
       });
       return;
     }
+  }
 
-    const confirm = await swalEstilo.fire({
-      title: "¿Eliminar usuario?",
-      text: `Se eliminará el usuario "${usuario.usuario}" de forma permanente.`,
-      icon: "warning",
-      showCancelButton: true,
-      cancelButtonText: "Cancelar",
-      confirmButtonText: "Sí, eliminar",
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#6edc8c",
-      customClass: { cancelButton: "btnAceptar" },
+  // CONFIRMACIÓN
+  const confirm = await swalEstilo.fire({
+    title: "¿Eliminar usuario?",
+    text: `El usuario "${usuario.usuario}" será eliminado permanentemente.`,
+    icon: "warning",
+    showCancelButton: true,
+    cancelButtonText: "Cancelar",
+    confirmButtonText: "Sí, eliminar",
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#6edc8c",
+  });
+
+  if (!confirm.isConfirmed) return;
+
+  // EJECUTAR DELETE
+  try {
+    const headers = {};
+    const token = localStorage.getItem("token");
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const response = await fetch(
+      `http://localhost:3000/usuarios/${usuario.usuario_id}`,
+      { method: "DELETE", headers }
+    );
+
+    //  manejar errores enviados por el backend
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+
+      let mensaje = "No se pudo eliminar el usuario.";
+
+      if (errorData?.message) {
+        if (Array.isArray(errorData.message)) {
+          mensaje = errorData.message.join(" ");
+        } else {
+          mensaje = errorData.message;
+        }
+      }
+
+      throw new Error(mensaje);
+    }
+
+    swalEstilo.fire({
+      title: "Eliminado",
+      text: "El usuario se eliminó correctamente.",
+      icon: "success",
+      confirmButtonText: "Cerrar",
     });
 
-    if (confirm.isConfirmed) {
-      try {
-        const headers = {};
-        try {
-          const token = localStorage.getItem("token");
-          if (token) headers["Authorization"] = `Bearer ${token}`;
-        } catch {}
+    // Refrescar listado
+    setUsuarios((prev) =>
+      prev.filter((u) => u.usuario_id !== usuario.usuario_id)
+    );
 
-        const response = await fetch(
-          `http://localhost:3000/usuarios/${usuario.usuario_id}`,
-          { method: "DELETE", headers }
-        );
+  } catch (error) {
+    console.error("Error eliminando usuario:", error);
 
-        if (!response.ok) throw new Error("Error al eliminar el usuario");
-
-        swalEstilo.fire({
-          title: "Eliminado",
-          text: "El usuario ha sido eliminado correctamente.",
-          icon: "success",
-          confirmButtonText: "Cerrar",
-        });
-
-        // Refrescar lista
-        setUsuarios((prev) =>
-          prev.filter((u) => u.usuario_id !== usuario.usuario_id)
-        );
-      } catch (error) {
-        console.error("Error eliminando usuario:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "No se pudo eliminar el usuario.",
-        });
-      }
-    }
-  };
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: error.message || "No se pudo eliminar el usuario.",
+    });
+  }
+};
 
   return (
     <main className="mainProfesor">
@@ -127,7 +187,6 @@ export default function UsuarioList({ modo, onEditar }) {
               <th>Tipo</th>
               <th>Verificado</th>
               <th>Activo</th>
-
               {modo !== "consultar" && <th>Acciones</th>}
             </tr>
           </thead>
@@ -148,7 +207,6 @@ export default function UsuarioList({ modo, onEditar }) {
                     <td>{obtenerTipo(u)}</td>
                     <td>{u.verificado ? "Sí" : "No"}</td>
                     <td>{u.persona?.activo ? "Sí" : "No"}</td>
-
 
                     {modo !== "consultar" && (
                       <td>
@@ -171,6 +229,7 @@ export default function UsuarioList({ modo, onEditar }) {
                                 />
                               </button>
                             )}
+
                             {modo === "eliminar" && (
                               <button
                                 className="btnTabla"

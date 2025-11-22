@@ -59,14 +59,24 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
 
         let nuevosErrores = { nombre: "", descripcion: "", cupoMaximo: "" };
         let esValido = true;
-
+/*
         if (!nombre.trim()) {
             nuevosErrores.nombre = "Por favor ingrese el nombre.";
             esValido = false;
         }
-
+*/
+        if (nombre.trim().length < 3 || nombre.trim().length > 50) {
+            nuevosErrores.nombre = "El nombre debe tener entre 3 y 50 caracteres.";
+            esValido = false;
+        }
+/*
         if (!descripcion.trim()) {
             nuevosErrores.descripcion = "Por favor ingrese una descripción.";
+            esValido = false;
+        }
+*/
+        if (descripcion.trim().length < 5 || descripcion.trim().length > 100) {
+            nuevosErrores.descripcion = "La descripción debe tener entre 5 y 100 caracteres.";
             esValido = false;
         }
 
@@ -92,14 +102,15 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
 
         // Si hay errores SALGO
         if (!esValido) return;
-
-        console.log("Nombre: ", nombre);
-        console.log("Descripcion: ", descripcion);
-        console.log("Cupo: ", cupoMaximo);
-
-        
+       
         //guardar({ nombre, descripcion, cupoMaximo, imagen });
-        const actividadData = { nombre, descripcion, cupoMaximo, imagen, activa: true };
+        const actividadData = { 
+            nombre, 
+            descripcion, 
+            cupoMaximo : Number(cupoMaximo), 
+            imagen, 
+            activa: true 
+        };
         
         try {
             const url =

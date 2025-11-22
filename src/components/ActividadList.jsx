@@ -18,17 +18,7 @@ const swalEstilo = Swal.mixin({
 export default function ActividadList({ actividades = [], modo, onEditar }) {
 
     const [actividadesBD, setActividadesBD] = useState([]);          // Levanta los datos de la BD
-    
-    /*
-    useEffect(() => {
-        fetch("http://localhost:3000/actividades")
-        .then((res) => res.json())
-        .then((data) => setActividades(data))
-        .catch((err) => console.error("Error:", err));
-    }, []);
-
-    */
-    
+        
     useEffect(() => {
         const fetchActividades = async () => {
         try {
@@ -59,42 +49,70 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
         fetchReservas();
     }, []);
     
-    console.log("reservas", reservas)
+    // Declaro el estado horarios
+    const [horarios, setHorarios] = useState([]);
+
+    useEffect(() => {
+    const fetchHorarios = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/horarios");
+            const data = await response.json();
+            setHorarios(data);
+        } catch (error) {
+            console.error("Error cargando horarios:", error);
+        }
+        };
+        fetchHorarios();
+    }, []);
 
     // ✅ Verifico si la actividad tiene reservas activas
     const tieneReservasActivas = (actividadId) => {
-  
-        console.log("Buscando reservas activas para actividadId:", actividadId);
-
+        //console.log("Buscando reservas activas para actividadId:", actividadId);
+        /*
         reservas.forEach(r => {
             console.log(`→ reserva_id=${r.reserva_id}, actividad_id=${r.actividad_id}, activo=${r.activo}`);
         });
-        /*
-
-        return reservas.some(
-        (r) => r.actividad_id === actividadId && r.activo === true
-        );
-*/
+        */
         const resultado = reservas.some(
             (r) => Number(r.actividad.actividad_id) === Number(actividadId) && r.activo === true
         );
 
-        console.log(`¿La actividad ${actividadId} tiene reservas activas? →`, resultado);
+       // console.log(`¿La actividad ${actividadId} tiene reservas activas? →`, resultado);
 
-        return resultado;
-        
+        return resultado;        
     };
       
+    // ✅ Verifico si la actividad tiene horarios activas
+    const tieneHorariosActivos = (actividadId) => {
+        return horarios.some(
+            h =>
+            Number(h.actividad.actividad_id) === Number(actividadId) &&
+            h.activo === true
+        );
+    };
+
     // ✅ Manejo de modificación con validación   
     const editarActividad = (actividad) => {
         if (tieneReservasActivas(actividad.actividad_id)) {
-        swalEstilo.fire({
-            icon: "warning",
-            title: "No se puede modificar",
-            text: `La actividad "${actividad.nombre}" tiene reservas activas.`,
-            confirmButtonText: "Cerrar",
-        });
-        return;
+            swalEstilo.fire({
+                icon: "warning",
+                title: "No se puede modificar",
+                text: `La actividad "${actividad.nombre}" tiene reservas activas.`,
+                confirmButtonText: "Cerrar",
+            });
+         
+            return;
+        }
+
+        if (tieneHorariosActivos(actividad.actividad_id)) {
+            swalEstilo.fire({
+                icon: "warning",
+                title: "No se puede modificar",
+                text: `La actividad "${actividad.nombre}" tiene horarios activos.`,
+                confirmButtonText: "Cerrar",
+            });
+
+            return;
         }
 
         if (onEditar) onEditar(actividad);
@@ -112,9 +130,18 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                 confirmButtonText: "Cerrar",
             });
             return;
-
         }
             
+        if (tieneHorariosActivos(actividad.actividad_id)) {
+            swalEstilo.fire({
+                icon: "warning",
+                title: "No se puede eliminar",
+                text: `La actividad "${actividad.nombre}" tiene horarios activos.`,
+                confirmButtonText: "Cerrar",
+            });
+            return;
+        }
+
         //swalEstilo.fire({
         const result = await swalEstilo.fire({
             title: "¿Eliminar actividad?",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -73,8 +73,8 @@ function normalizeHora(h) {
 
 // antes CalendarioTurnos ahora ReservasCalendario
 export default function ReservasCalendario ({ actividadSeleccionada }) {
-  const [eventos, setEventos] = useState([]);
-  
+  const [eventos, setEventos] = useState([]);  
+
   // creo estados para cada colección
   const [profesoresData, setProfesoresData] = useState([]);
   const [horasData, setHorasData] = useState([]);
@@ -130,45 +130,15 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
     
     if (clientesData.length > 0 && usuario) {      
       const cliente = clientesData.find(
-        (c) => Number(c.persona.persona_id) === Number(usuario.persona.persona_id)
+        (c) => Number(c.persona.persona_id) === Number(usuario.persona.persona_id) && usuario.persona.activo
       );
 
       setClienteActual(cliente);
     }
   }, [clientesData, usuario]);
  
-  console.log('clienteActual',clienteActual)
-  console.log('clienteActual.cliente_id',clienteActual?.cliente_id)
-
-
-  //const cliente_id = 1//clienteActual.cliente_id;
-  
   // Si el usuario no es un cliente, asigno -1 para que solo pueda ver las reservas sin editar
   const cliente_id = clienteActual?.cliente_id ?? -1;
-
-  console.log("cliente obtenido!", cliente_id)
-
-/*  
- // if (!clienteActual) {
-  if (!cliente_id || cliente_id === -1) {
-    swalEstilo.fire({
-      title: "Error",
-      text: "El usuario logueado no tiene permisos editar las reservas.",
-      icon: "error",
-      confirmButtonColor: "#d33",
-      confirmButtonText: "Cerrar",
-      customClass: {
-        confirmButton: "",   
-      }
-    });
-  };
-*/
-/*
-  // DEPURACIÓN: revisar que los horarios se cargaron correctamente
-  useEffect(() => {
-    console.log("Horarios cargados:", horariosData);
-  }, [horariosData]);
-*/
 
   // Generar eventos según actividad
   useEffect(() => {
@@ -204,14 +174,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
       // Descarto horario por estar desactivado
       if (!horario.activo) return;
-/*
-      console.log("Procesando horario:", horario);
-      console.log("Comparando actividad:", horario.actividad.actividad_id, 
-        "vs", actividadSeleccionada.actividad_id);
-      console.log("Horas disponibles:", horasData);
-      console.log("Hora del horario:", horario.hora);
-      console.log('horasData' ,horasData)
-*/
+
       const horaObj =
         horasData.find((h) => Number(h.hora_id) === Number(horario.hora.hora_id)) ||
         {};
@@ -246,8 +209,12 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
             .replace(/[\u0300-\u036f]/g, "");
           if (diaNorm !== diaActualNorm) continue;
 
-          const fechaISO = d.toISOString().split("T")[0]; // toISOString -> convierte un objeto de fecha (d) a una cadena de fecha y hora en formato ISO 8601, separa esa cadena por la letra 'T' y luego toma el primer elemento, obteniendo así la fecha en formato YYYY-MM-DD. Ej: 2025-10-29T10:30:00.000Z, se dividiría en dos partes: ["2025-10-29", "10:30:00.000Z"].
+          /* esto ya no sirve, porque a partir de la hora 21 me corre 1 día el calendario */
+          // const fechaISO = d.toISOString().split("T")[0]; // toISOString -> convierte un objeto de fecha (d) a una cadena de fecha y hora en formato ISO 8601, separa esa cadena por la letra 'T' y luego toma el primer elemento, obteniendo así la fecha en formato YYYY-MM-DD. Ej: 2025-10-29T10:30:00.000Z, se dividiría en dos partes: ["2025-10-29", "10:30:00.000Z"].
           // [0]: Al agregar [0] al final, se accede al primer elemento de ese array. En el ejemplo anterior, esto devolvería solo la fecha: "2025-10-29".
+
+          const fechaISO = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
 
           const start = `${fechaISO}T${horaInicio}`;
           const horaFinEvento = `${fechaISO}T${horaFin}`; 
@@ -382,8 +349,6 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
       });
       return;
     }
-
-    //console.log("evento", evento)
 
     const {
       horario_id,
@@ -551,12 +516,14 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
       // Verifico si el cliente ya tiene una reserva en ese horario
       const conflicto = reservas.find(
         (r) =>
-          r.cliente_id === cliente_id &&
+          r.cliente.cliente_id === cliente_id &&
           r.fecha.substring(0, 10) === fecha &&
           r.activo &&
-          r.horaInicio === horaInicio
+          r.horario.hora.horaInicio.substring(0, 5) === horaInicio
       );
 
+      
+      console.log("reservas", reservas)
       console.log(fecha)
       console.log(horaInicio)
 
@@ -649,7 +616,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="timeGridWeek"
-            //initialDate={new Date()}    // centra el calendario en el día actual
+            initialDate={new Date()}    // centra el calendario en el día actual
             headerToolbar={{
               left: "prev,next today",
               center: "title",

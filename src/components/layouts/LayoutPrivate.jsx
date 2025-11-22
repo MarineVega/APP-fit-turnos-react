@@ -84,7 +84,8 @@ export default function LayoutPrivate() {
   if (!autenticado) return null;
 
   return (
-    <div className="App">
+    //<div className="layout-private">    
+    <div className="App">    
       <Header />
       <main className="contenido">
         <Outlet />

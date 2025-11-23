@@ -19,8 +19,8 @@ export default function ProfesorList({ profesores = [], modo, onEditar, setProfe
   const [reservas, setReservas] = useState([]);
   const [horarios, setHorarios] = useState([]);
 
-   // Cargar reservas y horarios desde la base de datos
-   useEffect(() => {
+  // Cargar reservas y horarios desde la base de datos
+  useEffect(() => {
     // Cargar reservas
     fetch(`${API_BASE_URL}/reservas`)
       .then((res) => res.json())
@@ -41,7 +41,9 @@ export default function ProfesorList({ profesores = [], modo, onEditar, setProfe
   };
 
   const tieneHorariosAsignados = (profesorId) => {
-    return horarios.some((h) => Number(h.profesor_id) === Number(profesorId));
+    return horarios.some(
+      (h) => Number(h.profesor?.profesor_id) === Number(profesorId)
+    );
   };
 
   const editarProfesor = (profesor) => {
@@ -94,9 +96,6 @@ export default function ProfesorList({ profesores = [], modo, onEditar, setProfe
       })
       .then((result) => {
         if (result.isConfirmed) {
-          // Baja lógica (PATCH) — opcional:
-          // fetch(`${API_BASE_URL}/profesores/${profesor.profesor_id}`, { method: "PATCH", body: JSON.stringify({ activo: false }) })
-
           fetch(`${API_BASE_URL}/profesores/${profesor.profesor_id}`, {
             method: "DELETE",
           })
@@ -118,8 +117,12 @@ export default function ProfesorList({ profesores = [], modo, onEditar, setProfe
       });
   };
 
-  // Si el modo es "postAlta", lo trato como "consultar"
   const modoEfectivo = modo === "postAlta" ? "consultar" : modo;
+
+  // 🔥 ORDENAR PROFESORES POR NOMBRE (actualización pedida)
+  const profesoresOrdenados = [...profesores].sort((a, b) =>
+    a.persona.nombre.localeCompare(b.persona.nombre)
+  );
 
   return (
     <main className="mainProfesor">
@@ -137,8 +140,8 @@ export default function ProfesorList({ profesores = [], modo, onEditar, setProfe
           </thead>
 
           <tbody>
-            {profesores.length > 0 ? (
-              profesores.map((profesor) => (
+            {profesoresOrdenados.length > 0 ? (
+              profesoresOrdenados.map((profesor) => (
                 <tr key={profesor.profesor_id}>
                   <td>{profesor.persona.nombre}</td>
                   <td>{profesor.persona.apellido}</td>

@@ -37,16 +37,19 @@ export default function Usuario() {
     }
   }, [modo, usuario_id, usuarios]);
 
-  // Guardar usuario nuevo o editado (llamando al backend)
+  // Guardar usuario nuevo o editado
   const guardarUsuario = async (usuario) => {
     try {
       if (modo === "editar" && datoInicial) {
         // PUT: actualizar usuario existente
-        const res = await fetch(`http://localhost:3000/usuarios/${datoInicial.usuario_id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(usuario),
-        });
+        const res = await fetch(
+          `http://localhost:3000/usuarios/${datoInicial.usuario_id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(usuario),
+          }
+        );
         if (!res.ok) throw new Error("Error al actualizar usuario");
       } else {
         // POST: crear nuevo usuario
@@ -59,7 +62,9 @@ export default function Usuario() {
       }
 
       //  Volver a cargar la lista
-      const nuevos = await fetch("http://localhost:3000/usuarios").then((r) => r.json());
+      const nuevos = await fetch("http://localhost:3000/usuarios").then((r) =>
+        r.json()
+      );
       setUsuarios(nuevos);
     } catch (error) {
       console.error("Error guardando usuario:", error);
@@ -70,6 +75,11 @@ export default function Usuario() {
     setDatoInicial(usuario);
     setParams({ modo: "editar", id: usuario.usuario_id });
   };
+
+  // 🔥 Evitar pantalla rota mientras se cargan los usuarios
+  if (!usuarios.length) {
+    return <p className="cargando">Cargando...</p>;
+  }
 
   return (
     <main className="mainProfesor">
@@ -89,7 +99,11 @@ export default function Usuario() {
       {modo === "editar" && !datoInicial && (
         <>
           <TituloConFlecha>Modificar Usuario</TituloConFlecha>
-          <UsuarioList usuarios={usuarios} modo="editar" onEditar={handleEditar} />
+          <UsuarioList
+            usuarios={usuarios}
+            modo="editar"
+            onEditar={handleEditar}
+          />
         </>
       )}
 

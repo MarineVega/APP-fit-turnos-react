@@ -37,6 +37,11 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
 
   const [errores, setErrores] = useState({});
 
+  // 🔥 Scroll hacia arriba siempre que cambia el modo o se recarga el form
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [modo]);
+
   // Auto-completa repetir contraseña en modo edición
   useEffect(() => {
     if (modo === "editar" && usuario.contrasenia && !usuario.repetirContrasenia) {
@@ -50,7 +55,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
   const limpiarError = (campo) =>
     setErrores((prev) => ({ ...prev, [campo]: "" }));
 
-  // 🔥 BLOQUEO DEL SELECT — añadido
+  // No se puede seleccionar administador si es cliente y tiene reservas activas
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -78,7 +83,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
   const validarGuardar = async (e) => {
     e.preventDefault();
 
-    // 🔥 VALIDACIÓN EXTRA REAL a backend antes de guardar
+    //  VALIDACION a backend antes de guardar
     if (modo === "editar" && datoInicial?.persona?.tipoPersona_id === 3) {
       try {
         const headers = {};
@@ -105,21 +110,6 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
       } catch (err) {
         console.error("Error validando reservas antes de guardar:", err);
       }
-    }
-
-    // 🔥 BLOQUEO ANTERIOR (por si acaso)
-    if (
-      modo === "editar" &&
-      datoInicial?.persona?.tipoPersona_id === 3 &&
-      datoInicial?.tieneReservas &&
-      parseInt(usuario.tipoPersona_id) !== 3
-    ) {
-      Swal.fire(
-        "No permitido",
-        "Este usuario tiene reservas activas y no puede cambiarse de Cliente.",
-        "warning"
-      );
-      return;
     }
 
     const nuevosErrores = {};
@@ -247,7 +237,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
       .then(() => {
         limpiarFormulario();
         window.location.href =
-          modo === "editar" ? "/usuario?modo=editar" : "/usuario?modo=postAlta";
+          modo === "editar" ? "/usuario?modo=editar" : "/usuario?modo=consultar";
       });
   };
 

@@ -40,7 +40,6 @@ export default function ProfesorList({ profesores = [], modo, onEditar, setProfe
     );
   };
 
-  // ✅ CORREGIDO → ahora lee h.profesor.profesor_id (antes leías h.profesor_id)
   const tieneHorariosAsignados = (profesorId) => {
     return horarios.some(
       (h) => Number(h.profesor?.profesor_id) === Number(profesorId)
@@ -120,6 +119,11 @@ export default function ProfesorList({ profesores = [], modo, onEditar, setProfe
 
   const modoEfectivo = modo === "postAlta" ? "consultar" : modo;
 
+  // 🔥 ORDENAR PROFESORES POR NOMBRE (actualización pedida)
+  const profesoresOrdenados = [...profesores].sort((a, b) =>
+    a.persona.nombre.localeCompare(b.persona.nombre)
+  );
+
   return (
     <main className="mainProfesor">
       <section id="tablaProfesores">
@@ -136,8 +140,8 @@ export default function ProfesorList({ profesores = [], modo, onEditar, setProfe
           </thead>
 
           <tbody>
-            {profesores.length > 0 ? (
-              profesores.map((profesor) => (
+            {profesoresOrdenados.length > 0 ? (
+              profesoresOrdenados.map((profesor) => (
                 <tr key={profesor.profesor_id}>
                   <td>{profesor.persona.nombre}</td>
                   <td>{profesor.persona.apellido}</td>

@@ -31,7 +31,6 @@ export async function registerUser({
         usuario: email,
         email,
         password,
-        activo: true,
         persona: {
           nombre,
           apellido,

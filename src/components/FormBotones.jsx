@@ -12,7 +12,7 @@ const FormBotones = ({
                 id={boton1.id}
                 className={boton1.className}
                 onClick={boton1.onClick}
-                type="submit"
+                type={boton1.type || "submit"}
             >
                 {boton1.label}
             </button>
@@ -22,7 +22,7 @@ const FormBotones = ({
                 id={boton2.id}
                 className={boton2.className}
                 onClick={boton2.onClick}
-                type="button"
+                type={boton2.type || "button"}
             >
                 {boton2.label}
             </button>

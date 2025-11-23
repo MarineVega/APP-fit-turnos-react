@@ -7,7 +7,7 @@ import FormBotones from "./FormBotones";
 import { useSearchParams } from "react-router-dom";
 import "../styles/style.css";
 
-// ✅ Configuración del SweetAlert
+// SweetAlert
 const swalEstilo = Swal.mixin({
   imageWidth: 200,
   imageHeight: 200,
@@ -24,21 +24,20 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
   const modo = params.get("modo") || "agregar";
   const usuario_id = datoInicial?.usuario_id || null;
 
-  // Estados del formulario
   const [usuario, setUsuario] = useState({
     nombre: datoInicial?.persona?.nombre || datoInicial?.nombre || "",
     apellido: datoInicial?.persona?.apellido || datoInicial?.apellido || "",
     email: datoInicial?.email || datoInicial?.persona?.email || "",
     usuario: datoInicial?.usuario || "",
     contrasenia: datoInicial?.password || datoInicial?.contrasenia || "",
-    repetirContrasenia: "", // se completa abajo si es edición
+    repetirContrasenia: "",
     tipoPersona_id: datoInicial?.persona?.tipoPersona_id || "",
     activo: datoInicial?.activo ?? true,
   });
 
   const [errores, setErrores] = useState({});
 
-  // Si está en modo edición, repetirContrasenia toma el valor de contrasenia
+  // Auto-completa repetir contraseña en modo edición
   useEffect(() => {
     if (modo === "editar" && usuario.contrasenia && !usuario.repetirContrasenia) {
       setUsuario((prev) => ({
@@ -48,27 +47,85 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     }
   }, [modo, usuario.contrasenia]);
 
-  const limpiarError = (campo) => setErrores((prev) => ({ ...prev, [campo]: "" }));
+  const limpiarError = (campo) =>
+    setErrores((prev) => ({ ...prev, [campo]: "" }));
 
-  //  Manejo de cambios
+  // 🔥 BLOQUEO DEL SELECT — añadido
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    if (
+      name === "tipoPersona_id" &&
+      modo === "editar" &&
+      datoInicial?.persona?.tipoPersona_id === 3 &&
+      datoInicial?.tieneReservas &&
+      parseInt(value) !== 3
+    ) {
+      Swal.fire(
+        "No permitido",
+        "Este usuario es Cliente y tiene reservas activas. No puede cambiarse a otro tipo.",
+        "warning"
+      );
+      return;
+    }
+
     setUsuario({
       ...usuario,
       [name]: type === "checkbox" ? checked : value,
     });
   };
 
-  // Validación y guardado
- 
   const validarGuardar = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
+    // 🔥 VALIDACIÓN EXTRA REAL a backend antes de guardar
+    if (modo === "editar" && datoInicial?.persona?.tipoPersona_id === 3) {
+      try {
+        const headers = {};
+        const token = localStorage.getItem("token");
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        const resp = await fetch(
+          `http://localhost:3000/reservas/usuario/${datoInicial.persona.persona_id}`,
+          { headers }
+        );
+
+        if (resp.ok) {
+          const data = await resp.json();
+
+          if (data.tieneReservas && parseInt(usuario.tipoPersona_id) !== 3) {
+            Swal.fire(
+              "No permitido",
+              "Este usuario tiene reservas activas y no puede cambiarse de Cliente.",
+              "warning"
+            );
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Error validando reservas antes de guardar:", err);
+      }
+    }
+
+    // 🔥 BLOQUEO ANTERIOR (por si acaso)
+    if (
+      modo === "editar" &&
+      datoInicial?.persona?.tipoPersona_id === 3 &&
+      datoInicial?.tieneReservas &&
+      parseInt(usuario.tipoPersona_id) !== 3
+    ) {
+      Swal.fire(
+        "No permitido",
+        "Este usuario tiene reservas activas y no puede cambiarse de Cliente.",
+        "warning"
+      );
+      return;
+    }
 
     const nuevosErrores = {};
     let esValido = true;
 
-    //  Validaciones básicas
+    // Validaciones
     if (!usuario.nombre.trim()) {
       nuevosErrores.nombre = "El nombre es obligatorio.";
       esValido = false;
@@ -101,27 +158,23 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
       esValido = false;
     }
 
-    //  Evita duplicados de usuario y email
+    // Usuario duplicado
     const usuarioDuplicado = usuarios.some(
       (u) =>
         u.usuario?.toLowerCase().trim() === usuario.usuario.toLowerCase().trim() &&
         u.usuario_id !== usuario_id
     );
-
     const emailDuplicado = usuarios.some(
       (u) =>
         u.email?.toLowerCase().trim() === usuario.email.toLowerCase().trim() &&
         u.usuario_id !== usuario_id
     );
 
-    if (usuarioDuplicado && emailDuplicado) {
-      nuevosErrores.usuario = "Ya existe un usuario con ese nombre.";
-      nuevosErrores.email = "Ya existe un usuario con ese correo electrónico.";
-      esValido = false;
-    } else if (usuarioDuplicado) {
+    if (usuarioDuplicado) {
       nuevosErrores.usuario = "Ya existe un usuario con ese nombre.";
       esValido = false;
-    } else if (emailDuplicado) {
+    }
+    if (emailDuplicado) {
       nuevosErrores.email = "Ya existe un usuario con ese correo electrónico.";
       esValido = false;
     }
@@ -129,17 +182,15 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     setErrores(nuevosErrores);
     if (!esValido) return;
 
-    // Preparar datos para el backend
+    // --- Guardar en backend ---
     const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
     const token = localStorage.getItem("token");
 
-    // Si estamos en modo edición, llamamos PUT a /usuarios/:id
     if (modo === "editar" && usuario_id) {
       const body = {
         usuario: usuario.usuario,
         email: usuario.email,
         password: usuario.contrasenia,
-        activo: usuario.activo,
         persona: {
           nombre: usuario.nombre,
           apellido: usuario.apellido,
@@ -167,11 +218,10 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           throw new Error(text || "Error al actualizar usuario");
         }
       } catch (error) {
-        Swal.fire("Error", error.message || "No se pudo actualizar el usuario", "error");
+        Swal.fire("Error", error.message, "error");
         return;
       }
     } else {
-      // Modo crear: usar registerUser con los campos que espera
       try {
         await registerUser({
           nombre: usuario.nombre,
@@ -181,22 +231,16 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           tipoPersona_id: parseInt(usuario.tipoPersona_id),
         });
       } catch (error) {
-        Swal.fire("Error", error.message || "No se pudo registrar el usuario", "error");
+        Swal.fire("Error", error.message, "error");
         return;
       }
     }
 
-    const mensaje =
-      modo === "editar"
-        ? "El usuario ha sido actualizado."
-        : "El usuario ha sido creado.";
-
     swalEstilo
       .fire({
         title: "¡Operación Exitosa!",
-        text: mensaje,
+        text: modo === "editar" ? "El usuario ha sido actualizado." : "El usuario ha sido creado.",
         imageUrl: exitoImg,
-        imageAlt: "Éxito",
         icon: "success",
         confirmButtonText: "Volver",
       })
@@ -223,19 +267,14 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
 
   const cancelar = () => {
     limpiarFormulario();
-    if (modo === "agregar") {
-      window.location.href = "/administrar";
-    } else if (modo === "editar") {
-      window.location.href = "/usuario?modo=editar";
-    } else {
-      window.location.href = "/usuario?modo=consultar";
-    }
+    if (modo === "agregar") window.location.href = "/administrar";
+    else window.location.href = "/usuario?modo=editar";
   };
 
   return (
-    
     <section className="seccionProfesor">
       <form onSubmit={validarGuardar} className="formProfesor">
+
         <FormCampos
           label="Nombre *"
           name="nombre"
@@ -305,8 +344,11 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           error={errores.repetirContrasenia}
         />
 
-        {/* Selector de Tipo de Usuario */}
-        <label className="labelGeneral" htmlFor="tipoPersona_id">Tipo de Usuario *</label>
+        {/* SELECT tipo de usuario */}
+        <label className="labelGeneral" htmlFor="tipoPersona_id">
+          Tipo de Usuario *
+        </label>
+
         <select
           id="tipoPersona_id"
           name="tipoPersona_id"
@@ -314,22 +356,37 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           onChange={handleChange}
           className="inputProfesor"
           required
-          disabled={usuario.tipoPersona_id === "2"} // si es profesor, bloquea todo el select
+          disabled={
+            usuario.tipoPersona_id === "2" ||
+            (
+              modo === "editar" && 
+              datoInicial?.persona?.tipoPersona_id === 3 &&
+              datoInicial?.tieneReservas
+            )
+          }
         >
           <option value="">Seleccione...</option>
 
-          <option value="1">Administrador</option>
+          <option
+            value="1"
+            disabled={
+              modo === "editar" &&
+              datoInicial?.persona?.tipoPersona_id === 3 &&
+              datoInicial?.tieneReservas
+            }
+          >
+            Administrador
+          </option>
 
           <option
             value="2"
             disabled={modo === "agregar" || usuario.tipoPersona_id !== "2"}
           >
-            Profesor (proximamente)
+            Profesor (próximamente)
           </option>
 
           <option value="3">Cliente</option>
         </select>
-
 
         {errores.tipoPersona_id && (
           <p className="adventencia">{errores.tipoPersona_id}</p>
@@ -347,24 +404,23 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
 
         <p className="advertencia">* Campos obligatorios</p>
       </form>
-     
-      {/*  Botones */}
+
       <FormBotones
-        
         boton1={{
           id: "agregar",
           label: modo === "editar" ? "GUARDAR" : "AGREGAR",
           className: "btnAceptar",
+          type: "button",
           onClick: validarGuardar,
         }}
         boton2={{
           id: "cancelar",
           label: "CANCELAR",
           className: "btnCancelar",
+          type: "button",
           onClick: cancelar,
         }}
-        
       />
-     </section>
+    </section>
   );
 }

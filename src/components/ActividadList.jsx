@@ -18,17 +18,7 @@ const swalEstilo = Swal.mixin({
 export default function ActividadList({ actividades = [], modo, onEditar }) {
 
     const [actividadesBD, setActividadesBD] = useState([]);          // Levanta los datos de la BD
-    
-    /*
-    useEffect(() => {
-        fetch("http://localhost:3000/actividades")
-        .then((res) => res.json())
-        .then((data) => setActividades(data))
-        .catch((err) => console.error("Error:", err));
-    }, []);
-
-    */
-    
+        
     useEffect(() => {
         const fetchActividades = async () => {
         try {
@@ -59,42 +49,70 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
         fetchReservas();
     }, []);
     
-    console.log("reservas", reservas)
+    // Declaro el estado horarios
+    const [horarios, setHorarios] = useState([]);
+
+    useEffect(() => {
+    const fetchHorarios = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/horarios");
+            const data = await response.json();
+            setHorarios(data);
+        } catch (error) {
+            console.error("Error cargando horarios:", error);
+        }
+        };
+        fetchHorarios();
+    }, []);
 
     // ✅ Verifico si la actividad tiene reservas activas
     const tieneReservasActivas = (actividadId) => {
-  
-        console.log("Buscando reservas activas para actividadId:", actividadId);
-
+        //console.log("Buscando reservas activas para actividadId:", actividadId);
+        /*
         reservas.forEach(r => {
             console.log(`→ reserva_id=${r.reserva_id}, actividad_id=${r.actividad_id}, activo=${r.activo}`);
         });
-        /*
-
-        return reservas.some(
-        (r) => r.actividad_id === actividadId && r.activo === true
-        );
-*/
+        */
         const resultado = reservas.some(
             (r) => Number(r.actividad.actividad_id) === Number(actividadId) && r.activo === true
         );
 
-        console.log(`¿La actividad ${actividadId} tiene reservas activas? →`, resultado);
+       // console.log(`¿La actividad ${actividadId} tiene reservas activas? →`, resultado);
 
-        return resultado;
-        
+        return resultado;        
     };
       
+    // ✅ Verifico si la actividad tiene horarios activas
+    const tieneHorariosActivos = (actividadId) => {
+        return horarios.some(
+            h =>
+            Number(h.actividad.actividad_id) === Number(actividadId) &&
+            h.activo === true
+        );
+    };
+
     // ✅ Manejo de modificación con validación   
     const editarActividad = (actividad) => {
         if (tieneReservasActivas(actividad.actividad_id)) {
-        swalEstilo.fire({
-            icon: "warning",
-            title: "No se puede modificar",
-            text: `La actividad "${actividad.nombre}" tiene reservas activas.`,
-            confirmButtonText: "Cerrar",
-        });
-        return;
+            swalEstilo.fire({
+                icon: "warning",
+                title: "No se puede modificar",
+                text: `La actividad "${actividad.nombre}" tiene reservas activas.`,
+                confirmButtonText: "Cerrar",
+            });
+         
+            return;
+        }
+
+        if (tieneHorariosActivos(actividad.actividad_id)) {
+            swalEstilo.fire({
+                icon: "warning",
+                title: "No se puede modificar",
+                text: `La actividad "${actividad.nombre}" tiene horarios activos.`,
+                confirmButtonText: "Cerrar",
+            });
+
+            return;
         }
 
         if (onEditar) onEditar(actividad);
@@ -102,7 +120,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
 
     // ✅ Manejo de eliminación con validación    
     const eliminarActividad = async (actividad) => {
-        console.log('actividad.actividad_id ', actividad.actividad_id)
+       // console.log('actividad.actividad_id ', actividad.actividad_id)
 
         if (tieneReservasActivas(actividad.actividad_id)) {
             swalEstilo.fire({
@@ -112,9 +130,18 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                 confirmButtonText: "Cerrar",
             });
             return;
-
         }
             
+        if (tieneHorariosActivos(actividad.actividad_id)) {
+            swalEstilo.fire({
+                icon: "warning",
+                title: "No se puede eliminar",
+                text: `La actividad "${actividad.nombre}" tiene horarios activos.`,
+                confirmButtonText: "Cerrar",
+            });
+            return;
+        }
+
         //swalEstilo.fire({
         const result = await swalEstilo.fire({
             title: "¿Eliminar actividad?",
@@ -160,21 +187,23 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
             }
         }
     };
-   
-
     
     // Cargo la imagen desde src/assets/img dinámicamente
     const obtenerRutaImagen = (nombreArchivo) => {
+        const archivo =        
+            nombreArchivo && nombreArchivo.trim() !== "" && nombreArchivo !== null
+                ? nombreArchivo
+                : "icono_default.png";      // uso la imagen default si viene vacía
         try {
-        return new URL(`../assets/img/${nombreArchivo}`, import.meta.url).href;
+            return new URL(`../assets/img/${archivo}`, import.meta.url).href;
             /* ¿Qué hace la línea anterior?
             Si la imagen viene del formulario (File): usa URL.createObjectURL como antes.
             Si es un nombre de archivo (como "yoga.png"): 
             new URL('../assets/img/yoga.png', import.meta.url).href genera la URL final procesada por Vite.
             Esto permite usar imágenes que están dentro de src/assets/img sin moverlas a public. */
         } catch (error) {
-        console.warn(`No se encontró la imagen: ${nombreArchivo}`);
-        return null;
+            console.warn(`No se encontró la imagen: ${archivo}. Usando icono_default.png`);
+            return new URL(`../assets/img/icono_default.png`, import.meta.url).href;
         }
     };
 
@@ -231,8 +260,6 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                                             ) : (
                                                 "Sin imagen"
                                             )}
-                                            
-
                                         </td>
                                         
                                         {modoEfectivo !== "consultar" && (
@@ -240,10 +267,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                                                 {modoEfectivo === "editar" && (
                                                     <button
                                                         className="btnTabla"
-                                                        // Redirigir al formulario en modo editar
-                                                       // onClick={() => onEditar && onEditar(actividad)}
                                                         onClick={() => editarActividad(actividad)} // ✅ paso por la validación
-                                                        
                                                     >
                                                         <img    
                                                             src={

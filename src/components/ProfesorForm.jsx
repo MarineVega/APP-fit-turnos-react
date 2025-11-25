@@ -105,7 +105,7 @@ export default function ProfesorForm({ guardar, profesores = [], datoInicial = n
             if (modo === "editar") {
                 window.location.href = "/profesor?modo=editar";
             } else {
-                window.location.href = "/profesor?modo=postAlta";
+                window.location.href = "/profesor?modo=consultar";
             }
         });
     };
@@ -118,24 +118,28 @@ export default function ProfesorForm({ guardar, profesores = [], datoInicial = n
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     error={errores.nombre}
+                    className="inputProfesor"
                 />
                 <FormCampos
                     label="Apellido *"
                     value={apellido}
                     onChange={(e) => setApellido(e.target.value)}
                     error={errores.apellido}
+                    className="inputProfesor"
                 />
                 <FormCampos
                     label="Documento *"
                     value={documento}
                     onChange={(e) => setDocumento(e.target.value)}
                     error={errores.documento}
+                    className="inputProfesor"
                 />
                 <FormCampos
                     label="Título habilitante *"
                     value={titulo}
                     onChange={(e) => setTitulo(e.target.value)}
                     error={errores.titulo}
+                    className="inputProfesor"
                 />
 
                 {/* Checkbox Activo */}
@@ -152,10 +156,10 @@ export default function ProfesorForm({ guardar, profesores = [], datoInicial = n
 
                 <p className="advertencia">* Campos obligatorios</p>
             </form>
-
+           
             <FormBotones
-                boton1={{ label: modo === "editar" ? "GUARDAR" : "AGREGAR", onClick: validarGuardar }}
-                boton2={{ label: "CANCELAR", onClick: () => window.location.href = "/profesor" }}
+                boton1={{ label: modo === "editar" ? "GUARDAR" : "AGREGAR", className: "btnAceptar",onClick: validarGuardar }}
+                boton2={{ label: "CANCELAR", onClick: () => window.location.href = "/profesor" ,className: "btnCancelar"}}
             />
         </section>
     );

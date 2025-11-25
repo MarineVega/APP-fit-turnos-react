@@ -87,9 +87,10 @@ export default function HorarioForm({
   // Si estoy en modo editar, cargo los datos del horario
   useEffect(() => {
     if (modo === "editar" && datoInicial) {
+      /*
       console.log("datoInicial completo: ", datoInicial);
       console.log("dias: ", datoInicial.dias);
-
+      */
       setProfesorID(
         datoInicial.profesor != null
           ? Number(datoInicial.profesor.profesor_id)
@@ -163,141 +164,124 @@ export default function HorarioForm({
     }
 
     // Evito duplicados (excepto cuando se está editando el mismo horario)
-    const yaExiste = horarios.some((h) => {
-      let diasExistentes = [];
-/*
-      if (Array.isArray(h.dias_id)) {
-        diasExistentes = h.dias_id;
-      } else if (typeof h.dias_id === "string") {
-        // si los días vienen como string de la BD, los convierto a array
-        try {
-          diasExistentes = JSON.parse(h.dias_id);
-        } catch {
-          diasExistentes = [];
-        }
-      }
-*/
-        console.log("es array? ", h.dias)
-        console.log("es array? ", Array.isArray(h.dias))
 
-         
+    // Si el profesor es null → no validar duplicados
+    if (profesorID === null || profesorID === "" || profesorID === 0) {
+      console.log("Profesor null: NO se valida duplicado.");
+      // NO retorno nada, dejo seguir el flujo normal.      
+    } else {
+      const yaExiste = horarios.some((h) => {
+        let diasExistentes = [];
 
         if (Array.isArray(h.dias)) {
-            console.log("entró")
-            diasExistentes = h.dias;
-        } else if (typeof h.dias === "string") {
-            try {
-                console.log("dias parsed ", JSON.parse(h.dias))
+              //console.log("entró")
+              diasExistentes = h.dias;
+          } else if (typeof h.dias === "string") {
+              try {
+                  //console.log("dias parsed ", JSON.parse(h.dias))
+                  const parsed = JSON.parse(h.dias);
+                  
+                  diasExistentes = Array.isArray(parsed)
+                      ? parsed
+                      : h.dias.split(",").map(d => d.trim().toLowerCase());
+              } catch {
+                  //console.log("catch")
+                  diasExistentes = h.dias.split(",").map(d => d.trim().toLowerCase());
+              }
+          }
 
-                const parsed = JSON.parse(h.dias);
-                
-                diasExistentes = Array.isArray(parsed)
-                    ? parsed
-                    : h.dias.split(",").map(d => d.trim().toLowerCase());
-            } catch {
-                console.log("catch")
-                diasExistentes = h.dias.split(",").map(d => d.trim().toLowerCase());
-            }
-        }
+          // Normalizar días
+          const diasNormalizados = diasExistentes.map(d => String(d).toLowerCase());
 
-        // Normalizar días
-        const diasNormalizados = diasExistentes.map(d => String(d).toLowerCase());
+          const diasCoinciden = diasSeleccionados.some(d =>
+              diasNormalizados.includes(String(d).toLowerCase())
+          );
 
-         // Chequeo si hay al menos un día en común
-         /*
-        const diasCoinciden = diasSeleccionados.some((d) =>
-            diasExistentes.includes(d)
-        );
-        */
-        const diasCoinciden = diasSeleccionados.some(d =>
-            diasNormalizados.includes(String(d).toLowerCase())
-        );
+          // ids del horario leído
+          const profesorIdEnH = Number(
+              h.profesor?.profesor_id ||
+              h.profesor_id ||
+              0
+          );
 
-        // ids del horario leído
-        const profesorIdEnH = Number(
-            h.profesor?.profesor_id ||
-            h.profesor_id ||
-            0
-        );
+          const horaIdEnH = Number(
+              h.hora?.hora_id ||
+              h.hora_id ||
+              0
+          );
 
-        const horaIdEnH = Number(
-            h.hora?.hora_id ||
-            h.hora_id ||
-            0
-        );
-
-        const esDuplicado =
-            profesorIdEnH === Number(profesorID) &&
-            horaIdEnH === Number(horaID) &&
-            diasCoinciden &&
-            Number(h.horario_id) !== Number(id);
-
-
-        
-
-
-     
-      console.log("registro ", h);
-      console.log("id horario ", id);
+          const esDuplicado =
+              profesorIdEnH === Number(profesorID) &&
+              horaIdEnH === Number(horaID) &&
+              diasCoinciden &&
+              Number(h.horario_id) !== Number(id);
 /*
-      // Comparo todo
-      const esDuplicado =        
-        Number(h.profesor?.profesor_id || h.profesor_id || 0) === Number(profesorID || 0) &&
-        //Number(h.profesor.profesor_id || 0) === Number(profesorID || 0) &&
-        //Number(h.hora.hora_id) === Number(horaID) &&
-        Number(h.hora?.hora_id || h.hora_id || 0) === Number(horaID) &&
-        diasCoinciden &&
-        Number(h.horario_id) !== Number(id);
+      
+        console.log("registro ", h);
+        console.log("id horario ", id);
+      */
+  /*
+        // Comparo todo
+        const esDuplicado =        
+          Number(h.profesor?.profesor_id || h.profesor_id || 0) === Number(profesorID || 0) &&
+          //Number(h.profesor.profesor_id || 0) === Number(profesorID || 0) &&
+          //Number(h.hora.hora_id) === Number(horaID) &&
+          Number(h.hora?.hora_id || h.hora_id || 0) === Number(horaID) &&
+          diasCoinciden &&
+          Number(h.horario_id) !== Number(id);
+  */
+ /*
+        console.log("Comparando registro:", {
+          profesorEnH: Number(h.profesor?.profesor_id || h.profesor_id),
+          profesorSeleccionado: Number(profesorID),
+          horaEnH: Number(h.hora?.hora_id || h.hora_id),
+          horaSeleccionada: Number(horaID),
+          diasCoinciden,
+          mismoID: Number(h.horario_id) === Number(id),
+          esDuplicado
+          });
+
+
+        console.log(`Comparando con horario_id=${h.horario_id}:`, {
+          profesor: Number(h.profesor?.profesor_id || h.profesor_id || 0)  === Number(profesorID),
+          hora: h.hora.hora_id === Number(horaID),
+          diasCoinciden,
+          esDuplicado,
+        });
 */
-      console.log("Comparando registro:", {
-        profesorEnH: Number(h.profesor?.profesor_id || h.profesor_id),
-        profesorSeleccionado: Number(profesorID),
-        horaEnH: Number(h.hora?.hora_id || h.hora_id),
-        horaSeleccionada: Number(horaID),
-        diasCoinciden,
-        mismoID: Number(h.horario_id) === Number(id),
-        esDuplicado
+        return esDuplicado;
+      });
+    
+
+     // console.log("ya existe: ", yaExiste);
+
+
+      if (yaExiste) {
+        swalEstilo.fire({
+          icon: "error",
+          title: "Horario duplicado",
+          text: "Ya existe un horario con el mismo profesor, día y hora.",
+          confirmButtonColor: "#d33",
+          confirmButtonText: "Cerrar",
+          customClass: "",
         });
 
-
-      console.log(`Comparando con horario_id=${h.horario_id}:`, {
-        profesor: Number(h.profesor?.profesor_id || h.profesor_id || 0)  === Number(profesorID),
-        hora: h.hora.hora_id === Number(horaID),
-        diasCoinciden,
-        esDuplicado,
-      });
-
-      return esDuplicado;
-    });
-
-    console.log("ya existe: ", yaExiste);
-
-
-    if (yaExiste) {
-      swalEstilo.fire({
-        icon: "error",
-        title: "Horario duplicado",
-        text: "Ya existe un horario con el mismo profesor, día y hora.",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "Cerrar",
-        customClass: "",
-      });
-
-      return; // cancela el guardado
+        return; // cancela el guardado
+      }
     }
-
+    
     // Aplico los errores visuales si existen
     setErrores(nuevosErrores);
 
     // Si hay errores SALGO
     if (!esValido) return;
-
+/*
     console.log("Profesor: ", profesorID);
     console.log("Actividad: ", actividadID);
     console.log("Cupo: ", cupoMaximo);
     console.log("Días : ", diasSeleccionados);
     console.log("Hora: ", horaID);
-
+*/
     // Si pasa todas las validaciones, continua el guardado
     const horarioData = {
       profesor_id: profesorID !== "" ? Number(profesorID) : null,
@@ -316,11 +300,11 @@ export default function HorarioForm({
           : "http://localhost:3000/horarios";
 
       const method = modo === "editar" ? "PUT" : "POST";
-
+/*
       console.log("Enviando a backend:", horarioData);
       console.log("URL:", url);
       console.log("Método:", method);
-
+*/
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },

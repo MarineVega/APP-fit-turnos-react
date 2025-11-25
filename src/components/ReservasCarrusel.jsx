@@ -50,6 +50,14 @@ export default function ReservasCarrusel({ seleccion, onSeleccion }) {
         fetchActividades();
     }, []); 
 
+    // 21-11-2025 -> para que la PRIMER actividad aparezca en el centro al cargar el carrusel.
+    useEffect(() => {
+    if (actividades.length > 0) {
+        // para que la PRIMER actividad quede en el centro
+        setIndiceInicio(actividades.length - 1);
+        }
+    }, [actividades]);
+
 
     // 3. Hook de selección 
     // Lo movemos aquí porque tiene que ejecutarse en CADA render para que React lo registre.
@@ -123,9 +131,18 @@ export default function ReservasCarrusel({ seleccion, onSeleccion }) {
 
                 <div className="carrusel-actividades">
                     {actividadesVisibles.map((actividad, index) => {
+                        /*
                         const imagenSrc = new URL(`../assets/img/${actividad.imagen}`, import.meta.url).href;
                         const esSeleccionada = index === indiceSeleccionada;
+                        */
+                       const archivoImagen =
+                            actividad.imagen && actividad.imagen.trim() !== ""
+                                ? actividad.imagen
+                                : "icono_default.png";   // usa la imagen default
 
+                        const imagenSrc = new URL(`../assets/img/${archivoImagen}`, import.meta.url).href;
+                        const esSeleccionada = index === indiceSeleccionada;
+                        
                         return (
                             <div
                             key={`${actividad.actividad_id}-${index}`}       // clave única

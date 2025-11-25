@@ -12,7 +12,7 @@ export default function LayoutPrivate() {
     const token = localStorage.getItem("token");
     const usuarioGuardado = localStorage.getItem("usuarioActivo");
 
-    // ⛔ Si NO hay token y NO hay usuario → sin sesión
+    // Si NO hay token y NO hay usuario → sin sesión
     if (!token && !usuarioGuardado) {
       setAutenticado(false);
       setLoading(false);
@@ -20,7 +20,7 @@ export default function LayoutPrivate() {
       return;
     }
 
-    // 🔍 Si hay token → validar backend
+    // Si hay token → validar backend
     if (token) {
       try {
         const res = await fetch("http://localhost:3000/auth/perfil", {
@@ -44,7 +44,7 @@ export default function LayoutPrivate() {
       return;
     }
 
-    // 🟢 Si no hay token pero sí un usuario guardado válido → sesión activa
+    //  Si no hay token pero sí un usuario guardado válido → sesión activa
     try {
       const usuarioParsed = JSON.parse(usuarioGuardado);
       if (usuarioParsed) {
@@ -64,7 +64,7 @@ export default function LayoutPrivate() {
   useEffect(() => {
     verificarSesion();
 
-    // 🔄 ESCUCHA cuando se cierra sesión desde Navbar
+    //  ESCUCHA cuando se cierra sesión desde Navbar
     const handler = () => verificarSesion();
     window.addEventListener("usuarioActualizado", handler);
 
@@ -84,7 +84,8 @@ export default function LayoutPrivate() {
   if (!autenticado) return null;
 
   return (
-    <div className="layout-private">
+    //<div className="layout-private">    
+    <div className="App">    
       <Header />
       <main className="contenido">
         <Outlet />

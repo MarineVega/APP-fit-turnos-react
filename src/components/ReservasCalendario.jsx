@@ -331,10 +331,11 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
     } 
 
     const evento = info.event.extendedProps;
-    
+    /*
     console.log(info.event.extendedProps)
     console.log('evento 1',evento)
-    
+    */
+   
     // bloqueo si si el evento ya pasó
     if (evento.eventoPasado) {
       swalEstilo.fire({
@@ -432,8 +433,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
             try {
               const url = `http://localhost:3000/reservas/${reserva.reserva_id}`;
               
-              console.log("URL:", url);
-
+              //console.log("URL:", url);
 
               const response = await fetch(url, {
                 method: "DELETE",
@@ -457,7 +457,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
               });
 
             } catch (error) {
-              console.error(error);
+              //console.error(error);
               swalEstilo.fire({
                  title: "Error",
                 text: "No se pudo cancelar la reserva.",
@@ -521,12 +521,11 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           r.activo &&
           r.horario.hora.horaInicio.substring(0, 5) === horaInicio
       );
-
-      
+/*      
       console.log("reservas", reservas)
       console.log(fecha)
       console.log(horaInicio)
-
+*/
         
       if (result.isConfirmed) {
         if (conflicto) {
@@ -556,10 +555,10 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
         try {
           const url = `http://localhost:3000/reservas`
-    
+/*    
           console.log("Enviando a backend:", nuevaReserva);
           console.log("URL:", url);
-        
+  */      
     
           const response = await fetch(url, {
             method: "POST",
@@ -583,7 +582,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           });
 
         } catch (err) {
-          console.error("Error al reservar", err);
+          //console.error("Error al reservar", err);
           swalEstilo.fire({            
             title: "Error",
             html: `No se pudo generar la reserva.`,

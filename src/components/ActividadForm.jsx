@@ -119,11 +119,11 @@ export default function ActividadForm({ guardar, actividades = [], datoInicial =
                 : "http://localhost:3000/actividades";
 
             const method = modo === "editar" ? "PUT" : "POST";
-
+            /*
             console.log("Enviando a backend:", actividadData);
             console.log("URL:", url);
             console.log("Método:", method);
-
+            */
 
             const response = await fetch(url, {
                 method,

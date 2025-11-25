@@ -131,9 +131,18 @@ export default function ReservasCarrusel({ seleccion, onSeleccion }) {
 
                 <div className="carrusel-actividades">
                     {actividadesVisibles.map((actividad, index) => {
+                        /*
                         const imagenSrc = new URL(`../assets/img/${actividad.imagen}`, import.meta.url).href;
                         const esSeleccionada = index === indiceSeleccionada;
+                        */
+                       const archivoImagen =
+                            actividad.imagen && actividad.imagen.trim() !== ""
+                                ? actividad.imagen
+                                : "icono_default.png";   // usa la imagen default
 
+                        const imagenSrc = new URL(`../assets/img/${archivoImagen}`, import.meta.url).href;
+                        const esSeleccionada = index === indiceSeleccionada;
+                        
                         return (
                             <div
                             key={`${actividad.actividad_id}-${index}`}       // clave única

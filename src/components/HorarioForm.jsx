@@ -87,9 +87,10 @@ export default function HorarioForm({
   // Si estoy en modo editar, cargo los datos del horario
   useEffect(() => {
     if (modo === "editar" && datoInicial) {
+      /*
       console.log("datoInicial completo: ", datoInicial);
       console.log("dias: ", datoInicial.dias);
-
+      */
       setProfesorID(
         datoInicial.profesor != null
           ? Number(datoInicial.profesor.profesor_id)
@@ -167,24 +168,24 @@ export default function HorarioForm({
     // Si el profesor es null → no validar duplicados
     if (profesorID === null || profesorID === "" || profesorID === 0) {
       console.log("Profesor null: NO se valida duplicado.");
+      // NO retorno nada, dejo seguir el flujo normal.      
     } else {
       const yaExiste = horarios.some((h) => {
         let diasExistentes = [];
 
         if (Array.isArray(h.dias)) {
-              console.log("entró")
+              //console.log("entró")
               diasExistentes = h.dias;
           } else if (typeof h.dias === "string") {
               try {
-                  console.log("dias parsed ", JSON.parse(h.dias))
-
+                  //console.log("dias parsed ", JSON.parse(h.dias))
                   const parsed = JSON.parse(h.dias);
                   
                   diasExistentes = Array.isArray(parsed)
                       ? parsed
                       : h.dias.split(",").map(d => d.trim().toLowerCase());
               } catch {
-                  console.log("catch")
+                  //console.log("catch")
                   diasExistentes = h.dias.split(",").map(d => d.trim().toLowerCase());
               }
           }
@@ -214,14 +215,11 @@ export default function HorarioForm({
               horaIdEnH === Number(horaID) &&
               diasCoinciden &&
               Number(h.horario_id) !== Number(id);
-
-
-          
-
-
+/*
       
         console.log("registro ", h);
         console.log("id horario ", id);
+      */
   /*
         // Comparo todo
         const esDuplicado =        
@@ -232,6 +230,7 @@ export default function HorarioForm({
           diasCoinciden &&
           Number(h.horario_id) !== Number(id);
   */
+ /*
         console.log("Comparando registro:", {
           profesorEnH: Number(h.profesor?.profesor_id || h.profesor_id),
           profesorSeleccionado: Number(profesorID),
@@ -249,12 +248,12 @@ export default function HorarioForm({
           diasCoinciden,
           esDuplicado,
         });
-
+*/
         return esDuplicado;
       });
     
 
-      console.log("ya existe: ", yaExiste);
+     // console.log("ya existe: ", yaExiste);
 
 
       if (yaExiste) {
@@ -276,13 +275,13 @@ export default function HorarioForm({
 
     // Si hay errores SALGO
     if (!esValido) return;
-
+/*
     console.log("Profesor: ", profesorID);
     console.log("Actividad: ", actividadID);
     console.log("Cupo: ", cupoMaximo);
     console.log("Días : ", diasSeleccionados);
     console.log("Hora: ", horaID);
-
+*/
     // Si pasa todas las validaciones, continua el guardado
     const horarioData = {
       profesor_id: profesorID !== "" ? Number(profesorID) : null,
@@ -301,11 +300,11 @@ export default function HorarioForm({
           : "http://localhost:3000/horarios";
 
       const method = modo === "editar" ? "PUT" : "POST";
-
+/*
       console.log("Enviando a backend:", horarioData);
       console.log("URL:", url);
       console.log("Método:", method);
-
+*/
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },

@@ -120,7 +120,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
 
     // ✅ Manejo de eliminación con validación    
     const eliminarActividad = async (actividad) => {
-        console.log('actividad.actividad_id ', actividad.actividad_id)
+       // console.log('actividad.actividad_id ', actividad.actividad_id)
 
         if (tieneReservasActivas(actividad.actividad_id)) {
             swalEstilo.fire({
@@ -187,21 +187,23 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
             }
         }
     };
-   
-
     
     // Cargo la imagen desde src/assets/img dinámicamente
     const obtenerRutaImagen = (nombreArchivo) => {
+        const archivo =        
+            nombreArchivo && nombreArchivo.trim() !== "" && nombreArchivo !== null
+                ? nombreArchivo
+                : "icono_default.png";      // uso la imagen default si viene vacía
         try {
-        return new URL(`../assets/img/${nombreArchivo}`, import.meta.url).href;
+            return new URL(`../assets/img/${archivo}`, import.meta.url).href;
             /* ¿Qué hace la línea anterior?
             Si la imagen viene del formulario (File): usa URL.createObjectURL como antes.
             Si es un nombre de archivo (como "yoga.png"): 
             new URL('../assets/img/yoga.png', import.meta.url).href genera la URL final procesada por Vite.
             Esto permite usar imágenes que están dentro de src/assets/img sin moverlas a public. */
         } catch (error) {
-        console.warn(`No se encontró la imagen: ${nombreArchivo}`);
-        return null;
+            console.warn(`No se encontró la imagen: ${archivo}. Usando icono_default.png`);
+            return new URL(`../assets/img/icono_default.png`, import.meta.url).href;
         }
     };
 
@@ -258,8 +260,6 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                                             ) : (
                                                 "Sin imagen"
                                             )}
-                                            
-
                                         </td>
                                         
                                         {modoEfectivo !== "consultar" && (
@@ -267,10 +267,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
                                                 {modoEfectivo === "editar" && (
                                                     <button
                                                         className="btnTabla"
-                                                        // Redirigir al formulario en modo editar
-                                                       // onClick={() => onEditar && onEditar(actividad)}
                                                         onClick={() => editarActividad(actividad)} // ✅ paso por la validación
-                                                        
                                                     >
                                                         <img    
                                                             src={

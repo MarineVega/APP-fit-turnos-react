@@ -120,7 +120,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
 
     // ✅ Manejo de eliminación con validación    
     const eliminarActividad = async (actividad) => {
-        console.log('actividad.actividad_id ', actividad.actividad_id)
+       // console.log('actividad.actividad_id ', actividad.actividad_id)
 
         if (tieneReservasActivas(actividad.actividad_id)) {
             swalEstilo.fire({

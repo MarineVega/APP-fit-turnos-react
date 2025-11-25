@@ -110,7 +110,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
 
     // ✅ Manejo de eliminación con validación    
     const eliminarHorario = async (horario) => {
-        console.log('horario.horario_id ', horario.horario_id )
+        //console.log('horario.horario_id ', horario.horario_id )
 
         const nombreProfesor = horario.profesor?.persona?.nombre || "";
         const apellidoProfesor = horario.profesor?.persona?.apellido || "";

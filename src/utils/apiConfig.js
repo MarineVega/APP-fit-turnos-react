@@ -17,4 +17,4 @@
  * 🛠 Cuando subas el proyecto a producción:
  * - Solo cambiá el valor de API_BASE_URL a tu nueva URL (por ej. un servidor o dominio).
  */
-export const API_BASE_URL = "http://localhost:3000"; // Cambiar si el backend usa otro puerto o está en otro entorno
+export const API_BASE_URL = "https://app-fit-turnos-be.onrender.com"        //http://localhost:3000"; // Cambiar si el backend usa otro puerto o está en otro entorno

@@ -16,7 +16,7 @@ import Horario from "./pages/Horario";
 import Profesor from "./pages/Profesor";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import Usuario from "./pages/Usuario";
-import CuentaVerificada from "./pages/cuentaverificada.jsx";
+import CuentaVerificada from "./pages/CuentaVerificada.jsx";
 import VerificarCuenta from "./pages/VerificarCuenta";  // <-- IMPORTANTE
 
 function App() {

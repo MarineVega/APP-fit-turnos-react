@@ -23,7 +23,9 @@ export default function LoginForm({ onSwitch }) {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    fetch("http://localhost:3000/auth/perfil", {
+    //fetch("http://localhost:3000/auth/perfil", {
+    
+    fetch("https://app-fit-turnos-be.onrender.com:3000/auth/perfil", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {

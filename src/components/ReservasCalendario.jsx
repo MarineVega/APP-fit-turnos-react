@@ -174,15 +174,31 @@ export default function ReservasCalendario({ actividadSeleccionada }) {
 
     // Recorro horarios y genero eventos solamente para la actividad seleccionada
     horariosData.forEach((horario) => {
+
+       console.log("Procesando horario:", horario);
+      console.log("Comparando actividad:", horario.actividad.actividad_id, 
+        "vs", actividadSeleccionada.actividad_id);
+      console.log("Horas disponibles:", horasData);
+      console.log("Hora del horario:", horario.hora);
+      console.log('horasData' ,horasData)
+
       // Descarto horario por actividad -> actividad seleccionada es <> a la actividad del horario
       if (
         Number(horario.actividad.actividad_id) !==
         Number(actividadSeleccionada.actividad_id)
-      )
+      ) {
+        console.log("descarto horario por actividad")
         return;
 
+      }
+
       // Descarto horario por estar desactivado
-      if (!horario.activo) return;
+      if (!horario.activo) {
+        console.log("Descarto horario por estar desactivado")
+        return;
+
+      }
+        
 
       const horaObj =
         horasData.find(

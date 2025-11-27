@@ -12,7 +12,7 @@ export default function Reservas() {
     const fetchActividades = async () => {
       try {
         const response = await fetch(
-          "${import.meta.env.VITE_API_URL}/actividades"
+          `${import.meta.env.VITE_API_URL}/actividades`
         );
         const data = await response.json();
 

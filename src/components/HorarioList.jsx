@@ -21,7 +21,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
     const fetchHorarios = async () => {
       try {
         const response = await fetch(
-          "${import.meta.env.VITE_API_URL}/horarios"
+          `${import.meta.env.VITE_API_URL}/horarios`
         ); // BE
         const data = await response.json();
         setHorariosBD(data);
@@ -40,7 +40,7 @@ export default function HorarioList({ horarios = [], modo, onEditar }) {
     const fetchReservas = async () => {
       try {
         const response = await fetch(
-          "${import.meta.env.VITE_API_URL}/reservas"
+          `${import.meta.env.VITE_API_URL}/reservas`
         );
         const data = await response.json();
         setReservas(data);

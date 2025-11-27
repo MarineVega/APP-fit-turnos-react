@@ -20,7 +20,7 @@ export default function Horario() {
   const [horarios, setHorarios] = useState([]);
 
   useEffect(() => {
-    fetch("${import.meta.env.VITE_API_URL}/horarios")
+    fetch(`${import.meta.env.VITE_API_URL}/horarios`)
       .then((res) => res.json())
       .then((data) => setHorarios(data))
       .catch((err) => console.error("Error:", err));

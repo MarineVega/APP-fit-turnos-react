@@ -98,12 +98,12 @@ export default function ReservasCalendario({ actividadSeleccionada }) {
           actividadesRes,
           clientesRes,
         ] = await Promise.all([
-          fetch("${import.meta.env.VITE_API_URL}/profesores"),
-          fetch("${import.meta.env.VITE_API_URL}/horas"),
-          fetch("${import.meta.env.VITE_API_URL}/horarios"),
-          fetch("${import.meta.env.VITE_API_URL}/reservas"),
-          fetch("${import.meta.env.VITE_API_URL}/actividades"),
-          fetch("${import.meta.env.VITE_API_URL}/clientes"),
+          fetch(`${import.meta.env.VITE_API_URL}/profesores`),
+          fetch(`${import.meta.env.VITE_API_URL}/horas`),
+          fetch(`${import.meta.env.VITE_API_URL}/horarios`),
+          fetch(`${import.meta.env.VITE_API_URL}/reservas`),
+          fetch(`${import.meta.env.VITE_API_URL}/actividades`),
+          fetch(`${import.meta.env.VITE_API_URL}/clientes`),
         ]);
 
         const profesoresJson = await profesoresRes.json();

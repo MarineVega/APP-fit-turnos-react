@@ -42,13 +42,13 @@ export default function HorarioForm({
     const fetchDatos = async () => {
       try {
         const [profRes, actRes, horaRes] = await Promise.all([
-          fetch("${import.meta.env.VITE_API_URL}/profesores").then((r) =>
+          fetch(`${import.meta.env.VITE_API_URL}/profesores`).then((r) =>
             r.json()
           ),
-          fetch("${import.meta.env.VITE_API_URL}/actividades").then((r) =>
+          fetch(`${import.meta.env.VITE_API_URL}/actividades`).then((r) =>
             r.json()
           ),
-          fetch("${import.meta.env.VITE_API_URL}/horas").then((r) => r.json()),
+          fetch(`${import.meta.env.VITE_API_URL}/horas`).then((r) => r.json()),
         ]);
 
         setProfesores((profRes || []).filter((p) => p.persona?.activo));
@@ -298,7 +298,7 @@ export default function HorarioForm({
       const url =
         modo === "editar" && id
           ? `${import.meta.env.VITE_API_URL}/horarios/${id}`
-          : "${import.meta.env.VITE_API_URL}/horarios";
+          : `${import.meta.env.VITE_API_URL}/horarios`;
 
       const method = modo === "editar" ? "PUT" : "POST";
       /*

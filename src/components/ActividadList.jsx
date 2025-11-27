@@ -21,7 +21,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
     const fetchActividades = async () => {
       try {
         const response = await fetch(
-          "${import.meta.env.VITE_API_URL}/actividades"
+          `${import.meta.env.VITE_API_URL}/actividades`
         ); // el backend
         const data = await response.json();
         setActividadesBD(data);
@@ -40,7 +40,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
     const fetchReservas = async () => {
       try {
         const response = await fetch(
-          "${import.meta.env.VITE_API_URL}/reservas"
+          `${import.meta.env.VITE_API_URL}/reservas`
         ); // el backend
         const data = await response.json();
         setReservas(data);
@@ -58,7 +58,7 @@ export default function ActividadList({ actividades = [], modo, onEditar }) {
     const fetchHorarios = async () => {
       try {
         const response = await fetch(
-          "${import.meta.env.VITE_API_URL}/horarios"
+          `${import.meta.env.VITE_API_URL}/horarios`
         );
         const data = await response.json();
         setHorarios(data);

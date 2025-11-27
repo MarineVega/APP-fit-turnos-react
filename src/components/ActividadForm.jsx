@@ -126,7 +126,7 @@ export default function ActividadForm({
       const url =
         modo === "editar" && id
           ? `${import.meta.env.VITE_API_URL}/actividades/${id}`
-          : "${import.meta.env.VITE_API_URL}/actividades";
+          : `${import.meta.env.VITE_API_URL}/actividades`;
 
       const method = modo === "editar" ? "PUT" : "POST";
       /*

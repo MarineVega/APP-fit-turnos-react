@@ -22,7 +22,7 @@ export default function Actividad() {
   const [actividades, setActividades] = useState([]);
 
   useEffect(() => {
-    fetch("${import.meta.env.VITE_API_URL}/actividades")
+    fetch(`${import.meta.env.VITE_API_URL}/actividades`)
       .then((res) => res.json())
       .then((data) => setActividades(data))
       .catch((err) => console.error("Error:", err));

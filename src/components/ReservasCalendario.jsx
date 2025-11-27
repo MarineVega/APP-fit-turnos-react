@@ -55,25 +55,26 @@ function parseDias(diasCampo) {
 }
 
 // Convierte horas a formato HH:mm
-function normalizeHora(h) {  
+function normalizeHora(h) {
   // acepta formatos distintos: "08:00", "8.00", numbers 8 o "8", "08:00:00" o "8:00:00"
   if (!h) return null;
 
-  // si viene con segundos, "08:00:00" -> "08:00" 
-  if (typeof h === "string" && /^\d{1,2}:\d{2}:\d{2}$/.test(h)) return h.slice(0, 5);
+  // si viene con segundos, "08:00:00" -> "08:00"
+  if (typeof h === "string" && /^\d{1,2}:\d{2}:\d{2}$/.test(h))
+    return h.slice(0, 5);
 
   // si viene "08:00" lo devolvemos tal cual
-  if (typeof h === "string" && /^\d{1,2}:\d{2}$/.test(h)) return h; 
-  
+  if (typeof h === "string" && /^\d{1,2}:\d{2}$/.test(h)) return h;
+
   // si viene "8.00" o "8.0" o "8" => convertir a "08:00"
-  if (typeof h === "number") return `${String(h).padStart(2, "0")}:00`; 
-  
+  if (typeof h === "number") return `${String(h).padStart(2, "0")}:00`;
+
   return null;
 }
 
 // antes CalendarioTurnos ahora ReservasCalendario
-export default function ReservasCalendario ({ actividadSeleccionada }) {
-  const [eventos, setEventos] = useState([]);  
+export default function ReservasCalendario({ actividadSeleccionada }) {
+  const [eventos, setEventos] = useState([]);
 
   // creo estados para cada colección
   const [profesoresData, setProfesoresData] = useState([]);
@@ -84,20 +85,26 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
   const [clientesData, setClientesData] = useState([]);
 
   // Levanto usuario activo
-  const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));  
-  
+  const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profesoresRes, horasRes, horariosRes, reservasRes, actividadesRes, clientesRes] =
-          await Promise.all([
-            fetch("http://localhost:3000/profesores"),
-            fetch("http://localhost:3000/horas"),
-            fetch("http://localhost:3000/horarios"),
-            fetch("http://localhost:3000/reservas"),
-            fetch("http://localhost:3000/actividades"),
-            fetch("http://localhost:3000/clientes"),
-          ]);
+        const [
+          profesoresRes,
+          horasRes,
+          horariosRes,
+          reservasRes,
+          actividadesRes,
+          clientesRes,
+        ] = await Promise.all([
+          fetch("${import.meta.env.VITE_API_URL}/profesores"),
+          fetch("${import.meta.env.VITE_API_URL}/horas"),
+          fetch("${import.meta.env.VITE_API_URL}/horarios"),
+          fetch("${import.meta.env.VITE_API_URL}/reservas"),
+          fetch("${import.meta.env.VITE_API_URL}/actividades"),
+          fetch("${import.meta.env.VITE_API_URL}/clientes"),
+        ]);
 
         const profesoresJson = await profesoresRes.json();
         const horasJson = await horasRes.json();
@@ -106,37 +113,35 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
         const actividadesJson = await actividadesRes.json();
         const clientesJson = await clientesRes.json();
 
-
         setProfesoresData(profesoresJson);
         setHorasData(horasJson);
         setHorariosData(horariosJson);
         setReservas(reservasJson);
         setActividadesData(actividadesJson);
         setClientesData(clientesJson);
-
       } catch (error) {
         console.error("Error cargando datos:", error);
       }
     };
 
     fetchData();
-
   }, []);
 
-  const [clienteActual, setClienteActual] = useState(null);  
-  
+  const [clienteActual, setClienteActual] = useState(null);
+
   // Obtengo el ID de persona que corresponde al usuario, para después obtener el ID de cliente
   useEffect(() => {
-    
-    if (clientesData.length > 0 && usuario) {      
+    if (clientesData.length > 0 && usuario) {
       const cliente = clientesData.find(
-        (c) => Number(c.persona.persona_id) === Number(usuario.persona.persona_id) && usuario.persona.activo
+        (c) =>
+          Number(c.persona.persona_id) === Number(usuario.persona.persona_id) &&
+          usuario.persona.activo
       );
 
       setClienteActual(cliente);
     }
   }, [clientesData, usuario]);
- 
+
   // Si el usuario no es un cliente, asigno -1 para que solo pueda ver las reservas sin editar
   const cliente_id = clienteActual?.cliente_id ?? -1;
 
@@ -152,7 +157,8 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
       horariosData.length === 0 ||
       profesoresData.length === 0 ||
       horasData.length === 0
-    ) return;
+    )
+      return;
 
     const eventosGenerados = [];
     const hoy = new Date();
@@ -168,25 +174,31 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
     // Recorro horarios y genero eventos solamente para la actividad seleccionada
     horariosData.forEach((horario) => {
-     
       // Descarto horario por actividad -> actividad seleccionada es <> a la actividad del horario
-      if (Number(horario.actividad.actividad_id) !== Number(actividadSeleccionada.actividad_id)) return;
+      if (
+        Number(horario.actividad.actividad_id) !==
+        Number(actividadSeleccionada.actividad_id)
+      )
+        return;
 
       // Descarto horario por estar desactivado
       if (!horario.activo) return;
 
       const horaObj =
-        horasData.find((h) => Number(h.hora_id) === Number(horario.hora.hora_id)) ||
-        {};
+        horasData.find(
+          (h) => Number(h.hora_id) === Number(horario.hora.hora_id)
+        ) || {};
 
-      const horaInicio = normalizeHora(horaObj.horaInicio || horaObj.hora_inicio);
+      const horaInicio = normalizeHora(
+        horaObj.horaInicio || horaObj.hora_inicio
+      );
       const horaFin = normalizeHora(horaObj.horaFin || horaObj.hora_fin);
-      
+
       if (!horaInicio || !horaFin) return;
 
       const profesor = profesoresData.find(
-        (p) => 
-          horario.profesor &&                     // verificamos que horario.profesor exista ya que profesor puede ser null
+        (p) =>
+          horario.profesor && // verificamos que horario.profesor exista ya que profesor puede ser null
           Number(p.profesor_id) === Number(horario.profesor.profesor_id)
       );
 
@@ -194,8 +206,8 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
       dias.forEach((dia) => {
         for (
-          let d = new Date(inicioRango.getTime()); 
-          d <= finRango; 
+          let d = new Date(inicioRango.getTime());
+          d <= finRango;
           d.setDate(d.getDate() + 1)
         ) {
           const nombreDia = Object.keys(diasSemana).find(
@@ -213,38 +225,44 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           // const fechaISO = d.toISOString().split("T")[0]; // toISOString -> convierte un objeto de fecha (d) a una cadena de fecha y hora en formato ISO 8601, separa esa cadena por la letra 'T' y luego toma el primer elemento, obteniendo así la fecha en formato YYYY-MM-DD. Ej: 2025-10-29T10:30:00.000Z, se dividiría en dos partes: ["2025-10-29", "10:30:00.000Z"].
           // [0]: Al agregar [0] al final, se accede al primer elemento de ese array. En el ejemplo anterior, esto devolvería solo la fecha: "2025-10-29".
 
-          const fechaISO = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-
+          const fechaISO = `${d.getFullYear()}-${String(
+            d.getMonth() + 1
+          ).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
           const start = `${fechaISO}T${horaInicio}`;
-          const horaFinEvento = `${fechaISO}T${horaFin}`; 
+          const horaFinEvento = `${fechaISO}T${horaFin}`;
 
-        //  console.log("Reservas cargadas desde backend:", reservas);
-
+          //  console.log("Reservas cargadas desde backend:", reservas);
 
           const reservasHorario = reservas.filter(
             (r) =>
-              Number(r.horario_id ?? r.horario?.horario_id) === Number(horario.horario_id) &&
+              Number(r.horario_id ?? r.horario?.horario_id) ===
+                Number(horario.horario_id) &&
               r.fecha.substring(0, 10) === fechaISO &&
               r.activo
           );
 
           // Cupo base: si el horario tiene cupoMaximo, usar ese. Si NO tiene, usar el cupo de la actividad.
-          const cupoBase = 
+          const cupoBase =
             horario.cupoMaximo != null
               ? Number(horario.cupoMaximo)
               : Number(horario.actividad.cupoMaximo);
 
           // Aseguro un número válido
-          const cuposDisponibles = Math.max(cupoBase - reservasHorario.length, 0);
+          const cuposDisponibles = Math.max(
+            cupoBase - reservasHorario.length,
+            0
+          );
 
           const yaReservado = reservas.some((r) => {
             // Definimos la fecha de la reserva extrayendo los primeros 10 caracteres (YYYY-MM-DD)
             const fechaReservaNorm = r.fecha.substring(0, 10);
-          
+
             return (
-              Number(r.cliente_id ?? r.cliente?.cliente_id) === Number(cliente_id) &&
-              Number(r.horario_id ?? r.horario?.horario_id) === Number(horario.horario_id) &&
+              Number(r.cliente_id ?? r.cliente?.cliente_id) ===
+                Number(cliente_id) &&
+              Number(r.horario_id ?? r.horario?.horario_id) ===
+                Number(horario.horario_id) &&
               fechaReservaNorm === fechaISO &&
               r.activo
             );
@@ -252,18 +270,22 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
           // verifico si el evento ya pasó
           const ahora = new Date();
-          const fechaYHoraEvento = new Date(horaFinEvento);   // uso la hora de fin para considerar que el evento terminó
-          
-          const eventoPasado = fechaYHoraEvento <= ahora;     // TRUE si el evento ya pasó
-                    
-          const titulo = `Cupo: ${cuposDisponibles}  \n${profesor ? profesor.persona.nombre + " " + profesor.persona.apellido : ""}`;
+          const fechaYHoraEvento = new Date(horaFinEvento); // uso la hora de fin para considerar que el evento terminó
+
+          const eventoPasado = fechaYHoraEvento <= ahora; // TRUE si el evento ya pasó
+
+          const titulo = `Cupo: ${cuposDisponibles}  \n${
+            profesor
+              ? profesor.persona.nombre + " " + profesor.persona.apellido
+              : ""
+          }`;
 
           // asigno colores según el estado de las reservas
           // const colorEvento = yaReservado
           const colorEvento = eventoPasado
-            ? "#7fa8d1ff"       // grisáceo : Si el evento ya pasó
-            : yaReservado 
-            ? "#5cb85c"       // verde si está reservado por el cliente logueado
+            ? "#7fa8d1ff" // grisáceo : Si el evento ya pasó
+            : yaReservado
+            ? "#5cb85c" // verde si está reservado por el cliente logueado
             : cuposDisponibles > 0
             ? "#3788d8"
             : "#d9534f";
@@ -293,10 +315,8 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
               horaFin,
               eventoPasado,
               actividad_id: Number(horario.actividad.actividad_id),
-              profesor_id: profesor
-                ? Number(`${profesor.profesor_id}`)
-                : null,
-              reservas,           // borrarlo es para control
+              profesor_id: profesor ? Number(`${profesor.profesor_id}`) : null,
+              reservas, // borrarlo es para control
             },
           });
         }
@@ -305,16 +325,15 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
 
     setEventos(eventosGenerados);
   }, [
-    actividadSeleccionada, 
+    actividadSeleccionada,
     reservas,
     horariosData,
     horasData,
-    profesoresData
+    profesoresData,
   ]);
 
   // Manejador de clics
   const manejarClick = (info) => {
-  
     // 🚫 Si no es cliente → no permito interactuar
     if (!cliente_id || cliente_id === -1) {
       swalEstilo.fire({
@@ -324,29 +343,29 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
         confirmButtonText: "Cerrar",
         confirmButtonColor: "#d33",
         customClass: {
-        confirmButton: "",   
-      }
+          confirmButton: "",
+        },
       });
       return;
-    } 
+    }
 
     const evento = info.event.extendedProps;
     /*
     console.log(info.event.extendedProps)
     console.log('evento 1',evento)
     */
-   
+
     // bloqueo si si el evento ya pasó
     if (evento.eventoPasado) {
       swalEstilo.fire({
-          title: "Turno pasado",
-          text: "No es posible modificar reservas con fecha u hora anterior a la actual.",
-          imageUrl: error,
-          confirmButtonText: "Cerrar",
-          confirmButtonColor: "#d33",
-          customClass: {
-            confirmButton: "", // elimino la clase
-          },
+        title: "Turno pasado",
+        text: "No es posible modificar reservas con fecha u hora anterior a la actual.",
+        imageUrl: error,
+        confirmButtonText: "Cerrar",
+        confirmButtonColor: "#d33",
+        customClass: {
+          confirmButton: "", // elimino la clase
+        },
       });
       return;
     }
@@ -359,7 +378,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
       horaInicio,
       profesor,
       profesor_id,
-      actividad_id ,
+      actividad_id,
     } = evento;
 
     if (yaReservado) {
@@ -383,7 +402,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           },
         })
         .then(async (result) => {
-          if (result.isConfirmed) {           
+          if (result.isConfirmed) {
             /*
             // ---- DEBUG: inspeccionar objetos clave ----
             console.log(">>> DEBUG cancelar - evento.extendedProps:", info.event.extendedProps);
@@ -408,11 +427,10 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
             // Busco la reserva a eliminar
             const reserva = reservas.find(
               (r) =>
-                Number(
-                  r.cliente_id ??
-                  r.cliente?.cliente_id
-                ) === Number(cliente_id) &&                
-                Number(r.horario_id ?? r.horario?.horario_id) === Number(horario_id) &&
+                Number(r.cliente_id ?? r.cliente?.cliente_id) ===
+                  Number(cliente_id) &&
+                Number(r.horario_id ?? r.horario?.horario_id) ===
+                  Number(horario_id) &&
                 r.fecha.substring(0, 10) === fecha &&
                 r.activo
             );
@@ -425,19 +443,21 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "Cerrar",
                 customClass: {
-                  confirmButton: "",   
-                }
+                  confirmButton: "",
+                },
               });
             }
 
             try {
-              const url = `http://localhost:3000/reservas/${reserva.reserva_id}`;
-              
+              const url = `${import.meta.env.VITE_API_URL}/reservas/${
+                reserva.reserva_id
+              }`;
+
               //console.log("URL:", url);
 
               const response = await fetch(url, {
                 method: "DELETE",
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json" },
               });
 
               if (!response.ok) {
@@ -445,7 +465,9 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
               }
 
               // Actualizar estado en el frontend
-              setReservas((prev) => prev.filter(r => r.reserva_id !== reserva.reserva_id));
+              setReservas((prev) =>
+                prev.filter((r) => r.reserva_id !== reserva.reserva_id)
+              );
 
               swalEstilo.fire({
                 title: "Reserva cancelada",
@@ -455,20 +477,19 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
                   confirmButton: "btnAceptar",
                 },
               });
-
             } catch (error) {
               //console.error(error);
               swalEstilo.fire({
-                 title: "Error",
+                title: "Error",
                 text: "No se pudo cancelar la reserva.",
                 icon: "error",
                 confirmButtonColor: "#d33",
                 confirmButtonText: "Cerrar",
                 customClass: {
-                  confirmButton: "",   
-                }
+                  confirmButton: "",
+                },
               });
-            }            
+            }
           }
         });
       return;
@@ -485,117 +506,118 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
     }
 
     // Confirmar reserva
-    swalEstilo.fire({
-      title: "¿Confirmás tu reserva?",
-      html: `
+    swalEstilo
+      .fire({
+        title: "¿Confirmás tu reserva?",
+        html: `
         <p><b>Actividad:</b> ${actividadSeleccionada.nombre}</p>
         <p><b>Profesor:</b> ${profesor} </p>
         <p><b>Fecha y hora:</b> ${fecha}  ⏱  ${horaInicio} hs</p>
         <p><b>Cupos disponibles:</b> ${cuposDisponibles}</p>     
         `,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, reservar",
-      cancelButtonText: "Cancelar",
-      // cambio dinámicamente el color del texto del botón Cancelar; tengo que agregar el bloque didRender dentro del swalEstilo... porque es una función que se ejecuta cuando se muestra el alerta, y el mixin solo define una configuración base.
-      didRender: () => {
-        const cancelButton = Swal.getCancelButton();
-        if (cancelButton) {
-          cancelButton.style.color = "#222222"; // cambio el color de texto del botón Cancelar
-          // cambia de color la letra cuando paso el mouse (sería el hover)
-          cancelButton.addEventListener("mouseover", () => {
-            cancelButton.style.color = "#f5f5f5";
-          });
-          cancelButton.addEventListener("mouseout", () => {
-            cancelButton.style.color = "#222222";
-          });
-        }
-      },
-    })
-    .then(async (result) => {
-      // Verifico si el cliente ya tiene una reserva en ese horario
-      const conflicto = reservas.find(
-        (r) =>
-          r.cliente.cliente_id === cliente_id &&
-          r.fecha.substring(0, 10) === fecha &&
-          r.activo &&
-          r.horario.hora.horaInicio.substring(0, 5) === horaInicio
-      );
-/*      
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, reservar",
+        cancelButtonText: "Cancelar",
+        // cambio dinámicamente el color del texto del botón Cancelar; tengo que agregar el bloque didRender dentro del swalEstilo... porque es una función que se ejecuta cuando se muestra el alerta, y el mixin solo define una configuración base.
+        didRender: () => {
+          const cancelButton = Swal.getCancelButton();
+          if (cancelButton) {
+            cancelButton.style.color = "#222222"; // cambio el color de texto del botón Cancelar
+            // cambia de color la letra cuando paso el mouse (sería el hover)
+            cancelButton.addEventListener("mouseover", () => {
+              cancelButton.style.color = "#f5f5f5";
+            });
+            cancelButton.addEventListener("mouseout", () => {
+              cancelButton.style.color = "#222222";
+            });
+          }
+        },
+      })
+      .then(async (result) => {
+        // Verifico si el cliente ya tiene una reserva en ese horario
+        const conflicto = reservas.find(
+          (r) =>
+            r.cliente.cliente_id === cliente_id &&
+            r.fecha.substring(0, 10) === fecha &&
+            r.activo &&
+            r.horario.hora.horaInicio.substring(0, 5) === horaInicio
+        );
+        /*      
       console.log("reservas", reservas)
       console.log(fecha)
       console.log(horaInicio)
 */
-        
-      if (result.isConfirmed) {
-        if (conflicto) {
-          swalEstilo.fire({            
-            title: "Conflicto de horario",
-            imageUrl: error,
-            html: `
+
+        if (result.isConfirmed) {
+          if (conflicto) {
+            swalEstilo.fire({
+              title: "Conflicto de horario",
+              imageUrl: error,
+              html: `
               Ya tenés una reserva para ese día y hora.<br>
               No podés reservar más de una actividad al mismo tiempo.`,
-            confirmButtonColor: "#d33",
-            confirmButtonText: "Cerrar",
-            customClass: {
-              confirmButton: "",      // elimino la clase
-            },
-          });
-          return;
-        }
-      
-        const nuevaReserva = {
-          actividad_id,          
-          profesor_id,
-          cliente_id,
-          horario_id,
-          fecha,
-          activo: true,
-        };
+              confirmButtonColor: "#d33",
+              confirmButtonText: "Cerrar",
+              customClass: {
+                confirmButton: "", // elimino la clase
+              },
+            });
+            return;
+          }
 
-        try {
-          const url = `http://localhost:3000/reservas`
-/*    
+          const nuevaReserva = {
+            actividad_id,
+            profesor_id,
+            cliente_id,
+            horario_id,
+            fecha,
+            activo: true,
+          };
+
+          try {
+            const url = `${import.meta.env.VITE_API_URL}/reservas`;
+            /*    
           console.log("Enviando a backend:", nuevaReserva);
           console.log("URL:", url);
-  */      
-    
-          const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(nuevaReserva),
-          });
-    
-          if (!response.ok) throw new Error("Error al guardar en la base de datos");
-    
-          const data = await response.json();   // recupero reserva_id real
+  */
 
-          // guardo la reserva EXACTA que viene del backend
-          setReservas((prev) => [...prev, data]);
-          
-          //setReservas((prev) => [...prev, nuevaReserva]);
-          swalEstilo.fire({
-            title: "¡Reserva confirmada!",
-            text: "",
-            icon: "success",
-            imageUrl: chica_ok,
-          });
+            const response = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(nuevaReserva),
+            });
 
-        } catch (err) {
-          //console.error("Error al reservar", err);
-          swalEstilo.fire({            
-            title: "Error",
-            html: `No se pudo generar la reserva.`,
-            icon: "error",
-            confirmButtonColor: "#d33",
-            confirmButtonText: "Cerrar",
-            customClass: {
-              confirmButton: "",      // elimino la clase
-            },
-          });
+            if (!response.ok)
+              throw new Error("Error al guardar en la base de datos");
+
+            const data = await response.json(); // recupero reserva_id real
+
+            // guardo la reserva EXACTA que viene del backend
+            setReservas((prev) => [...prev, data]);
+
+            //setReservas((prev) => [...prev, nuevaReserva]);
+            swalEstilo.fire({
+              title: "¡Reserva confirmada!",
+              text: "",
+              icon: "success",
+              imageUrl: chica_ok,
+            });
+          } catch (err) {
+            //console.error("Error al reservar", err);
+            swalEstilo.fire({
+              title: "Error",
+              html: `No se pudo generar la reserva.`,
+              icon: "error",
+              confirmButtonColor: "#d33",
+              confirmButtonText: "Cerrar",
+              customClass: {
+                confirmButton: "", // elimino la clase
+              },
+            });
+          }
         }
-      }
-    });
+      });
   };
 
   // Configuración visual del calendario
@@ -615,7 +637,7 @@ export default function ReservasCalendario ({ actividadSeleccionada }) {
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="timeGridWeek"
-            initialDate={new Date()}    // centra el calendario en el día actual
+            initialDate={new Date()} // centra el calendario en el día actual
             headerToolbar={{
               left: "prev,next today",
               center: "title",

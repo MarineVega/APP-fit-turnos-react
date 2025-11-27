@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";         // React no se importa con llaves, solo el hook useState
+import React, { useState, useEffect } from "react"; // React no se importa con llaves, solo el hook useState
 import { useSearchParams } from "react-router-dom";
 import "../styles/style.css";
 
@@ -22,20 +22,19 @@ export default function Actividad() {
   const [actividades, setActividades] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/actividades")
+    fetch("${import.meta.env.VITE_API_URL}/actividades")
       .then((res) => res.json())
       .then((data) => setActividades(data))
       .catch((err) => console.error("Error:", err));
   }, []);
 
-
   const [params, setParams] = useSearchParams();
   const modo = params.get("modo") || "consultar";
-  const id = parseInt(params.get("id"));            // 👈 identificador de la actividad a editar (si existe)
- // const [actividades, setActividades] = useState(actividadesData);
-  const [datoInicial, setDatoInicial] = useState(null);     // actividad seleccionada para editar
+  const id = parseInt(params.get("id")); // 👈 identificador de la actividad a editar (si existe)
+  // const [actividades, setActividades] = useState(actividadesData);
+  const [datoInicial, setDatoInicial] = useState(null); // actividad seleccionada para editar
 
-  // Detectar si hay una actividad seleccionada para editar  
+  // Detectar si hay una actividad seleccionada para editar
   React.useEffect(() => {
     if (modo === "editar" && id) {
       const act = actividades.find((a) => a.id === id);
@@ -63,15 +62,17 @@ export default function Actividad() {
   // Cuando clickeo en el botón editar de la tabla
   const handleEditar = (actividad) => {
     setDatoInicial(actividad);
-    setParams({ modo: "editar", id: actividad.id }); 
+    setParams({ modo: "editar", id: actividad.id });
   };
 
   return (
     <main className="mainActividad">
-
       {modo === "agregar" && (
         <>
-          <TituloConFlecha destino="/administrar"> Agregar Actividad </TituloConFlecha>
+          <TituloConFlecha destino="/administrar">
+            {" "}
+            Agregar Actividad{" "}
+          </TituloConFlecha>
 
           <ImagenLateral
             imgIzquierda={imgIzquierda}
@@ -81,14 +82,17 @@ export default function Actividad() {
           />
 
           {/* 👇 Le paso también las actividades existentes, para la validación de nombre existente */}
-          <ActividadForm guardar={guardarActividad} actividades={actividades} />          
+          <ActividadForm guardar={guardarActividad} actividades={actividades} />
         </>
       )}
 
       {/* Primero muestro la tabla, y al hacer clic en editar se abre el form */}
       {modo === "editar" && !datoInicial && (
-        <>          
-          <TituloConFlecha destino="/administrar"> Modificar Actividad </TituloConFlecha>
+        <>
+          <TituloConFlecha destino="/administrar">
+            {" "}
+            Modificar Actividad{" "}
+          </TituloConFlecha>
           <ActividadList
             actividades={actividades}
             modo="editar"
@@ -99,8 +103,11 @@ export default function Actividad() {
 
       {modo === "editar" && datoInicial && (
         <>
-          <TituloConFlecha destino="/administrar"> Modificar Actividad </TituloConFlecha>
-           <ImagenLateral
+          <TituloConFlecha destino="/administrar">
+            {" "}
+            Modificar Actividad{" "}
+          </TituloConFlecha>
+          <ImagenLateral
             imgIzquierda={imgIzquierda}
             imgDerecha={imgDerecha}
             altIzq="Actividad izquierda"
@@ -115,26 +122,35 @@ export default function Actividad() {
       )}
 
       {modo === "eliminar" && (
-        <>          
-          <TituloConFlecha destino="/administrar"> Eliminar Actividad </TituloConFlecha>
+        <>
+          <TituloConFlecha destino="/administrar">
+            {" "}
+            Eliminar Actividad{" "}
+          </TituloConFlecha>
           <ActividadList actividades={actividades} modo="eliminar" />
         </>
       )}
 
       {modo === "consultar" && (
         <>
-          <TituloConFlecha destino="/administrar"> Listado de Actividades </TituloConFlecha>
+          <TituloConFlecha destino="/administrar">
+            {" "}
+            Listado de Actividades{" "}
+          </TituloConFlecha>
           <ActividadList actividades={actividades} modo="consultar" />
         </>
       )}
 
       {modo === "postAlta" && (
         <>
-          <TituloConFlecha destino="/administrar"> Listado de Actividades </TituloConFlecha>
-          <ActividadList actividades={actividades} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
+          <TituloConFlecha destino="/administrar">
+            {" "}
+            Listado de Actividades{" "}
+          </TituloConFlecha>
+          <ActividadList actividades={actividades} modo="postAlta" />{" "}
+          {/* 👈 le paso este modo para que muestre el botón*/}
         </>
       )}
-
     </main>
   );
 }

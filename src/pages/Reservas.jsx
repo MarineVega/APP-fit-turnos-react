@@ -5,39 +5,40 @@ import TituloConFlecha from "../components/TituloConFlecha";
 
 // antes Turnos ahora Reservas
 export default function Reservas() {
-  const [actividadSeleccionada, setActividadSeleccionada] = useState(null);  
+  const [actividadSeleccionada, setActividadSeleccionada] = useState(null);
 
   // Cargo actividades desde la BD
   useEffect(() => {
     const fetchActividades = async () => {
-        try {
-            const response = await fetch("http://localhost:3000/actividades");
-            const data = await response.json();
+      try {
+        const response = await fetch(
+          "${import.meta.env.VITE_API_URL}/actividades"
+        );
+        const data = await response.json();
 
-            // Filtro solo las activas
-            const activas = data.filter(a => a.activa === true);
+        // Filtro solo las activas
+        const activas = data.filter((a) => a.activa === true);
 
-              // Ordeno por nombre
-            const ordenadas = activas.sort((a, b) => {
-                const nomA = a.nombre.toLowerCase();
-                const nomB = b.nombre.toLowerCase();
+        // Ordeno por nombre
+        const ordenadas = activas.sort((a, b) => {
+          const nomA = a.nombre.toLowerCase();
+          const nomB = b.nombre.toLowerCase();
 
-                if (nomA < nomB) return -1;
-                if (nomA > nomB) return 1;
-                return 0;
-            });
-            
-            setActividadSeleccionada(ordenadas);
+          if (nomA < nomB) return -1;
+          if (nomA > nomB) return 1;
+          return 0;
+        });
 
-        } catch (error) {
-            console.error("Error cargando actividades:", error);
-        }
+        setActividadSeleccionada(ordenadas);
+      } catch (error) {
+        console.error("Error cargando actividades:", error);
+      }
     };
 
     fetchActividades();
-  }, []); 
+  }, []);
 
-/*
+  /*
   // Al cargar la página, selecciona la primera actividad activa
   useEffect(() => {
     const actividadesActivas = fetchActividades.filter(a => a.activa);
@@ -47,19 +48,17 @@ export default function Reservas() {
   }, []); // solo una vez al montar
 */
   // console.log("Actividad seleccionada:", actividadSeleccionada);
-  
 
   return (
     <>
       {/* <div className="turnos-container"> */}
       <TituloConFlecha destino="/"> Reserva tu Turno </TituloConFlecha>
-        <ReservasCarrusel
-          seleccion={actividadSeleccionada}
-          onSeleccion={(actividad) => setActividadSeleccionada(actividad)}
-        />
+      <ReservasCarrusel
+        seleccion={actividadSeleccionada}
+        onSeleccion={(actividad) => setActividadSeleccionada(actividad)}
+      />
 
-        <ReservasCalendario actividadSeleccionada={actividadSeleccionada} />
-
+      <ReservasCalendario actividadSeleccionada={actividadSeleccionada} />
     </>
   );
 }

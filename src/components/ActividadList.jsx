@@ -4,318 +4,346 @@ import Swal from "sweetalert2";
 
 // configuro estilos para sweetalert
 const swalEstilo = Swal.mixin({
-    imageWidth: 200,       // ancho en píxeles
-    imageHeight: 200,      // alto en píxeles 
-    background: '#bababa',
-    confirmButtonColor: '#6edc8c',
-    customClass: {
-        confirmButton: 'btnAceptar',
-        cancelButton: 'btnCancelar'
-    }
+  imageWidth: 200, // ancho en píxeles
+  imageHeight: 200, // alto en píxeles
+  background: "#bababa",
+  confirmButtonColor: "#6edc8c",
+  customClass: {
+    confirmButton: "btnAceptar",
+    cancelButton: "btnCancelar",
+  },
 });
 
-
 export default function ActividadList({ actividades = [], modo, onEditar }) {
+  const [actividadesBD, setActividadesBD] = useState([]); // Levanta los datos de la BD
 
-    const [actividadesBD, setActividadesBD] = useState([]);          // Levanta los datos de la BD
-        
-    useEffect(() => {
-        const fetchActividades = async () => {
-        try {
-            const response = await fetch("http://localhost:3000/actividades"); // el backend
-            const data = await response.json();
-            setActividadesBD(data);
-        } catch (error) {
-            console.error("Error cargando actividades:", error);
-        }
-        };
+  useEffect(() => {
+    const fetchActividades = async () => {
+      try {
+        const response = await fetch(
+          "${import.meta.env.VITE_API_URL}/actividades"
+        ); // el backend
+        const data = await response.json();
+        setActividadesBD(data);
+      } catch (error) {
+        console.error("Error cargando actividades:", error);
+      }
+    };
 
-        fetchActividades();
-    }, []);
-    
-    // Declaro el estado reservas
-    const [reservas, setReservas] = useState([]);
+    fetchActividades();
+  }, []);
 
-    useEffect(() => {
-        const fetchReservas = async () => {
-        try {
-            const response = await fetch("http://localhost:3000/reservas"); // el backend
-            const data = await response.json();
-            setReservas(data);
-        } catch (error) {
-            console.error("Error cargando reservas:", error);
-        }
-        };
-        fetchReservas();
-    }, []);
-    
-    // Declaro el estado horarios
-    const [horarios, setHorarios] = useState([]);
+  // Declaro el estado reservas
+  const [reservas, setReservas] = useState([]);
 
-    useEffect(() => {
+  useEffect(() => {
+    const fetchReservas = async () => {
+      try {
+        const response = await fetch(
+          "${import.meta.env.VITE_API_URL}/reservas"
+        ); // el backend
+        const data = await response.json();
+        setReservas(data);
+      } catch (error) {
+        console.error("Error cargando reservas:", error);
+      }
+    };
+    fetchReservas();
+  }, []);
+
+  // Declaro el estado horarios
+  const [horarios, setHorarios] = useState([]);
+
+  useEffect(() => {
     const fetchHorarios = async () => {
-        try {
-            const response = await fetch("http://localhost:3000/horarios");
-            const data = await response.json();
-            setHorarios(data);
-        } catch (error) {
-            console.error("Error cargando horarios:", error);
-        }
-        };
-        fetchHorarios();
-    }, []);
+      try {
+        const response = await fetch(
+          "${import.meta.env.VITE_API_URL}/horarios"
+        );
+        const data = await response.json();
+        setHorarios(data);
+      } catch (error) {
+        console.error("Error cargando horarios:", error);
+      }
+    };
+    fetchHorarios();
+  }, []);
 
-    // ✅ Verifico si la actividad tiene reservas activas
-    const tieneReservasActivas = (actividadId) => {
-        //console.log("Buscando reservas activas para actividadId:", actividadId);
-        /*
+  // ✅ Verifico si la actividad tiene reservas activas
+  const tieneReservasActivas = (actividadId) => {
+    //console.log("Buscando reservas activas para actividadId:", actividadId);
+    /*
         reservas.forEach(r => {
             console.log(`→ reserva_id=${r.reserva_id}, actividad_id=${r.actividad_id}, activo=${r.activo}`);
         });
         */
-        const resultado = reservas.some(
-            (r) => Number(r.actividad.actividad_id) === Number(actividadId) && r.activo === true
+    const resultado = reservas.some(
+      (r) =>
+        Number(r.actividad.actividad_id) === Number(actividadId) &&
+        r.activo === true
+    );
+
+    // console.log(`¿La actividad ${actividadId} tiene reservas activas? →`, resultado);
+
+    return resultado;
+  };
+
+  // ✅ Verifico si la actividad tiene horarios activas
+  const tieneHorariosActivos = (actividadId) => {
+    return horarios.some(
+      (h) =>
+        Number(h.actividad.actividad_id) === Number(actividadId) &&
+        h.activo === true
+    );
+  };
+
+  // ✅ Manejo de modificación con validación
+  const editarActividad = (actividad) => {
+    if (tieneReservasActivas(actividad.actividad_id)) {
+      swalEstilo.fire({
+        icon: "warning",
+        title: "No se puede modificar",
+        text: `La actividad "${actividad.nombre}" tiene reservas activas.`,
+        confirmButtonText: "Cerrar",
+      });
+
+      return;
+    }
+
+    if (tieneHorariosActivos(actividad.actividad_id)) {
+      swalEstilo.fire({
+        icon: "warning",
+        title: "No se puede modificar",
+        text: `La actividad "${actividad.nombre}" tiene horarios activos.`,
+        confirmButtonText: "Cerrar",
+      });
+
+      return;
+    }
+
+    if (onEditar) onEditar(actividad);
+  };
+
+  // ✅ Manejo de eliminación con validación
+  const eliminarActividad = async (actividad) => {
+    // console.log('actividad.actividad_id ', actividad.actividad_id)
+
+    if (tieneReservasActivas(actividad.actividad_id)) {
+      swalEstilo.fire({
+        icon: "warning",
+        title: "No se puede eliminar",
+        text: `La actividad "${actividad.nombre}" tiene reservas activas.`,
+        confirmButtonText: "Cerrar",
+      });
+      return;
+    }
+
+    if (tieneHorariosActivos(actividad.actividad_id)) {
+      swalEstilo.fire({
+        icon: "warning",
+        title: "No se puede eliminar",
+        text: `La actividad "${actividad.nombre}" tiene horarios activos.`,
+        confirmButtonText: "Cerrar",
+      });
+      return;
+    }
+
+    //swalEstilo.fire({
+    const result = await swalEstilo.fire({
+      title: "¿Eliminar actividad?",
+      text: `Esta acción eliminará la actividad "${actividad.nombre}" permanentemente.`,
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonColor: "#6edc8c",
+      customClass: {
+        cancelButton: "btnAceptar",
+      },
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        // 🔥 Llamada al backend DELETE
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/actividades/${
+            actividad.actividad_id
+          }`,
+          {
+            method: "DELETE",
+          }
         );
 
-       // console.log(`¿La actividad ${actividadId} tiene reservas activas? →`, resultado);
+        if (!response.ok) {
+          throw new Error("Error al eliminar la actividad");
+        }
 
-        return resultado;        
-    };
-      
-    // ✅ Verifico si la actividad tiene horarios activas
-    const tieneHorariosActivos = (actividadId) => {
-        return horarios.some(
-            h =>
-            Number(h.actividad.actividad_id) === Number(actividadId) &&
-            h.activo === true
+        // Actualizo la tabla local sin recargar
+        setActividadesBD((prev) =>
+          prev.filter((a) => a.actividad_id !== actividad.actividad_id)
         );
-    };
 
-    // ✅ Manejo de modificación con validación   
-    const editarActividad = (actividad) => {
-        if (tieneReservasActivas(actividad.actividad_id)) {
-            swalEstilo.fire({
-                icon: "warning",
-                title: "No se puede modificar",
-                text: `La actividad "${actividad.nombre}" tiene reservas activas.`,
-                confirmButtonText: "Cerrar",
-            });
-         
-            return;
-        }
-
-        if (tieneHorariosActivos(actividad.actividad_id)) {
-            swalEstilo.fire({
-                icon: "warning",
-                title: "No se puede modificar",
-                text: `La actividad "${actividad.nombre}" tiene horarios activos.`,
-                confirmButtonText: "Cerrar",
-            });
-
-            return;
-        }
-
-        if (onEditar) onEditar(actividad);
-    };
-
-    // ✅ Manejo de eliminación con validación    
-    const eliminarActividad = async (actividad) => {
-       // console.log('actividad.actividad_id ', actividad.actividad_id)
-
-        if (tieneReservasActivas(actividad.actividad_id)) {
-            swalEstilo.fire({
-                icon: "warning",
-                title: "No se puede eliminar",
-                text: `La actividad "${actividad.nombre}" tiene reservas activas.`,
-                confirmButtonText: "Cerrar",
-            });
-            return;
-        }
-            
-        if (tieneHorariosActivos(actividad.actividad_id)) {
-            swalEstilo.fire({
-                icon: "warning",
-                title: "No se puede eliminar",
-                text: `La actividad "${actividad.nombre}" tiene horarios activos.`,
-                confirmButtonText: "Cerrar",
-            });
-            return;
-        }
-
-        //swalEstilo.fire({
-        const result = await swalEstilo.fire({
-            title: "¿Eliminar actividad?",
-            text: `Esta acción eliminará la actividad "${actividad.nombre}" permanentemente.`,
-            icon: "warning",
-            showCancelButton: true,
-            cancelButtonColor: '#6edc8c',                        
-            customClass: {
-                cancelButton: 'btnAceptar'
-            },
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
+        swalEstilo.fire({
+          title: "Eliminada",
+          text: "La actividad ha sido eliminada.",
+          icon: "success",
+          confirmButtonColor: "#6edc8c",
+          confirmButtonText: "Cerrar",
         });
-     
-        if (result.isConfirmed) {
-            try {
-            // 🔥 Llamada al backend DELETE
-                const response = await fetch(`http://localhost:3000/actividades/${actividad.actividad_id}`, {
-                    method: 'DELETE',
-                });
+      } catch (error) {
+        console.error(error);
+        swalEstilo.fire("Error", "No se pudo eliminar la actividad.", "error");
+      }
+    }
+  };
 
-                if (!response.ok) {
-                    throw new Error("Error al eliminar la actividad");
-                }
-
-                // Actualizo la tabla local sin recargar
-                setActividadesBD(prev =>
-                    prev.filter(a => a.actividad_id !== actividad.actividad_id)
-                );
-
-                
-                swalEstilo.fire({
-                    title: "Eliminada",
-                    text: "La actividad ha sido eliminada.",
-                    icon: "success",
-                    confirmButtonColor: "#6edc8c",
-                    confirmButtonText: "Cerrar",
-                });
-            } catch (error) {
-                console.error(error);
-                swalEstilo.fire("Error", "No se pudo eliminar la actividad.", "error");
-            }
-        }
-    };
-    
-    // Cargo la imagen desde src/assets/img dinámicamente
-    const obtenerRutaImagen = (nombreArchivo) => {
-        const archivo =        
-            nombreArchivo && nombreArchivo.trim() !== "" && nombreArchivo !== null
-                ? nombreArchivo
-                : "icono_default.png";      // uso la imagen default si viene vacía
-        try {
-            return new URL(`../assets/img/${archivo}`, import.meta.url).href;
-            /* ¿Qué hace la línea anterior?
+  // Cargo la imagen desde src/assets/img dinámicamente
+  const obtenerRutaImagen = (nombreArchivo) => {
+    const archivo =
+      nombreArchivo && nombreArchivo.trim() !== "" && nombreArchivo !== null
+        ? nombreArchivo
+        : "icono_default.png"; // uso la imagen default si viene vacía
+    try {
+      return new URL(`../assets/img/${archivo}`, import.meta.url).href;
+      /* ¿Qué hace la línea anterior?
             Si la imagen viene del formulario (File): usa URL.createObjectURL como antes.
             Si es un nombre de archivo (como "yoga.png"): 
             new URL('../assets/img/yoga.png', import.meta.url).href genera la URL final procesada por Vite.
             Esto permite usar imágenes que están dentro de src/assets/img sin moverlas a public. */
-        } catch (error) {
-            console.warn(`No se encontró la imagen: ${archivo}. Usando icono_default.png`);
-            return new URL(`../assets/img/icono_default.png`, import.meta.url).href;
-        }
-    };
+    } catch (error) {
+      console.warn(
+        `No se encontró la imagen: ${archivo}. Usando icono_default.png`
+      );
+      return new URL(`../assets/img/icono_default.png`, import.meta.url).href;
+    }
+  };
 
-    // Creo función de ordenamiento
-    const ordenarActividades = (lista) => {
-        return [...lista].sort((a, b) => {
-            // 1️. Ordeno por nombre
-            const actA = a.nombre.toLowerCase();
-            const actB = b.nombre.toLowerCase();
-            if (actA < actB) return -1;
-            if (actA > actB) return 1;
+  // Creo función de ordenamiento
+  const ordenarActividades = (lista) => {
+    return [...lista].sort((a, b) => {
+      // 1️. Ordeno por nombre
+      const actA = a.nombre.toLowerCase();
+      const actB = b.nombre.toLowerCase();
+      if (actA < actB) return -1;
+      if (actA > actB) return 1;
 
-            return 0; // iguales
-        });
-    };
+      return 0; // iguales
+    });
+  };
 
-    // Si el modo es "postAlta", lo trato como "consultar"
-    const modoEfectivo = modo === "postAlta" ? "consultar" : modo;
-    
-    return (
-        <main className="mainActividad">
-            <section id="tablaActividades">
-                <table>
-                    <thead>
-                        <tr>
-                        <th>Nombre</th>
-                        <th>Detalle</th>
-                        <th>Cupo Max.</th>
-                        <th>Imagen</th>
-                        {modoEfectivo !== "consultar" && <th>Acciones</th>}
-                        </tr>
-                    </thead>
+  // Si el modo es "postAlta", lo trato como "consultar"
+  const modoEfectivo = modo === "postAlta" ? "consultar" : modo;
 
-                    <tbody>
-                        {actividadesBD.length > 0 ? (                           
-                            ordenarActividades(actividadesBD).map((actividad) => {
-                                const imagenSrc =
-                                    actividad.imagen instanceof File
-                                        ? URL.createObjectURL(actividad.imagen)
-                                        : obtenerRutaImagen(actividad.imagen);
+  return (
+    <main className="mainActividad">
+      <section id="tablaActividades">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Detalle</th>
+              <th>Cupo Max.</th>
+              <th>Imagen</th>
+              {modoEfectivo !== "consultar" && <th>Acciones</th>}
+            </tr>
+          </thead>
 
-                                return (
-                                    <tr key={actividad.actividad_id}>
-                                        <td>{actividad.nombre}</td>
-                                        <td>{actividad.descripcion}</td>
-                                        <td id="cupo">{actividad.cupoMaximo}</td>
-                                        <td id="imagen">
-                                            {imagenSrc ? (
-                                                <img
-                                                src={imagenSrc}
-                                                alt={actividad.nombre}
-                                                width="50"
-                                                />
-                                            ) : (
-                                                "Sin imagen"
-                                            )}
-                                        </td>
-                                        
-                                        {modoEfectivo !== "consultar" && (
-                                            <td>
-                                                {modoEfectivo === "editar" && (
-                                                    <button
-                                                        className="btnTabla"
-                                                        onClick={() => editarActividad(actividad)} // ✅ paso por la validación
-                                                    >
-                                                        <img    
-                                                            src={
-                                                                new URL("../assets/img/icono_editar.png", import.meta.url).href
-                                                            }
-                                                            alt="Editar"
-                                                            width="30"
-                                                        />
-                                                    </button>
-                                                )}
+          <tbody>
+            {actividadesBD.length > 0 ? (
+              ordenarActividades(actividadesBD).map((actividad) => {
+                const imagenSrc =
+                  actividad.imagen instanceof File
+                    ? URL.createObjectURL(actividad.imagen)
+                    : obtenerRutaImagen(actividad.imagen);
 
-                                                {modoEfectivo === "eliminar" && (
-                                                    <button
-                                                        className="btnTabla"
-                                                        onClick={() => eliminarActividad(actividad)}    // ✅ paso por la validación
-                                                    >
-                                                        <img    
-                                                            src={
-                                                                new URL("../assets/img/icono_eliminar.png", import.meta.url).href
-                                                            }
-                                                            alt="Eliminar"
-                                                            width="30"
-                                                        />
-                                                    </button>
-                                                )}
-                                            </td>
-                                        )}
-                                    </tr>
-                                );
-                            
-                            })
-                            ) : (
-                            <tr>
-                                <td colSpan={modoEfectivo !== "consultar" ? 5 : 4}>No hay actividades registradas</td>
-                            </tr>
+                return (
+                  <tr key={actividad.actividad_id}>
+                    <td>{actividad.nombre}</td>
+                    <td>{actividad.descripcion}</td>
+                    <td id="cupo">{actividad.cupoMaximo}</td>
+                    <td id="imagen">
+                      {imagenSrc ? (
+                        <img
+                          src={imagenSrc}
+                          alt={actividad.nombre}
+                          width="50"
+                        />
+                      ) : (
+                        "Sin imagen"
+                      )}
+                    </td>
+
+                    {modoEfectivo !== "consultar" && (
+                      <td>
+                        {modoEfectivo === "editar" && (
+                          <button
+                            className="btnTabla"
+                            onClick={() => editarActividad(actividad)} // ✅ paso por la validación
+                          >
+                            <img
+                              src={
+                                new URL(
+                                  "../assets/img/icono_editar.png",
+                                  import.meta.url
+                                ).href
+                              }
+                              alt="Editar"
+                              width="30"
+                            />
+                          </button>
                         )}
-                    </tbody>
-                </table>
-            </section>
 
-            {modo === "postAlta" && (
-                <FormBotones
-                    boton1={{ id: "agregar", label: "AGREGAR", className: "btnAceptar", onClick: () => (window.location.href = "/actividad?modo=agregar") }}
-                    boton2={{ id: "cancelar", label: "VOLVER", className: "btnCancelar", onClick: () => (window.location.href = "/administrar") }}                        
-                    contenedorClass="contenedorBotones"
-                />
+                        {modoEfectivo === "eliminar" && (
+                          <button
+                            className="btnTabla"
+                            onClick={() => eliminarActividad(actividad)} // ✅ paso por la validación
+                          >
+                            <img
+                              src={
+                                new URL(
+                                  "../assets/img/icono_eliminar.png",
+                                  import.meta.url
+                                ).href
+                              }
+                              alt="Eliminar"
+                              width="30"
+                            />
+                          </button>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={modoEfectivo !== "consultar" ? 5 : 4}>
+                  No hay actividades registradas
+                </td>
+              </tr>
             )}
-            
-        </main>
-    );
+          </tbody>
+        </table>
+      </section>
+
+      {modo === "postAlta" && (
+        <FormBotones
+          boton1={{
+            id: "agregar",
+            label: "AGREGAR",
+            className: "btnAceptar",
+            onClick: () => (window.location.href = "/actividad?modo=agregar"),
+          }}
+          boton2={{
+            id: "cancelar",
+            label: "VOLVER",
+            className: "btnCancelar",
+            onClick: () => (window.location.href = "/administrar"),
+          }}
+          contenedorClass="contenedorBotones"
+        />
+      )}
+    </main>
+  );
 }

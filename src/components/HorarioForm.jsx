@@ -42,9 +42,13 @@ export default function HorarioForm({
     const fetchDatos = async () => {
       try {
         const [profRes, actRes, horaRes] = await Promise.all([
-          fetch("http://localhost:3000/profesores").then((r) => r.json()),
-          fetch("http://localhost:3000/actividades").then((r) => r.json()),
-          fetch("http://localhost:3000/horas").then((r) => r.json()),
+          fetch("${import.meta.env.VITE_API_URL}/profesores").then((r) =>
+            r.json()
+          ),
+          fetch("${import.meta.env.VITE_API_URL}/actividades").then((r) =>
+            r.json()
+          ),
+          fetch("${import.meta.env.VITE_API_URL}/horas").then((r) => r.json()),
         ]);
 
         setProfesores((profRes || []).filter((p) => p.persona?.activo));
@@ -168,59 +172,57 @@ export default function HorarioForm({
     // Si el profesor es null → no validar duplicados
     if (profesorID === null || profesorID === "" || profesorID === 0) {
       console.log("Profesor null: NO se valida duplicado.");
-      // NO retorno nada, dejo seguir el flujo normal.      
+      // NO retorno nada, dejo seguir el flujo normal.
     } else {
       const yaExiste = horarios.some((h) => {
         let diasExistentes = [];
 
         if (Array.isArray(h.dias)) {
-              //console.log("entró")
-              diasExistentes = h.dias;
-          } else if (typeof h.dias === "string") {
-              try {
-                  //console.log("dias parsed ", JSON.parse(h.dias))
-                  const parsed = JSON.parse(h.dias);
-                  
-                  diasExistentes = Array.isArray(parsed)
-                      ? parsed
-                      : h.dias.split(",").map(d => d.trim().toLowerCase());
-              } catch {
-                  //console.log("catch")
-                  diasExistentes = h.dias.split(",").map(d => d.trim().toLowerCase());
-              }
+          //console.log("entró")
+          diasExistentes = h.dias;
+        } else if (typeof h.dias === "string") {
+          try {
+            //console.log("dias parsed ", JSON.parse(h.dias))
+            const parsed = JSON.parse(h.dias);
+
+            diasExistentes = Array.isArray(parsed)
+              ? parsed
+              : h.dias.split(",").map((d) => d.trim().toLowerCase());
+          } catch {
+            //console.log("catch")
+            diasExistentes = h.dias
+              .split(",")
+              .map((d) => d.trim().toLowerCase());
           }
+        }
 
-          // Normalizar días
-          const diasNormalizados = diasExistentes.map(d => String(d).toLowerCase());
+        // Normalizar días
+        const diasNormalizados = diasExistentes.map((d) =>
+          String(d).toLowerCase()
+        );
 
-          const diasCoinciden = diasSeleccionados.some(d =>
-              diasNormalizados.includes(String(d).toLowerCase())
-          );
+        const diasCoinciden = diasSeleccionados.some((d) =>
+          diasNormalizados.includes(String(d).toLowerCase())
+        );
 
-          // ids del horario leído
-          const profesorIdEnH = Number(
-              h.profesor?.profesor_id ||
-              h.profesor_id ||
-              0
-          );
+        // ids del horario leído
+        const profesorIdEnH = Number(
+          h.profesor?.profesor_id || h.profesor_id || 0
+        );
 
-          const horaIdEnH = Number(
-              h.hora?.hora_id ||
-              h.hora_id ||
-              0
-          );
+        const horaIdEnH = Number(h.hora?.hora_id || h.hora_id || 0);
 
-          const esDuplicado =
-              profesorIdEnH === Number(profesorID) &&
-              horaIdEnH === Number(horaID) &&
-              diasCoinciden &&
-              Number(h.horario_id) !== Number(id);
-/*
+        const esDuplicado =
+          profesorIdEnH === Number(profesorID) &&
+          horaIdEnH === Number(horaID) &&
+          diasCoinciden &&
+          Number(h.horario_id) !== Number(id);
+        /*
       
         console.log("registro ", h);
         console.log("id horario ", id);
       */
-  /*
+        /*
         // Comparo todo
         const esDuplicado =        
           Number(h.profesor?.profesor_id || h.profesor_id || 0) === Number(profesorID || 0) &&
@@ -230,7 +232,7 @@ export default function HorarioForm({
           diasCoinciden &&
           Number(h.horario_id) !== Number(id);
   */
- /*
+        /*
         console.log("Comparando registro:", {
           profesorEnH: Number(h.profesor?.profesor_id || h.profesor_id),
           profesorSeleccionado: Number(profesorID),
@@ -251,10 +253,8 @@ export default function HorarioForm({
 */
         return esDuplicado;
       });
-    
 
-     // console.log("ya existe: ", yaExiste);
-
+      // console.log("ya existe: ", yaExiste);
 
       if (yaExiste) {
         swalEstilo.fire({
@@ -269,13 +269,13 @@ export default function HorarioForm({
         return; // cancela el guardado
       }
     }
-    
+
     // Aplico los errores visuales si existen
     setErrores(nuevosErrores);
 
     // Si hay errores SALGO
     if (!esValido) return;
-/*
+    /*
     console.log("Profesor: ", profesorID);
     console.log("Actividad: ", actividadID);
     console.log("Cupo: ", cupoMaximo);
@@ -287,7 +287,8 @@ export default function HorarioForm({
       profesor_id: profesorID !== "" ? Number(profesorID) : null,
       actividad_id: Number(actividadID),
       //cupoMaximo: Number(cupoMaximo),
-      cupoMaximo: cupoMaximo === null || cupoMaximo === "" ? null : Number(cupoMaximo), // si tiene null, que mande null, sino mandaba 0
+      cupoMaximo:
+        cupoMaximo === null || cupoMaximo === "" ? null : Number(cupoMaximo), // si tiene null, que mande null, sino mandaba 0
       dias: diasSeleccionados.join(","), // convierte ["lunes","jueves"] → "lunes,jueves"
       hora_id: Number(horaID),
       activo: true,
@@ -296,11 +297,11 @@ export default function HorarioForm({
     try {
       const url =
         modo === "editar" && id
-          ? `http://localhost:3000/horarios/${id}`
-          : "http://localhost:3000/horarios";
+          ? `${import.meta.env.VITE_API_URL}/horarios/${id}`
+          : "${import.meta.env.VITE_API_URL}/horarios";
 
       const method = modo === "editar" ? "PUT" : "POST";
-/*
+      /*
       console.log("Enviando a backend:", horarioData);
       console.log("URL:", url);
       console.log("Método:", method);

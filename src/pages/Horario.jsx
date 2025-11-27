@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";                // React no se importa con llaves, solo el hook useState
+import React, { useState, useEffect } from "react"; // React no se importa con llaves, solo el hook useState
 import { useSearchParams } from "react-router-dom";
 import "../styles/style.css";
 
@@ -18,21 +18,21 @@ export default function Horario() {
   //http://localhost:5173/horario?modo=agregar
 
   const [horarios, setHorarios] = useState([]);
-  
-    useEffect(() => {
-      fetch("http://localhost:3000/horarios")
-        .then((res) => res.json())
-        .then((data) => setHorarios(data))
-        .catch((err) => console.error("Error:", err));
-    }, []);
+
+  useEffect(() => {
+    fetch("${import.meta.env.VITE_API_URL}/horarios")
+      .then((res) => res.json())
+      .then((data) => setHorarios(data))
+      .catch((err) => console.error("Error:", err));
+  }, []);
 
   const [params, setParams] = useSearchParams();
   const modo = params.get("modo") || "consultar";
-  const id = parseInt(params.get("id"));                    // 👈 identificador del horario a editar (si existe)
- // const [horarios, setHorarios] = useState(horariosData);
-  const [datoInicial, setDatoInicial] = useState(null);     // horario seleccionado para editar
+  const id = parseInt(params.get("id")); // 👈 identificador del horario a editar (si existe)
+  // const [horarios, setHorarios] = useState(horariosData);
+  const [datoInicial, setDatoInicial] = useState(null); // horario seleccionado para editar
 
-  // Detecto si hay un horario seleccionado para editar  
+  // Detecto si hay un horario seleccionado para editar
   React.useEffect(() => {
     if (modo === "editar" && id) {
       const act = horarios.find((a) => a.id === id);
@@ -50,37 +50,36 @@ export default function Horario() {
       );
       setHorarios(actualizados);
     } else {
-      setHorarios((prev) => [
-        ...prev,
-        { id: prev.length + 1, ...horario },
-      ]);
+      setHorarios((prev) => [...prev, { id: prev.length + 1, ...horario }]);
     }
   };
 
   // Cuando clickeo en el botón editar de la tabla
   const handleEditar = (horario) => {
     setDatoInicial(horario);
-    setParams({ modo: "editar", id: horario.id }); 
+    setParams({ modo: "editar", id: horario.id });
   };
 
-  return (   
+  return (
     <main className="mainHorario">
       {modo === "agregar" && (
         <>
-          <TituloConFlecha destino="/administrar">Agregar Horario</TituloConFlecha>
+          <TituloConFlecha destino="/administrar">
+            Agregar Horario
+          </TituloConFlecha>
 
           <ImagenLateral
             imgIzquierda={imgIzquierda}
             imgDerecha={imgDerecha}
             altIzq="Horario izquierdo"
             altDer="Horario derecho"
-          />         
+          />
 
           {/* 👇 Le paso también los horarios existentes, para la validaciones */}
-          <HorarioForm 
-            guardar={guardarHorario} 
+          <HorarioForm
+            guardar={guardarHorario}
             datoInicial={datoInicial}
-            horarios={horarios} 
+            horarios={horarios}
           />
         </>
       )}
@@ -88,7 +87,9 @@ export default function Horario() {
       {/* Primero muestro la tabla, y al hacer clic en editar se abre el form */}
       {modo === "editar" && !datoInicial && (
         <>
-          <TituloConFlecha destino="/administrar">Modificar Horario</TituloConFlecha>
+          <TituloConFlecha destino="/administrar">
+            Modificar Horario
+          </TituloConFlecha>
           <HorarioList
             horarios={horarios}
             modo="editar"
@@ -98,8 +99,10 @@ export default function Horario() {
       )}
 
       {modo === "editar" && datoInicial && (
-        <>          
-          <TituloConFlecha destino="/administrar">Modificar Horario</TituloConFlecha>
+        <>
+          <TituloConFlecha destino="/administrar">
+            Modificar Horario
+          </TituloConFlecha>
           <ImagenLateral />
           <HorarioForm
             guardar={guardarHorario}
@@ -111,26 +114,31 @@ export default function Horario() {
 
       {modo === "eliminar" && (
         <>
-          <TituloConFlecha destino="/administrar">Eliminar Horario</TituloConFlecha>
+          <TituloConFlecha destino="/administrar">
+            Eliminar Horario
+          </TituloConFlecha>
           <HorarioList horarios={horarios} modo="eliminar" />
         </>
       )}
 
       {modo === "consultar" && (
         <>
-          <TituloConFlecha destino="/administrar">Listado de Horarios</TituloConFlecha>
+          <TituloConFlecha destino="/administrar">
+            Listado de Horarios
+          </TituloConFlecha>
           <HorarioList horarios={horarios} modo="consultar" />
         </>
       )}
 
       {modo === "postAlta" && (
         <>
-          <TituloConFlecha destino="/administrar">Listado de Horarios</TituloConFlecha>
-          <HorarioList horarios={horarios} modo="postAlta" />     {/* 👈 le paso este modo para que muestre el botón*/}
+          <TituloConFlecha destino="/administrar">
+            Listado de Horarios
+          </TituloConFlecha>
+          <HorarioList horarios={horarios} modo="postAlta" />{" "}
+          {/* 👈 le paso este modo para que muestre el botón*/}
         </>
-    )}
-
+      )}
     </main>
   );
 }
-

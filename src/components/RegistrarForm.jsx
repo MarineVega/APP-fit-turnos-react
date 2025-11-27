@@ -26,70 +26,94 @@ export default function RegistrarForm({ onSwitch }) {
   });
 
   const handleRegister = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    // VALIDACIONES
-    if (!username || !email || !password || !password2)
-      return setError("Completá todos los campos.");
+  // VALIDACIONES
+  if (!username || !email || !password || !password2)
+    return setError("Completá todos los campos.");
 
-    if (/\s/.test(username))
-      return setError("El nombre de usuario no puede contener espacios.");
+  if (/\s/.test(username))
+    return setError("El nombre de usuario no puede contener espacios.");
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      return setError("El email no es válido.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return setError("El email no es válido.");
 
-    if (password.length < 6)
-      return setError("La contraseña debe tener al menos 6 caracteres.");
+  if (password.length < 6)
+    return setError("La contraseña debe tener al menos 6 caracteres.");
 
-    if (password !== password2)
-      return setError("Las contraseñas no coinciden.");
+  if (password !== password2)
+    return setError("Las contraseñas no coinciden.");
 
-    setLoading(true);
+  setLoading(true);
 
-    // FORMATO EXACTO QUE ESPERA EL BACKEND
-    const nuevoUsuario = {
-      usuario: username,
-      email,
-      password,
-      persona: {
-        tipoPersona_id: 3, // Cliente
-        activo:false, 
-      },
-    };
-
-    try {
-      const API_URL = import.meta.env.VITE_API_URL;
-
-      const res = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevoUsuario),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "No se pudo registrar el usuario.");
-      }
-
-      // MENSAJE DE VERIFICACIÓN
-      await swalEstilo.fire({
-        title: "¡Registración exitosa!",
-        text: "Te enviamos un correo para activar tu cuenta.",
-        icon: "success",
-        confirmButtonText: "Ir al Login",
-      });
-
-      onSwitch("login");
-
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  const nuevoUsuario = {
+    usuario: username,
+    email,
+    password,
+    persona: {
+      tipoPersona_id: 3,
+      activo: false,
+    },
   };
+
+  try {
+    const API_URL = import.meta.env.VITE_API_URL;
+
+    //  Validación si no hay URL configurada
+    if (!API_URL) {
+      throw new Error("Error interno: falta configurar la URL del servidor.");
+    }
+
+    //  Timeout (si el back no responde)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nuevoUsuario),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("El servidor no respondió correctamente.");
+    }
+
+    if (!res.ok) {
+      throw new Error(data.message || "No se pudo registrar el usuario.");
+    }
+
+    await swalEstilo.fire({
+      title: "¡Registración exitosa!",
+      text: "Te enviamos un correo para activar tu cuenta.",
+      icon: "success",
+      confirmButtonText: "Ir al Login",
+    });
+
+    onSwitch("login");
+
+  } catch (err) {
+    console.error("Error en registro:", err);
+
+    //  Manejos específicos de error
+    if (err.name === "AbortError") {
+      setError("El servidor tardó demasiado en responder. Intentá más tarde.");
+    } else if (err.message === "Ocurrio un error de red") {
+      setError("No hay conexión con el servidor.");
+    } else {
+      setError(err.message);
+    }
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>

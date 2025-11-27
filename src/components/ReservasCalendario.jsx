@@ -155,7 +155,7 @@ export default function ReservasCalendario({ actividadSeleccionada }) {
 
     if (
       horariosData.length === 0 ||
-      profesoresData.length === 0 ||
+      //profesoresData.length === 0 ||
       horasData.length === 0
     )
       return;
@@ -174,32 +174,15 @@ export default function ReservasCalendario({ actividadSeleccionada }) {
 
     // Recorro horarios y genero eventos solamente para la actividad seleccionada
     horariosData.forEach((horario) => {
-
-       console.log("Procesando horario:", horario);
-      console.log("Comparando actividad:", horario.actividad.actividad_id, 
-        "vs", actividadSeleccionada.actividad_id);
-      console.log("Horas disponibles:", horasData);
-      console.log("Hora del horario:", horario.hora);
-      console.log('horasData' ,horasData)
-
       // Descarto horario por actividad -> actividad seleccionada es <> a la actividad del horario
       if (
         Number(horario.actividad.actividad_id) !==
         Number(actividadSeleccionada.actividad_id)
-      ) {
-        console.log("descarto horario por actividad")
+      ) 
         return;
-
-      }
 
       // Descarto horario por estar desactivado
-      if (!horario.activo) {
-        console.log("Descarto horario por estar desactivado")
-        return;
-
-      }
-        
-
+      if (!horario.activo) return;
       const horaObj =
         horasData.find(
           (h) => Number(h.hora_id) === Number(horario.hora.hora_id)

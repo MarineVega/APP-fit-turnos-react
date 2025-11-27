@@ -19,7 +19,7 @@ export default function Usuario() {
 
   //  Cargar usuarios desde el backend
   useEffect(() => {
-    fetch("http://localhost:3000/usuarios")
+    fetch(`${import.meta.env.VITE_API_URL}/usuarios`)
       .then((res) => res.json())
       .then((data) => {
         setUsuarios(data);
@@ -43,7 +43,7 @@ export default function Usuario() {
       if (modo === "editar" && datoInicial) {
         // PUT: actualizar usuario existente
         const res = await fetch(
-          `http://localhost:3000/usuarios/${datoInicial.usuario_id}`,
+          `${import.meta.env.VITE_API_URL}/usuarios/${datoInicial.usuario_id}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -53,7 +53,7 @@ export default function Usuario() {
         if (!res.ok) throw new Error("Error al actualizar usuario");
       } else {
         // POST: crear nuevo usuario
-        const res = await fetch("http://localhost:3000/usuarios", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(usuario),
@@ -62,7 +62,7 @@ export default function Usuario() {
       }
 
       //  Volver a cargar la lista
-      const nuevos = await fetch("http://localhost:3000/usuarios").then((r) =>
+      const nuevos = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`).then((r) =>
         r.json()
       );
       setUsuarios(nuevos);

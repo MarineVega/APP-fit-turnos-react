@@ -91,7 +91,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
         const resp = await fetch(
-          `http://localhost:3000/reservas/usuario/${datoInicial.persona.persona_id}`,
+          `${import.meta.env.VITE_API_URL}/reservas/usuario/${datoInicial.persona.persona_id}`,
           { headers }
         );
 

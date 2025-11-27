@@ -28,7 +28,7 @@ export default function UsuarioList({ modo, onEditar }) {
         const token = localStorage.getItem("token");
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
-        const response = await fetch("http://localhost:3000/usuarios", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios` , {
           headers,
         });
 
@@ -71,7 +71,7 @@ export default function UsuarioList({ modo, onEditar }) {
           if (token) headers["Authorization"] = `Bearer ${token}`;
 
           const resp = await fetch(
-            `http://localhost:3000/reservas/usuario/${usuario.persona.persona_id}`,
+            `${import.meta.env.VITE_API_URL}/reservas/usuario/${usuario.persona.persona_id}`,
             { headers }
           );
 
@@ -113,7 +113,7 @@ export default function UsuarioList({ modo, onEditar }) {
         if (token) headers["Authorization"] = `Bearer ${token}`;
 
         const resp = await fetch(
-          `http://localhost:3000/reservas/usuario/${usuario.persona.persona_id}`,
+          `${import.meta.env.VITE_API_URL}/reservas/usuario/${usuario.persona.persona_id}`,
           { headers }
         );
 
@@ -158,7 +158,7 @@ export default function UsuarioList({ modo, onEditar }) {
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
       const response = await fetch(
-        `http://localhost:3000/usuarios/${usuario.usuario_id}`,
+        `${import.meta.env.VITE_API_URL}/usuarios/${usuario.usuario_id}`,
         { method: "DELETE", headers }
       );
 

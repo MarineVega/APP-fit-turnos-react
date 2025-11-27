@@ -23,7 +23,7 @@ export default function LayoutPrivate() {
     // Si hay token → validar backend
     if (token) {
       try {
-        const res = await fetch("http://localhost:3000/auth/perfil", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/perfil`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

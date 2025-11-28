@@ -29,7 +29,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     apellido: datoInicial?.persona?.apellido || datoInicial?.apellido || "",
     email: datoInicial?.email || datoInicial?.persona?.email || "",
     usuario: datoInicial?.usuario || "",
-    contrasenia: datoInicial?.password || datoInicial?.contrasenia || "",
+    contrasenia: "",
     repetirContrasenia: "",
     tipoPersona_id: datoInicial?.persona?.tipoPersona_id || "",
     activo: datoInicial?.activo ?? true,
@@ -37,25 +37,15 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
 
   const [errores, setErrores] = useState({});
 
-  // 🔥 Scroll hacia arriba siempre que cambia el modo o se recarga el form
+  // 🔥 Scroll hacia arriba al cambiar de modo
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [modo]);
 
-  // Auto-completa repetir contraseña en modo edición
-  useEffect(() => {
-    if (modo === "editar" && usuario.contrasenia && !usuario.repetirContrasenia) {
-      setUsuario((prev) => ({
-        ...prev,
-        repetirContrasenia: prev.contrasenia,
-      }));
-    }
-  }, [modo, usuario.contrasenia]);
-
   const limpiarError = (campo) =>
     setErrores((prev) => ({ ...prev, [campo]: "" }));
 
-  // No se puede seleccionar administador si es cliente y tiene reservas activas
+  // --- CAMBIOS DEL FORM ---
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -80,42 +70,14 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     });
   };
 
+  // --- GUARDAR ---
   const validarGuardar = async (e) => {
     e.preventDefault();
-
-    //  VALIDACION a backend antes de guardar
-    if (modo === "editar" && datoInicial?.persona?.tipoPersona_id === 3) {
-      try {
-        const headers = {};
-        const token = localStorage.getItem("token");
-        if (token) headers["Authorization"] = `Bearer ${token}`;
-
-        const resp = await fetch(
-          `${import.meta.env.VITE_API_URL}/reservas/usuario/${datoInicial.persona.persona_id}`,
-          { headers }
-        );
-
-        if (resp.ok) {
-          const data = await resp.json();
-
-          if (data.tieneReservas && parseInt(usuario.tipoPersona_id) !== 3) {
-            Swal.fire(
-              "No permitido",
-              "Este usuario tiene reservas activas y no puede cambiarse de Cliente.",
-              "warning"
-            );
-            return;
-          }
-        }
-      } catch (err) {
-        console.error("Error validando reservas antes de guardar:", err);
-      }
-    }
 
     const nuevosErrores = {};
     let esValido = true;
 
-    // Validaciones
+    // --- VALIDACIONES GENERALES ---
     if (!usuario.nombre.trim()) {
       nuevosErrores.nombre = "El nombre es obligatorio.";
       esValido = false;
@@ -132,23 +94,28 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
       nuevosErrores.usuario = "El nombre de usuario es obligatorio.";
       esValido = false;
     }
-    if (!usuario.contrasenia.trim()) {
-      nuevosErrores.contrasenia = "La contraseña es obligatoria.";
-      esValido = false;
+
+    // --- VALIDACIÓN DE CONTRASEÑA SOLO EN AGREGAR ---
+    if (modo === "agregar") {
+      if (!usuario.contrasenia.trim()) {
+        nuevosErrores.contrasenia = "La contraseña es obligatoria.";
+        esValido = false;
+      }
+      if (!usuario.repetirContrasenia.trim()) {
+        nuevosErrores.repetirContrasenia = "Debe repetir la contraseña.";
+        esValido = false;
+      } else if (usuario.contrasenia !== usuario.repetirContrasenia) {
+        nuevosErrores.repetirContrasenia = "Las contraseñas no coinciden.";
+        esValido = false;
+      }
     }
-    if (!usuario.repetirContrasenia.trim()) {
-      nuevosErrores.repetirContrasenia = "Debe repetir la contraseña.";
-      esValido = false;
-    } else if (usuario.contrasenia !== usuario.repetirContrasenia) {
-      nuevosErrores.repetirContrasenia = "Las contraseñas no coinciden.";
-      esValido = false;
-    }
+
     if (!usuario.tipoPersona_id) {
       nuevosErrores.tipoPersona_id = "Debe seleccionar un tipo de usuario.";
       esValido = false;
     }
 
-    // Usuario duplicado
+    // --- VALIDACIÓN DE EMAIL/USUARIO DUPLICADO ---
     const usuarioDuplicado = usuarios.some(
       (u) =>
         u.usuario?.toLowerCase().trim() === usuario.usuario.toLowerCase().trim() &&
@@ -172,24 +139,20 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
     setErrores(nuevosErrores);
     if (!esValido) return;
 
-    // --- Guardar en backend ---
+    // --- GUARDAR ---
     const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
     const token = localStorage.getItem("token");
 
+    // --- MODO EDITAR ---
     if (modo === "editar" && usuario_id) {
       const body = {
         usuario: usuario.usuario,
         email: usuario.email,
-        password: usuario.contrasenia,
         persona: {
           nombre: usuario.nombre,
           apellido: usuario.apellido,
-          documento: "",
-          telefono: "",
-          domicilio: "",
-          fecha_nac: "",
           tipoPersona_id: parseInt(usuario.tipoPersona_id),
-          activo: true,
+          activo: usuario.activo,
         },
       };
 
@@ -211,7 +174,10 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
         Swal.fire("Error", error.message, "error");
         return;
       }
-    } else {
+    }
+
+    // --- MODO AGREGAR ---
+    else {
       try {
         await registerUser({
           nombre: usuario.nombre,
@@ -310,31 +276,36 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           error={errores.usuario}
         />
 
-        <FormCampos
-          label="Contraseña *"
-          name="contrasenia"
-          type="password"
-          placeholder="Ingrese una contraseña"
-          value={usuario.contrasenia}
-          onChange={handleChange}
-          onFocus={() => limpiarError("contrasenia")}
-          className="inputProfesor"
-          error={errores.contrasenia}
-        />
+        {/* 🔥 CONTRASEÑA SOLO EN MODO AGREGAR */}
+        {modo === "agregar" && (
+          <>
+            <FormCampos
+              label="Contraseña *"
+              name="contrasenia"
+              type="password"
+              placeholder="Ingrese una contraseña"
+              value={usuario.contrasenia}
+              onChange={handleChange}
+              onFocus={() => limpiarError("contrasenia")}
+              className="inputProfesor"
+              error={errores.contrasenia}
+            />
 
-        <FormCampos
-          label="Repetir Contraseña *"
-          name="repetirContrasenia"
-          type="password"
-          placeholder="Repita la contraseña"
-          value={usuario.repetirContrasenia}
-          onChange={handleChange}
-          onFocus={() => limpiarError("repetirContrasenia")}
-          className="inputProfesor"
-          error={errores.repetirContrasenia}
-        />
+            <FormCampos
+              label="Repetir Contraseña *"
+              name="repetirContrasenia"
+              type="password"
+              placeholder="Repita la contraseña"
+              value={usuario.repetirContrasenia}
+              onChange={handleChange}
+              onFocus={() => limpiarError("repetirContrasenia")}
+              className="inputProfesor"
+              error={errores.repetirContrasenia}
+            />
+          </>
+        )}
 
-        {/* SELECT tipo de usuario */}
+        {/* SELECT TIPO DE USUARIO */}
         <label className="labelGeneral" htmlFor="tipoPersona_id">
           Tipo de Usuario *
         </label>
@@ -349,7 +320,7 @@ export default function UsuarioForm({ guardar, usuarios = [], datoInicial = null
           disabled={
             usuario.tipoPersona_id === "2" ||
             (
-              modo === "editar" && 
+              modo === "editar" &&
               datoInicial?.persona?.tipoPersona_id === 3 &&
               datoInicial?.tieneReservas
             )

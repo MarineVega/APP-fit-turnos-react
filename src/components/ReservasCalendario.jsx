@@ -155,7 +155,7 @@ export default function ReservasCalendario({ actividadSeleccionada }) {
 
     if (
       horariosData.length === 0 ||
-      profesoresData.length === 0 ||
+      //profesoresData.length === 0 ||
       horasData.length === 0
     )
       return;

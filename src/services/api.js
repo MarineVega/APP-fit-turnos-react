@@ -14,7 +14,7 @@ function getAuthHeaders(contentType = true) {
 }
 
 // --------------------------------------------
-// REGISTRO
+// REGISTRO (FIX: endpoint correcto /auth/register)
 // --------------------------------------------
 export async function registerUser({
   nombre,
@@ -24,19 +24,15 @@ export async function registerUser({
   tipoPersona_id,
 }) {
   try {
-    const response = await fetch(`${API_URL}/usuarios`, {
+    const response = await fetch(`${API_URL}/auth/register`, {
       method: "POST",
       headers: getAuthHeaders(true),
       body: JSON.stringify({
-        usuario: email,
+        nombre,
+        apellido,
         email,
         password,
-        persona: {
-          nombre,
-          apellido,
-          tipoPersona_id,
-          activo: true,
-        },
+        tipoPersona_id,
       }),
     });
 
@@ -47,7 +43,11 @@ export async function registerUser({
 
     return await response.json();
   } catch (error) {
-    throw new Error(`Error al registrar usuario: ${error.message}`);
+    throw new Error(
+      error.message === "Failed to fetch"
+        ? "No se pudo conectar con el servidor"
+        : `Error al registrar usuario: ${error.message}`
+    );
   }
 }
 
@@ -55,18 +55,25 @@ export async function registerUser({
 // LOGIN
 // --------------------------------------------
 export async function loginUser({ email, password }) {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
+  try {
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Error en el login");
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Error en el login");
+    }
+
+    return await res.json();
+  } catch (err) {
+    if (err.message === "Failed to fetch")
+      throw new Error("No se pudo conectar con el servidor");
+
+    throw err;
   }
-
-  return await res.json();
 }
 
 // --------------------------------------------

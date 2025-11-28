@@ -5,7 +5,7 @@
 <h1 align="center">🏋️‍♂️ APP FIT TURNOS</h1>
 
 <p align="center">
-  Aplicación móvil / web desarrollada en <strong>React</strong> para reservar turnos en gimnasios, gestionar horarios y acceder a disponibilidad en tiempo real.
+  Aplicación móvil / web desarrollada en <strong>React</strong> para reservar turnos en gimnasios, centros de rehabilitación, natatorios, etc., gestionar horarios y acceder a disponibilidad en tiempo real.
 </p>
 
 ---
@@ -28,28 +28,28 @@
 ## 👥 Funcionalidades por tipo de usuario
 
 ### 🔐 ADMINISTRADORES
-- Gestión de disciplinas, servicios, horarios, pagos y socios  
+- Gestión de disciplinas, servicios, horarios, pagos y socios (disponible en próxima versión)
 - Administración de profesores, entrenadores y preparadores físicos  
 - Control de disponibilidad y aforo  
-- Publicación de noticias y eventos  
-- Gestión de espacio publicitario (patrocinadores)
+- Publicación de noticias y eventos (disponible en próxima versión)  
+- Gestión de espacio publicitario (patrocinadores) (disponible en próxima versión)
 
 ---
 
 ### 🧑‍🏫 PROFESORES
-- Consulta de padrones de alumnos  
-- Modificación de horarios con notificación automática  
-- Publicación de información de eventos, fotos y resultados
+- Consulta de padrones de alumnos (disponible en próxima versión)  
+- Modificación de horarios con notificación automática (disponible en próxima versión)  
+- Publicación de información de eventos, fotos y resultados (disponible en próxima versión)
 
 ---
 
 ### 🧑‍💻 CLIENTES
-- Reserva, cancelación y modificación de turnos  
+- Reserva y cancelación de turnos  
 - Preinscripción mediante formulario (requiere aprobación del admin)  
-- Consulta y gestión de disciplinas: inscripción, baja y cantidad de días  
-- Consulta de condición de socio y puntos acumulados  
+- Consulta y gestión de disciplinas: inscripción, baja y cantidad de días (disponible en próxima versión)  
+- Consulta de condición de socio y puntos acumulados (disponible en próxima versión)  
 - Inscripción a clases según disponibilidad  
-- Consulta de clases restantes  
+- Consulta de clases restantes (disponible en próxima versión)  
 
 ---
 

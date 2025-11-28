@@ -17,12 +17,16 @@ export default function LoginForm({ onSwitch }) {
 
   // --------------------------------------------
   // VALIDAR token, pero SIN autologin
+  // Solo limpia tokens inválidos
   // --------------------------------------------
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    fetch(`${import.meta.env.VITE_API_URL}/auth/perfil`, {
+    //fetch("http://localhost:3000/auth/perfil", {    
+    //fetch("https://app-fit-turnos-be.onrender.com:3000/auth/perfil", {
+    
+    fetch(`${import.meta.env.VITE_API_URL}/auth/perfil`, {    
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
@@ -78,16 +82,9 @@ export default function LoginForm({ onSwitch }) {
     } catch (err) {
       console.error(err);
 
-      //  ERROR DE RED (Render dormido o API caída)
-      if (err.message === "Network Error" || err.code === "ERR_NETWORK") {
-        setError("No se puede conectar con el servidor. Probá más tarde.");
-        setLoading(false);
-        return;
-      }
-
       const backendMsg = err.response?.data?.message || err.message;
 
-      // Cuenta no verificada
+      // ⚠️ Cuenta no verificada
       if (backendMsg?.includes("no está verificada")) {
         Swal.fire({
           title: "Cuenta no verificada",
@@ -124,7 +121,7 @@ export default function LoginForm({ onSwitch }) {
         return;
       }
 
-      //  Otros errores
+      // ❌ Otros errores
       setError(backendMsg || "Error al iniciar sesión.");
 
     } finally {
@@ -161,6 +158,9 @@ export default function LoginForm({ onSwitch }) {
     });
   };
 
+  // --------------------------
+  // BOTÓN CANCELAR ARREGLADO
+  // --------------------------
   const cancelar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("usuarioActivo");

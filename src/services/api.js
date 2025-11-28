@@ -14,7 +14,7 @@ function getAuthHeaders(contentType = true) {
 }
 
 // --------------------------------------------
-// REGISTRO (FIX: endpoint correcto /auth/register)
+// REGISTRO
 // --------------------------------------------
 export async function registerUser({
   nombre,
@@ -24,15 +24,20 @@ export async function registerUser({
   tipoPersona_id,
 }) {
   try {
-    const response = await fetch(`${API_URL}/auth/register`, {
-      method: "POST",
+    const response = await fetch(`${API_URL}/usuarios`, {
+         method: "POST",
       headers: getAuthHeaders(true),
       body: JSON.stringify({
-        nombre,
-        apellido,
+        usuario: email,
+
         email,
         password,
-        tipoPersona_id,
+        persona: {
+          nombre,
+          apellido,
+          tipoPersona_id,
+          activo: true,
+        },
       }),
     });
 
@@ -43,37 +48,28 @@ export async function registerUser({
 
     return await response.json();
   } catch (error) {
-    throw new Error(
-      error.message === "Failed to fetch"
-        ? "No se pudo conectar con el servidor"
-        : `Error al registrar usuario: ${error.message}`
-    );
-  }
+    throw new Error(`Error al registrar usuario: ${error.message}`);
+ }
 }
 
 // --------------------------------------------
 // LOGIN
 // --------------------------------------------
 export async function loginUser({ email, password }) {
-  try {
-    const res = await fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+  const res = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || "Error en el login");
-    }
 
-    return await res.json();
-  } catch (err) {
-    if (err.message === "Failed to fetch")
-      throw new Error("No se pudo conectar con el servidor");
-
-    throw err;
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Error en el login");
   }
+
+  return await res.json();
+
 }
 
 // --------------------------------------------
@@ -123,3 +119,11 @@ export async function resendVerificationEmail(email) {
 
   return await res.json();
 }
+
+
+
+
+
+
+
+
